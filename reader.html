@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — StoryNest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+
+</head>
+
+<body class="reader-page">
+
+    <!-- =====================================================
+         READER HEADER
+    ===================================================== -->
+
+    <header class="reader-header">
+        <div class="reader-header-left">
+            <a href="index.html" class="reader-back" title="Home">←</a>
+            <div class="reader-header-info">
+                <strong id="readerNovelTitle">Loading...</strong>
+                <span id="chapterHeader">Chapter 1</span>
+            </div>
+        </div>
+
+        <div class="reader-actions">
+            <button id="readerMenuBtn" class="reader-menu-btn" onclick="toggleReaderMenu(event)" title="Menu">⋮</button>
+            <div class="reader-dropdown" id="readerDropdown">
+                <a href="#" onclick="goToNovelDetails(); return false;">📚 Novel Details</a>
+                <a href="#" onclick="goHome(); return false;">🏠 Home</a>
+                <a href="#" onclick="toggleFontSize(); return false;" id="fontSizeBtn">🔤 18px</a>
+                <a href="#" onclick="toggleTheme(); return false;" id="themeBtn">🌙 Dark Mode</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- =====================================================
+         READING PROGRESS BAR
+    ===================================================== -->
+
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
+    <main class="reader-container">
+        <div class="reader-page-content" id="readerPageContent">
+            <p>Loading chapter...</p>
+        </div>
+    </main>
+
+    <!-- =====================================================
+         AD SPACE - EMPTY (Reserved for future ads)
+    ===================================================== -->
+
+    <div class="reader-ad-space" id="readerAdSpace"></div>
+
+    <!-- =====================================================
+         SCRIPTS
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/reader.js"></script>
+
+    <!-- Reader Menu & Controls -->
+    <script>
+        // =====================================================
+        // MENU TOGGLE
+        // =====================================================
+
+        function toggleReaderMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('readerDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('readerDropdown');
+            const menuBtn = document.getElementById('readerMenuBtn');
+            if (dropdown && menuBtn && !dropdown.contains(e.target) && e.target !== menuBtn) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+
+        function goToNovelDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) {
+                window.location.href = 'novel.html?id=' + id;
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // =====================================================
+        // FONT SIZE
+        // =====================================================
+
+        let currentFontSize = parseInt(localStorage.getItem('readerFontSize')) || 18;
+
+        function toggleFontSize() {
+            const sizes = [16, 18, 20, 22, 24, 26];
+            let index = sizes.indexOf(currentFontSize);
+            if (index === -1 || index === sizes.length - 1) {
+                currentFontSize = sizes[0];
+            } else {
+                currentFontSize = sizes[index + 1];
+            }
+
+            applyFontSize(currentFontSize);
+            localStorage.setItem('readerFontSize', currentFontSize);
+
+            const btn = document.getElementById('fontSizeBtn');
+            if (btn) {
+                btn.textContent = '🔤 ' + currentFontSize + 'px';
+            }
+        }
+
+        function applyFontSize(size) {
+            const content = document.querySelector('.reader-page-content');
+            const paragraphs = document.querySelectorAll('.reader-page-content p');
+
+            if (content) content.style.fontSize = size + 'px';
+            paragraphs.forEach(p => { p.style.fontSize = size + 'px'; });
+
+            // Notify reader.js so it can recalculate progress
+            window.dispatchEvent(new CustomEvent('readerFontSizeChanged', { detail: { size } }));
+        }
+
+        // =====================================================
+        // THEME (Dark / Light)
+        // =====================================================
+
+        // Always start in light mode — do NOT read from localStorage on load
+        let currentTheme = 'light';
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+
+            if (currentTheme === 'light') {
+                body.classList.add('dark-theme');
+                currentTheme = 'dark';
+                if (btn) btn.textContent = '☀️ Light Mode';
+            } else {
+                body.classList.remove('dark-theme');
+                currentTheme = 'light';
+                if (btn) btn.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // =====================================================
+        // RESTORE PREFERENCES (font size only — theme always starts light)
+        // =====================================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedSize = localStorage.getItem('readerFontSize');
+            if (savedSize) {
+                currentFontSize = parseInt(savedSize);
+                applyFontSize(currentFontSize);
+                const btn = document.getElementById('fontSizeBtn');
+                if (btn) btn.textContent = '🔤 ' + currentFontSize + 'px';
+            }
+
+            // Explicitly ensure light mode on load
+            document.body.classList.remove('dark-theme');
+            currentTheme = 'light';
+            const themeBtn = document.getElementById('themeBtn');
+            if (themeBtn) themeBtn.textContent = '🌙 Dark Mode';
+        });
+
+        console.log('📖 Scrolling reader controls loaded.');
+    </script>
+
+</body>
+</html>
