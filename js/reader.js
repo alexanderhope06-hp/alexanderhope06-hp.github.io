@@ -25,28 +25,17 @@ const progressBar = document.getElementById("readingProgress");
    ===================================================== */
 
 function unlockScrolling() {
-    // Add the fix class so CSS knows to keep the viewport as the
-    // scrolling container (required for position:fixed on mobile).
-    document.documentElement.classList.add("reader-scroll-fix");
-    document.body.classList.add("reader-scroll-fix");
+    // Make sure the browser can scroll the normal page.
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
 
-    // Force page-level scrolling so position:fixed works.
-    document.documentElement.style.overflow = "visible";
-    document.documentElement.style.overflowX = "hidden";
+    // Prevent CSS from accidentally turning the page into
+    // a fixed/non-scrollable reader.
     document.documentElement.style.overflowY = "auto";
-
-    document.body.style.overflow = "visible";
-    document.body.style.overflowX = "hidden";
     document.body.style.overflowY = "auto";
 
-    // Kill any transform/filter that would break position:fixed.
-    document.documentElement.style.transform = "none";
-    document.documentElement.style.filter = "none";
-    document.documentElement.style.perspective = "none";
-    document.body.style.transform = "none";
-    document.body.style.filter = "none";
-    document.body.style.perspective = "none";
-
+    // Do NOT use touch-action: none.
+    // touch-action: auto allows normal finger scrolling.
     document.documentElement.style.touchAction = "auto";
     document.body.style.touchAction = "auto";
 
@@ -54,8 +43,6 @@ function unlockScrolling() {
         readerPageContent.style.overflow = "visible";
         readerPageContent.style.overflowY = "visible";
         readerPageContent.style.touchAction = "auto";
-        readerPageContent.style.transform = "none";
-        readerPageContent.style.filter = "none";
     }
 }
 

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" class="reader-scroll-fix">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,329 +7,10 @@
     <title>Reading — StoryNest</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="image/fav.png">
-    <script src="https://unprofessionalginger.com/68/65/0b/68650b66314d58ba9f252150edce2440.js"></script>
-    <style>
-        /* =====================================================
-           FIXED BOTTOM AD BAR - ALWAYS VISIBLE (MOBILE FIX)
-           ===================================================== */
-        .storynest-bottom-ad {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            /* iOS safe area for notch/home bar */
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            z-index: 2147483647; /* max z-index to beat everything */
-            background: #ffffff;
-            border-top: 1px solid #eaeaea;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
-            display: flex !important; /* force flex even if theme css overrides */
-            align-items: center;
-            justify-content: center;
-            min-height: 60px;
-            height: auto;
-            width: 100%;
-            box-sizing: border-box;
-            /* Force hardware acceleration / new stacking context (fixes iOS fixed bug) */
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            will-change: transform;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            transition: transform 0.25s ease, opacity 0.25s ease;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
 
-        body.dark-theme .storynest-bottom-ad {
-            background: #1e1e24;
-            border-top-color: #333;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .storynest-bottom-ad.hidden {
-            transform: translateY(110%) translateZ(0);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .storynest-bottom-ad .close-ad {
-            position: absolute;
-            right: 6px;
-            top: 6px;
-            background: rgba(0, 0, 0, 0.08);
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
-            line-height: 1;
-            cursor: pointer;
-            color: #444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            z-index: 10;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body.dark-theme .storynest-bottom-ad .close-ad {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ddd;
-        }
-
-        .storynest-bottom-ad .close-ad:hover,
-        .storynest-bottom-ad .close-ad:active {
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        body.dark-theme .storynest-bottom-ad .close-ad:hover,
-        body.dark-theme .storynest-bottom-ad .close-ad:active {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* Force the ad container to have a real, non-zero height */
-        .storynest-bottom-ad .storynest-ad-content {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 340px;
-            min-height: 50px;
-            height: 50px;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Force iframes inside the ad to show */
-        .storynest-bottom-ad .storynest-ad-content iframe,
-        .storynest-bottom-ad iframe {
-            display: block !important;
-            width: 320px !important;
-            height: 50px !important;
-            max-width: 100% !important;
-            border: 0;
-            margin: 0 auto;
-        }
-
-        /* Fallback: if ad network injects its own wrapper */
-        .storynest-bottom-ad > div {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-
-        /* =====================================================
-           INLINE AD (inside content) - styling
-           ===================================================== */
-        .storynest-inline-ad {
-            margin: 32px auto;
-            padding: 14px;
-            background: #f8f8fa;
-            border-radius: 12px;
-            border: 1px solid #eaeaea;
-            text-align: center;
-            max-width: 100%;
-            min-height: 60px;
-            overflow: hidden;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        body.dark-theme .storynest-inline-ad {
-            background: #25252e;
-            border-color: #3a3a44;
-        }
-
-        .storynest-inline-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #999;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        body.dark-theme .storynest-inline-label {
-            color: #777;
-        }
-
-        .storynest-inline-ad iframe {
-            display: block !important;
-            width: 320px !important;
-            height: 50px !important;
-            max-width: 100% !important;
-            border: 0;
-            margin: 0 auto;
-        }
-
-        /* =====================================================
-           READER PAGE – make room for bottom ad
-           ===================================================== */
-        body.reader-page {
-            padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-            transition: padding-bottom 0.25s;
-        }
-
-        body.reader-page.bottom-ad-hidden {
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-        }
-
-        /* =====================================================
-           DARK THEME – general reader overrides
-           ===================================================== */
-        body.dark-theme {
-            background: #121218;
-            color: #e4e4ec;
-        }
-
-        body.dark-theme .reader-header {
-            background: #1a1a22;
-            border-bottom-color: #2a2a34;
-        }
-
-        body.dark-theme .reader-header-info strong {
-            color: #e4e4ec;
-        }
-
-        body.dark-theme .reader-header-info span {
-            color: #9a9ab0;
-        }
-
-        body.dark-theme .reader-back,
-        body.dark-theme .reader-menu-btn {
-            color: #e4e4ec;
-        }
-
-        body.dark-theme .reader-dropdown {
-            background: #1e1e28;
-            border-color: #2e2e3a;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-        }
-
-        body.dark-theme .reader-dropdown a {
-            color: #d0d0e0;
-        }
-
-        body.dark-theme .reader-dropdown a:hover {
-            background: #2a2a38;
-        }
-
-        body.dark-theme .reader-page-content {
-            color: #d8d8e6;
-        }
-
-        body.dark-theme .reader-page-content .page-chapter-title {
-            color: #f0f0fa;
-        }
-
-        body.dark-theme .reader-page-content p {
-            color: #c8c8d8;
-        }
-
-        body.dark-theme .reading-progress {
-            background: #2a2a3a;
-        }
-
-        body.dark-theme .reading-progress::after {
-            background: #7c7cff;
-        }
-
-        /* Progress bar */
-        .reading-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: #eaeaea;
-            z-index: 10000;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        body.dark-theme .reading-progress {
-            background: #2a2a3a;
-        }
-
-        .reading-progress::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: #6c6cff;
-            border-radius: 0 2px 2px 0;
-        }
-
-        /* Reader header default (light) */
-        .reader-header {
-            background: #ffffff;
-            border-bottom: 1px solid #eaeaea;
-        }
-
-        .reader-back {
-            color: #222;
-        }
-
-        .reader-menu-btn {
-            color: #222;
-        }
-
-        .reader-dropdown {
-            background: #ffffff;
-            border: 1px solid #eaeaea;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        .reader-dropdown a {
-            color: #333;
-        }
-
-        .reader-dropdown a:hover {
-            background: #f5f5f5;
-        }
-
-        /* =====================================================
-           MOBILE-SPECIFIC FIXES
-           ===================================================== */
-        @media (max-width: 768px) {
-            .storynest-bottom-ad {
-                min-height: 55px;
-                padding: 6px 10px;
-                padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-            }
-
-            .storynest-bottom-ad .storynest-ad-content {
-                height: 50px;
-                min-height: 50px;
-                max-width: 100%;
-            }
-
-            .storynest-bottom-ad .close-ad {
-                width: 26px;
-                height: 26px;
-                font-size: 15px;
-                right: 4px;
-                top: 4px;
-            }
-
-            /* Make sure the bar sits above any other mobile UI */
-            body.reader-page {
-                padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
-            }
-        }
-    </style>
 </head>
 
-<body class="reader-page reader-scroll-fix">
-
-    <!-- =====================================================
-         READING PROGRESS BAR (fixed at top)
-    ===================================================== -->
-
-    <div class="reading-progress" id="readingProgress"></div>
+<body class="reader-page">
 
     <!-- =====================================================
          READER HEADER
@@ -356,6 +37,12 @@
     </header>
 
     <!-- =====================================================
+         READING PROGRESS BAR
+    ===================================================== -->
+
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <!-- =====================================================
          MAIN CONTENT
     ===================================================== -->
 
@@ -365,37 +52,11 @@
         </div>
     </main>
 
-<!-- =====================================================
-     STORYNEST FIXED BOTTOM AD
-===================================================== -->
+    <!-- =====================================================
+         AD SPACE - EMPTY (Reserved for future ads)
+    ===================================================== -->
 
-<div class="storynest-bottom-ad" id="storynestBottomAd">
-    <button class="close-ad" onclick="closeBottomAd()" aria-label="Close advertisement">
-        ×
-    </button>
-
-    <div class="storynest-ad-content">
-        <script>
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-
-        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
-
-        <!-- Fallback visible placeholder so the bar never collapses on mobile -->
-        <noscript>
-            <div style="width:320px;height:50px;background:#f0f0f5;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">
-                Advertisement
-            </div>
-        </noscript>
-    </div>
-</div>
-
+    <div class="reader-ad-space" id="readerAdSpace"></div>
 
     <!-- =====================================================
          SCRIPTS
@@ -405,7 +66,7 @@
     <script src="js/supabase.js"></script>
     <script src="js/reader.js"></script>
 
-    <!-- Reader Menu, Controls, Theme, Ads -->
+    <!-- Reader Menu & Controls -->
     <script>
         // =====================================================
         // MENU TOGGLE
@@ -479,10 +140,10 @@
         }
 
         // =====================================================
-        // THEME (Dark / Light) — WORKING TOGGLE
+        // THEME (Dark / Light)
         // =====================================================
 
-        // Always start in light mode
+        // Always start in light mode — do NOT read from localStorage on load
         let currentTheme = 'light';
 
         function toggleTheme() {
@@ -499,27 +160,6 @@
                 if (btn) btn.textContent = '🌙 Dark Mode';
             }
         }
-
-        // =====================================================
-        // BOTTOM AD – close / show
-        // =====================================================
-
-        function closeBottomAd() {
-            const ad = document.getElementById('storynestBottomAd');
-            if (ad) {
-                ad.classList.add('hidden');
-                document.body.classList.add('bottom-ad-hidden');
-            }
-        }
-
-        // Make sure the bottom ad exists and is visible on load
-        document.addEventListener('DOMContentLoaded', function () {
-            const ad = document.getElementById('storynestBottomAd');
-            if (ad) {
-                ad.classList.remove('hidden');
-                document.body.classList.remove('bottom-ad-hidden');
-            }
-        });
 
         // =====================================================
         // RESTORE PREFERENCES (font size only — theme always starts light)
@@ -539,213 +179,10 @@
             currentTheme = 'light';
             const themeBtn = document.getElementById('themeBtn');
             if (themeBtn) themeBtn.textContent = '🌙 Dark Mode';
-
-            // Show bottom ad (in case it was hidden from previous session)
-            const ad = document.getElementById('storynestBottomAd');
-            if (ad) {
-                ad.classList.remove('hidden');
-                document.body.classList.remove('bottom-ad-hidden');
-            }
         });
 
         console.log('📖 Scrolling reader controls loaded.');
     </script>
 
-    <!-- =====================================================
-         INLINE AD INJECTION – appears after reading for some time
-    ===================================================== -->
-    <script>
-        (function () {
-            // Configuration
-            const READING_TIME_BEFORE_AD_MS = 15000; // 15 seconds
-            const MIN_PARAGRAPHS_BEFORE_AD = 3;
-            let inlineAdInserted = false;
-            let readingTimer = null;
-
-            // The inline ad HTML (same as provided, but we'll inject it)
-            function createInlineAdHTML() {
-                return `
-                    <div class="storynest-inline-ad" id="storynestInlineAd">
-                        <div class="storynest-inline-label">Advertisement</div>
-                        <script>
-                            atOptions = {
-                                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                                'format' : 'iframe',
-                                'height' : 50,
-                                'width' : 320,
-                                'params' : {}
-                            };
-                        <\/script>
-                        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"><\/script>
-                    </div>
-                `;
-            }
-
-            // Insert the inline ad into the reader content after a few paragraphs
-            function insertInlineAd() {
-                if (inlineAdInserted) return;
-                const content = document.getElementById('readerPageContent');
-                if (!content) return;
-
-                const paragraphs = content.querySelectorAll('p');
-                if (paragraphs.length < MIN_PARAGRAPHS_BEFORE_AD) return;
-
-                // Pick an insertion point: after the 3rd paragraph or middle
-                let insertAfterIndex = Math.min(
-                    MIN_PARAGRAPHS_BEFORE_AD,
-                    Math.floor(paragraphs.length / 2)
-                );
-                if (insertAfterIndex < 1) insertAfterIndex = 1;
-
-                const targetParagraph = paragraphs[insertAfterIndex - 1];
-                if (!targetParagraph) return;
-
-                // Create container for the ad
-                const adContainer = document.createElement('div');
-                adContainer.innerHTML = createInlineAdHTML();
-
-                // Insert after target paragraph
-                targetParagraph.parentNode.insertBefore(adContainer, targetParagraph.nextSibling);
-
-                // Re-run scripts inside the injected ad (since innerHTML doesn't execute scripts)
-                const scripts = adContainer.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    if (oldScript.src) {
-                        newScript.src = oldScript.src;
-                    } else {
-                        newScript.textContent = oldScript.textContent;
-                    }
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-
-                inlineAdInserted = true;
-                console.log('📢 Inline ad inserted after', insertAfterIndex, 'paragraphs');
-            }
-
-            // Start the reading timer when the page is ready
-            function startReadingTimer() {
-                if (readingTimer) clearTimeout(readingTimer);
-                readingTimer = setTimeout(() => {
-                    insertInlineAd();
-                }, READING_TIME_BEFORE_AD_MS);
-            }
-
-            // Observe content changes (when chapter loads)
-            const observer = new MutationObserver(function (mutations) {
-                const content = document.getElementById('readerPageContent');
-                if (content && content.querySelectorAll('p').length > 0) {
-                    // Reset inline ad flag on chapter change
-                    inlineAdInserted = false;
-                    // Remove any existing inline ad
-                    const existingAd = document.getElementById('storynestInlineAd');
-                    if (existingAd) existingAd.remove();
-                    // Start timer again
-                    startReadingTimer();
-                }
-            });
-
-            // Start observing once DOM is ready
-            document.addEventListener('DOMContentLoaded', function () {
-                const content = document.getElementById('readerPageContent');
-                if (content) {
-                    observer.observe(content, { childList: true, subtree: true });
-                }
-                // Also start timer initially if content already loaded
-                if (content && content.querySelectorAll('p').length > 0) {
-                    startReadingTimer();
-                }
-            });
-
-            // Expose a function to manually trigger (optional)
-            window.__insertInlineAd = insertInlineAd;
-        })();
-
-</script>
-
-
-
-<script>
-    // =====================================================
-    // MOBILE BOTTOM AD WATCHDOG
-    // Ensures the bar stays visible and doesn't collapse
-    // =====================================================
-    (function () {
-        function keepAdVisible() {
-            const ad = document.getElementById('storynestBottomAd');
-            if (!ad) return;
-
-            // Force display and visibility
-            ad.style.display = 'flex';
-            ad.style.visibility = 'visible';
-            ad.style.opacity = '1';
-            ad.style.position = 'fixed';
-            ad.style.bottom = '0';
-            ad.style.left = '0';
-            ad.style.right = '0';
-            ad.style.zIndex = '2147483647';
-
-            // Ensure content area has height
-            const content = ad.querySelector('.storynest-ad-content');
-            if (content && content.offsetHeight < 20) {
-                content.style.minHeight = '50px';
-                content.style.height = '50px';
-            }
-
-            // If the ad iframe hasn't loaded after 3s, show a fallback
-            if (content && content.querySelectorAll('iframe').length === 0) {
-                // Ad network may take a moment — only show fallback after timeout
-                if (!content.dataset.fallbackShown) {
-                    setTimeout(() => {
-                        if (content.querySelectorAll('iframe').length === 0 && !content.dataset.fallbackShown) {
-                            content.dataset.fallbackShown = 'true';
-                            const fb = document.createElement('div');
-                            fb.style.cssText = 'width:320px;height:50px;background:#f0f0f5;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;';
-                            fb.textContent = 'Advertisement';
-                            content.appendChild(fb);
-                        }
-                    }, 3000);
-                }
-            }
-
-            // Only restore padding when not hidden
-            if (!ad.classList.contains('hidden')) {
-                document.body.classList.remove('bottom-ad-hidden');
-            }
-        }
-
-        // Run on load
-        document.addEventListener('DOMContentLoaded', keepAdVisible);
-
-        // Re-check after ads load
-        window.addEventListener('load', keepAdVisible);
-
-        // Re-check on resize (mobile orientation change / keyboard)
-        window.addEventListener('resize', keepAdVisible);
-
-        // Re-check on scroll end (iOS sometimes drops fixed elements)
-        let scrollTimeout;
-        window.addEventListener('scroll', function () {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(keepAdVisible, 150);
-        }, { passive: true });
-
-        // Also watch for the ad network removing our bar
-        const observer = new MutationObserver(function () {
-            const ad = document.getElementById('storynestBottomAd');
-            if (ad && !ad.classList.contains('hidden') && ad.style.display === 'none') {
-                ad.style.display = 'flex';
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const ad = document.getElementById('storynestBottomAd');
-            if (ad) {
-                observer.observe(ad, { attributes: true, attributeFilter: ['style', 'class'] });
-            }
-        });
-    })();
-    </script>
-
 </body>
-
 </html>
