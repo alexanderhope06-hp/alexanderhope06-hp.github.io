@@ -26,6 +26,26 @@
                 <button class="login-btn">Login</button>
             </a>
         </div>
+
+</header>
+
+<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
+<div class="storynest-top-ad">
+    <div class="storynest-top-ad-inner">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '6e386924edca4892ed33ab2caa248000',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+    </div>
+</div>
+
+
     </header>
 
     <main class="page-container">
@@ -115,6 +135,45 @@
         </div>
         <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
     </footer>
+
+<!-- ================= STICKY BOTTOM AD BAR ================= -->
+<div class="storynest-bottom-ad" id="storynestBottomAd">
+    <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
+    <div class="storynest-ad-content">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+    </div>
+</div>
+
+<script>
+(function () {
+    var adBar = document.getElementById('storynestBottomAd');
+    var closeBtn = document.getElementById('closeBottomAd');
+    if (!adBar || !closeBtn) return;
+
+    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
+        adBar.classList.add('hidden');
+        document.body.classList.add('bottom-ad-hidden');
+        return;
+    }
+
+    closeBtn.addEventListener('click', function () {
+        adBar.classList.add('hidden');
+        document.body.classList.add('bottom-ad-hidden');
+        sessionStorage.setItem('storynest_ad_closed', '1');
+    });
+})();
+</script>
+
+
 
 </body>
 </html>
