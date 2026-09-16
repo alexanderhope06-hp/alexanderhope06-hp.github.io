@@ -154,11 +154,17 @@ function displayChapter() {
 
     renderChapter(chapter);
 
+    // =================================================
+    // TRACK IMPRESSION FOR REVENUE ATTRIBUTION
+    // =================================================
+    if (novel && novel.id && novel.author_id && chapter.id) {
+        trackChapterImpression(novel.id, chapter.id, novel.author_id);
+    }
+
     updateURL();
 
     restorePosition();
 }
-
 
 /* =====================================================
    RENDER CHAPTER
@@ -764,4 +770,30 @@ function escapeHTML(value) {
     div.textContent = value ?? "";
 
     return div.innerHTML;
+}
+
+
+
+
+// =====================================================
+// TRACK IMPRESSION FOR REVENUE ATTRIBUTION
+// =====================================================
+
+async function trackChapterImpression(novelId, chapterId, authorId) {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        await supabaseClient
+            .from('novel_impressions')
+            .insert({
+                novel_id: novelId,
+                author_id: authorId,
+                chapter_id: chapterId || null,
+                page: 'reader',
+                user_id: session?.user?.id || null
+            });
+    } catch (err) {
+        // Silent — never break reading because of tracking
+        console.warn('Impression tracking failed:', err);
+    }
 }
