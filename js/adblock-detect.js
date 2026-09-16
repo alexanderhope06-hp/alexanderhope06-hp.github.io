@@ -1,188 +1,581 @@
 /* =====================================================
-   STORYNEST — AD BLOCK DETECTION  (v3 — bulletproof)
-   Detects uBlock / AdBlock / Brave Shields / AdGuard DNS
-   via DOM bait. Runs safely after DOM is ready.
+   STORYNEST — AD BLOCK DETECTION
+   NOTICE BANNER + MODAL
    ===================================================== */
 
-(function () {
-    'use strict';
 
-    // ---------- CONFIG ----------
-    var CHECK_DELAY      = 1500;    // ms after load to measure bait
-    var MESSAGE_DURATION = 15000;   // ms banner stays visible
-    var SESSION_HIDE_KEY = 'storynest_adblock_hidden_session';
-    var DEBUG            = false;   // set true to see logs
+/* =====================================================
+   BOTTOM NOTICE BANNER
+   ===================================================== */
 
-    function log() {
-        if (DEBUG && window.console) {
-            console.log.apply(console, ['[adblock-detect]'].concat([].slice.call(arguments)));
-        }
+.storynest-adblock-banner {
+    position: fixed;
+
+    left: 50%;
+    bottom: 90px;
+
+    width: calc(100% - 32px);
+    max-width: 520px;
+
+    padding: 16px 18px;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    box-sizing: border-box;
+
+    /*
+     * Very high z-index so the notice stays above
+     * StoryNest content and the sticky ad.
+     */
+    z-index: 2147483000;
+
+    /*
+     * Hidden state
+     */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translate(-50%, 40px);
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0.35s ease;
+
+    /*
+     * Appearance
+     */
+    background: rgba(23, 23, 31, 0.97);
+
+    border: 1px solid rgba(155, 92, 255, 0.35);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.45);
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.55;
+
+    /*
+     * Prevent content from escaping the rounded box.
+     */
+    overflow: hidden;
+
+    /*
+     * Glass effect where supported.
+     */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+
+/* ---------- VISIBLE STATE ---------- */
+
+.storynest-adblock-banner.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform: translate(-50%, 0);
+}
+
+
+/* =====================================================
+   ICON
+   ===================================================== */
+
+.storynest-adblock-icon {
+    flex: 0 0 auto;
+
+    width: 26px;
+    height: 26px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    line-height: 1;
+
+    margin-top: 1px;
+}
+
+
+/* =====================================================
+   BANNER CONTENT
+   ===================================================== */
+
+.storynest-adblock-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.storynest-adblock-body strong {
+    display: block;
+
+    margin: 0 0 4px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+.storynest-adblock-body p {
+    margin: 0;
+
+    color: #b8b8c4;
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+
+/* =====================================================
+   ALLOW ADS LINK
+   ===================================================== */
+
+.storynest-adblock-body a {
+    color: #c39aff;
+
+    font-weight: 600;
+
+    text-decoration: underline;
+    text-decoration-color: rgba(195, 154, 255, 0.4);
+
+    text-underline-offset: 3px;
+
+    transition:
+        color 0.2s ease,
+        text-decoration-color 0.2s ease;
+}
+
+.storynest-adblock-body a:hover {
+    color: #e0c9ff;
+    text-decoration-color: #e0c9ff;
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+   ===================================================== */
+
+.storynest-adblock-close {
+    flex: 0 0 auto;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    color: #aaa;
+
+    font-size: 14px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.storynest-adblock-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.storynest-adblock-close:active {
+    transform: scale(0.92);
+}
+
+
+/* =====================================================
+   MODAL BACKDROP
+   ===================================================== */
+
+.storynest-adblock-modal {
+    position: fixed;
+
+    inset: 0;
+
+    /*
+     * Must be above the banner.
+     */
+    z-index: 2147483001;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.70);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+
+    /*
+     * Prevent the page behind the modal from
+     * accidentally receiving touches.
+     */
+    overscroll-behavior: contain;
+}
+
+
+/* ---------- VISIBLE MODAL ---------- */
+
+.storynest-adblock-modal.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   MODAL BOX
+   ===================================================== */
+
+.storynest-adblock-modal-box {
+    position: relative;
+
+    width: 100%;
+    max-width: 480px;
+
+    max-height: min(85vh, 700px);
+
+    box-sizing: border-box;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 28px 26px 22px;
+
+    border-radius: 16px;
+
+    background: #17171f;
+
+    border: 1px solid #35353f;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.60);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    /*
+     * Makes scrolling smoother on mobile.
+     */
+    -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior: contain;
+}
+
+
+/* =====================================================
+   MODAL HEADING
+   ===================================================== */
+
+.storynest-adblock-modal-box h3 {
+    margin: 0 0 10px;
+
+    color: #ffffff;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+
+/* =====================================================
+   MODAL PARAGRAPHS
+   ===================================================== */
+
+.storynest-adblock-modal-box p {
+    margin: 0 0 12px;
+
+    color: #b8b8c4;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   MODAL LIST
+   ===================================================== */
+
+.storynest-adblock-modal-box ul {
+    margin: 0 0 16px;
+    padding: 0;
+
+    list-style: none;
+
+    display: grid;
+    gap: 10px;
+}
+
+
+/* =====================================================
+   MODAL LIST ITEMS
+   ===================================================== */
+
+.storynest-adblock-modal-box li {
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    color: #d0d0d8;
+
+    background: #1c1c25;
+
+    border: 1px solid #26262f;
+    border-radius: 10px;
+
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.storynest-adblock-modal-box li strong {
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   THANK-YOU MESSAGE
+   ===================================================== */
+
+.storynest-adblock-modal-thanks {
+    margin: 0 !important;
+
+    text-align: center;
+
+    color: #c39aff !important;
+
+    font-size: 13px !important;
+    font-weight: 600;
+
+    line-height: 1.5 !important;
+}
+
+
+/* =====================================================
+   MODAL CLOSE BUTTON
+   ===================================================== */
+
+.storynest-adblock-modal-close {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    color: #aaa;
+
+    font-size: 14px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.storynest-adblock-modal-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.storynest-adblock-modal-close:active {
+    transform: scale(0.92);
+}
+
+
+/* =====================================================
+   MOBILE — 480px AND BELOW
+   ===================================================== */
+
+@media (max-width: 480px) {
+
+    .storynest-adblock-banner {
+        left: 50%;
+
+        /*
+         * Keep the notice above the sticky ad.
+         */
+        bottom: 84px;
+
+        width: calc(100% - 20px);
+
+        padding: 13px 13px;
+
+        gap: 10px;
+
+        border-radius: 12px;
+
+        font-size: 13px;
     }
 
-    // ---------- BAIL OUT IF ALREADY DISMISSED ----------
-    if (sessionStorage.getItem(SESSION_HIDE_KEY) === '1') {
-        log('already dismissed this session');
-        return;
+
+    .storynest-adblock-icon {
+        width: 23px;
+        height: 23px;
+
+        font-size: 20px;
     }
 
-    // ---------- RUN AFTER DOM IS READY ----------
-    function init() {
-        log('init, body exists:', !!document.body);
 
-        // ---------- CREATE THE BAIT ----------
-        var bait = document.createElement('div');
-        bait.id = 'storynest-ad-bait';
-        // Multiple ad-like class names so most blockers catch it
-        bait.className = 'adsbox ad-banner advertisement sponsored-ad text-ad ad-placement banner-ads';
-        bait.setAttribute('data-ad-slot', 'storynest');
-        bait.style.cssText = [
-            'position:absolute',
-            'left:-9999px',
-            'top:-9999px',
-            'width:12px',
-            'height:12px',
-            'pointer-events:none'
-        ].join(';');
-        bait.innerHTML = '&nbsp;';
-        document.body.appendChild(bait);
-
-        log('bait inserted');
-
-        // ---------- CHECK AFTER DELAY ----------
-        setTimeout(function () {
-            var blocked = false;
-            var details = {};
-
-            try {
-                var style  = window.getComputedStyle(bait);
-                var h      = bait.offsetHeight;
-                var w      = bait.offsetWidth;
-
-                details = {
-                    offsetHeight: h,
-                    offsetWidth:  w,
-                    display:      style.display,
-                    visibility:   style.visibility,
-                    opacity:      style.opacity
-                };
-
-                blocked =
-                    h === 0 ||
-                    w === 0 ||
-                    style.display    === 'none' ||
-                    style.visibility === 'hidden' ||
-                    parseFloat(style.opacity) === 0;
-            } catch (e) {
-                log('measurement error (treat as not blocked):', e);
-                blocked = false;
-            }
-
-            log('bait measurement:', details, '→ blocked:', blocked);
-
-            if (bait.parentNode) bait.parentNode.removeChild(bait);
-
-            if (blocked) {
-                showAdBlockMessage();
-            }
-        }, CHECK_DELAY);
+    .storynest-adblock-body strong {
+        font-size: 13px;
     }
 
-    // ---------- ENTRY POINT ----------
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+
+    .storynest-adblock-body p {
+        font-size: 12.5px;
+        line-height: 1.5;
     }
 
-    // ---------- THE MESSAGE ----------
-    function showAdBlockMessage() {
-        log('showing banner');
-        if (document.getElementById('storynest-adblock-banner')) return;
 
-        var banner = document.createElement('div');
-        banner.id = 'storynest-adblock-banner';
-        banner.className = 'storynest-adblock-banner';
+    .storynest-adblock-close {
+        width: 26px;
+        height: 26px;
 
-        banner.innerHTML = [
-            '<div class="storynest-adblock-icon">🛡️</div>',
-            '<div class="storynest-adblock-body">',
-            '    <strong>Ads help keep StoryNest free</strong>',
-            '    <p>',
-            '        We noticed you have an ad blocker enabled.',
-            '        StoryNest is 100% free thanks to the ads we show.',
-            '        If you enjoy reading here, please consider',
-            '        <a href="#" id="storynest-adblock-how">whitelisting us</a>',
-            '        or disabling your blocker for this site.',
-            '    </p>',
-            '</div>',
-            '<button class="storynest-adblock-close" aria-label="Close">✕</button>'
-        ].join('');
-
-        document.body.appendChild(banner);
-
-        requestAnimationFrame(function () {
-            banner.classList.add('visible');
-        });
-
-        banner.querySelector('.storynest-adblock-close').addEventListener('click', function () {
-            banner.classList.remove('visible');
-            sessionStorage.setItem(SESSION_HIDE_KEY, '1');
-            setTimeout(function () {
-                if (banner.parentNode) banner.parentNode.removeChild(banner);
-            }, 400);
-        });
-
-        banner.querySelector('#storynest-adblock-how').addEventListener('click', function (e) {
-            e.preventDefault();
-            showHowToWhitelist();
-        });
-
-        setTimeout(function () {
-            if (banner.parentNode) {
-                banner.classList.remove('visible');
-                setTimeout(function () {
-                    if (banner.parentNode) banner.parentNode.removeChild(banner);
-                }, 400);
-            }
-        }, MESSAGE_DURATION);
+        font-size: 13px;
     }
 
-    // ---------- HOW-TO MODAL ----------
-    function showHowToWhitelist() {
-        var modal = document.createElement('div');
-        modal.className = 'storynest-adblock-modal';
-        modal.innerHTML = [
-            '<div class="storynest-adblock-modal-box">',
-            '    <button class="storynest-adblock-modal-close" aria-label="Close">✕</button>',
-            '    <h3>How to whitelist StoryNest</h3>',
-            '    <p>Choose your blocker below and add <strong>storynest</strong> to the allow list:</p>',
-            '    <ul>',
-            '        <li><strong>AdGuard DNS</strong> — Open AdGuard app → DNS Protection → turn off, or switch to "Default" DNS.</li>',
-            '        <li><strong>uBlock Origin</strong> — Click the icon → click the big power button so it turns grey.</li>',
-            '        <li><strong>AdBlock / AdBlock Plus</strong> — Click the icon → "Don\'t run on this site".</li>',
-            '        <li><strong>Brave Browser</strong> — Click the Brave shield icon → set Shields to "Down".</li>',
-            '        <li><strong>iPhone / Android</strong> — If using a private DNS profile, switch back to automatic DNS in your device settings.</li>',
-            '    </ul>',
-            '    <p class="storynest-adblock-modal-thanks">Thank you for supporting StoryNest 💜</p>',
-            '</div>'
-        ].join('');
 
-        document.body.appendChild(modal);
-        requestAnimationFrame(function () {
-            modal.classList.add('visible');
-        });
-
-        function close() {
-            modal.classList.remove('visible');
-            setTimeout(function () {
-                if (modal.parentNode) modal.parentNode.removeChild(modal);
-            }, 300);
-        }
-
-        modal.querySelector('.storynest-adblock-modal-close').addEventListener('click', close);
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) close();
-        });
+    .storynest-adblock-modal {
+        padding: 12px;
     }
 
-})();
+
+    .storynest-adblock-modal-box {
+        max-height: 90vh;
+
+        padding: 24px 18px 18px;
+
+        border-radius: 14px;
+    }
+
+
+    .storynest-adblock-modal-box h3 {
+        padding-right: 30px;
+
+        font-size: 17px;
+    }
+
+
+    .storynest-adblock-modal-box p {
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+
+    .storynest-adblock-modal-box li {
+        padding: 11px 12px;
+
+        font-size: 12.5px;
+        line-height: 1.5;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL PHONES — 360px AND BELOW
+   ===================================================== */
+
+@media (max-width: 360px) {
+
+    .storynest-adblock-banner {
+        bottom: 78px;
+
+        width: calc(100% - 14px);
+
+        padding: 11px;
+
+        gap: 8px;
+    }
+
+
+    .storynest-adblock-icon {
+        width: 20px;
+        height: 20px;
+
+        font-size: 18px;
+    }
+
+
+    .storynest-adblock-body strong {
+        font-size: 12.5px;
+    }
+
+
+    .storynest-adblock-body p {
+        font-size: 12px;
+    }
+
+
+    .storynest-adblock-modal-box {
+        padding: 22px 15px 16px;
+    }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .storynest-adblock-banner,
+    .storynest-adblock-modal,
+    .storynest-adblock-close,
+    .storynest-adblock-modal-close {
+        transition: none;
+    }
+}
