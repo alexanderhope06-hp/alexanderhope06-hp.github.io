@@ -1,64 +1,102 @@
 /* =====================================================
-   STORYNEST — AD BLOCK DETECTION  (v2 — reliable)
+   STORYNEST — AD BLOCK DETECTION  (v3 — bulletproof)
    Detects uBlock / AdBlock / Brave Shields / AdGuard DNS
-   via DOM bait only. No DNS probe (avoids false positives).
+   via DOM bait. Runs safely after DOM is ready.
    ===================================================== */
 
 (function () {
     'use strict';
 
     // ---------- CONFIG ----------
-    var CHECK_DELAY        = 1200;    // ms to wait for CSS to settle
-    var MESSAGE_DURATION   = 15000;   // ms banner stays on screen
-    var SESSION_HIDE_KEY   = 'storynest_adblock_hidden_session';
+    var CHECK_DELAY      = 1500;    // ms after load to measure bait
+    var MESSAGE_DURATION = 15000;   // ms banner stays visible
+    var SESSION_HIDE_KEY = 'storynest_adblock_hidden_session';
+    var DEBUG            = false;   // set true to see logs
 
-    // ---------- BAIL OUT IF ALREADY DISMISSED THIS SESSION ----------
-    if (sessionStorage.getItem(SESSION_HIDE_KEY) === '1') return;
-
-    // ---------- CREATE THE BAIT ELEMENT ----------
-    var bait = document.createElement('div');
-    bait.id = 'storynest-ad-bait';
-    bait.className = 'adsbox ad-banner advertisement sponsored-ad text-ad ad-placement';
-    bait.style.cssText = [
-        'position:absolute',
-        'left:-9999px',
-        'top:-9999px',
-        'width:10px',
-        'height:10px',
-        'pointer-events:none'
-    ].join(';');
-    bait.innerHTML = '&nbsp;';
-    document.body.appendChild(bait);
-
-    // ---------- CHECK AFTER DELAY ----------
-    setTimeout(function () {
-        var blocked = false;
-
-        try {
-            var style  = window.getComputedStyle(bait);
-            var height = bait.offsetHeight;
-            var width  = bait.offsetWidth;
-
-            blocked =
-                height === 0 ||
-                width === 0 ||
-                style.display === 'none' ||
-                style.visibility === 'hidden' ||
-                parseFloat(style.opacity) === 0;
-        } catch (e) {
-            blocked = false;   // if anything throws, assume NOT blocked
+    function log() {
+        if (DEBUG && window.console) {
+            console.log.apply(console, ['[adblock-detect]'].concat([].slice.call(arguments)));
         }
+    }
 
-        // Clean up
-        if (bait.parentNode) bait.parentNode.removeChild(bait);
+    // ---------- BAIL OUT IF ALREADY DISMISSED ----------
+    if (sessionStorage.getItem(SESSION_HIDE_KEY) === '1') {
+        log('already dismissed this session');
+        return;
+    }
 
-        if (blocked) {
-            showAdBlockMessage();
-        }
-    }, CHECK_DELAY);
+    // ---------- RUN AFTER DOM IS READY ----------
+    function init() {
+        log('init, body exists:', !!document.body);
+
+        // ---------- CREATE THE BAIT ----------
+        var bait = document.createElement('div');
+        bait.id = 'storynest-ad-bait';
+        // Multiple ad-like class names so most blockers catch it
+        bait.className = 'adsbox ad-banner advertisement sponsored-ad text-ad ad-placement banner-ads';
+        bait.setAttribute('data-ad-slot', 'storynest');
+        bait.style.cssText = [
+            'position:absolute',
+            'left:-9999px',
+            'top:-9999px',
+            'width:12px',
+            'height:12px',
+            'pointer-events:none'
+        ].join(';');
+        bait.innerHTML = '&nbsp;';
+        document.body.appendChild(bait);
+
+        log('bait inserted');
+
+        // ---------- CHECK AFTER DELAY ----------
+        setTimeout(function () {
+            var blocked = false;
+            var details = {};
+
+            try {
+                var style  = window.getComputedStyle(bait);
+                var h      = bait.offsetHeight;
+                var w      = bait.offsetWidth;
+
+                details = {
+                    offsetHeight: h,
+                    offsetWidth:  w,
+                    display:      style.display,
+                    visibility:   style.visibility,
+                    opacity:      style.opacity
+                };
+
+                blocked =
+                    h === 0 ||
+                    w === 0 ||
+                    style.display    === 'none' ||
+                    style.visibility === 'hidden' ||
+                    parseFloat(style.opacity) === 0;
+            } catch (e) {
+                log('measurement error (treat as not blocked):', e);
+                blocked = false;
+            }
+
+            log('bait measurement:', details, '→ blocked:', blocked);
+
+            if (bait.parentNode) bait.parentNode.removeChild(bait);
+
+            if (blocked) {
+                showAdBlockMessage();
+            }
+        }, CHECK_DELAY);
+    }
+
+    // ---------- ENTRY POINT ----------
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
     // ---------- THE MESSAGE ----------
     function showAdBlockMessage() {
+        log('showing banner');
         if (document.getElementById('storynest-adblock-banner')) return;
 
         var banner = document.createElement('div');
