@@ -1,75 +1,66 @@
 /* =====================================================
-   STORYNEST — AD BLOCK DETECTION
-   Detects AdGuard DNS / uBlock / AdBlock / Brave Shields
-   and shows a polite fallback message.
+   STORYNEST — AD BLOCK DETECTION  (v2 — reliable)
+   Detects uBlock / AdBlock / Brave Shields / AdGuard DNS
+   via DOM bait only. No DNS probe (avoids false positives).
    ===================================================== */
 
 (function () {
     'use strict';
 
     // ---------- CONFIG ----------
-    var CHECK_DELAY = 1500;                  // ms to wait for ad script to load
-    var MESSAGE_DURATION = 15000;            // ms the banner stays on screen
-    var STORAGE_KEY = 'storynest_adblock_dismissed';
-    var SESSION_HIDE_KEY = 'storynest_adblock_hidden_session';
+    var CHECK_DELAY        = 1200;    // ms to wait for CSS to settle
+    var MESSAGE_DURATION   = 15000;   // ms banner stays on screen
+    var SESSION_HIDE_KEY   = 'storynest_adblock_hidden_session';
 
-    // ---------- BAIL OUT IF USER ALREADY DISMISSED ----------
+    // ---------- BAIL OUT IF ALREADY DISMISSED THIS SESSION ----------
     if (sessionStorage.getItem(SESSION_HIDE_KEY) === '1') return;
 
-    // ---------- CREATE A BAIT ELEMENT ----------
-    // AdGuard DNS / uBlock / AdBlock all hide elements with class names
-    // that look like ads. If the bait element has no size after the delay,
-    // ads are being blocked.
+    // ---------- CREATE THE BAIT ELEMENT ----------
     var bait = document.createElement('div');
-    bait.className = 'adsbox ad-banner advertisement sponsored-ad';
     bait.id = 'storynest-ad-bait';
+    bait.className = 'adsbox ad-banner advertisement sponsored-ad text-ad ad-placement';
     bait.style.cssText = [
         'position:absolute',
         'left:-9999px',
         'top:-9999px',
-        'width:1px',
-        'height:1px',
-        'pointer-events:none',
-        'opacity:0'
+        'width:10px',
+        'height:10px',
+        'pointer-events:none'
     ].join(';');
     bait.innerHTML = '&nbsp;';
     document.body.appendChild(bait);
 
-    // ---------- SECOND CHECK: try to load a real ad domain ----------
-    var dnsBlocked = false;
-    var imgTest = new Image();
-    imgTest.onerror = function () { dnsBlocked = true; };
-    imgTest.src = 'https://unprofessionalginger.com/favicon.ico?' + Date.now();
-
-    // ---------- AFTER DELAY, DECIDE ----------
+    // ---------- CHECK AFTER DELAY ----------
     setTimeout(function () {
-        var baitHidden = false;
+        var blocked = false;
+
         try {
-            var style = window.getComputedStyle(bait);
-            baitHidden =
-                bait.offsetHeight === 0 ||
-                bait.offsetWidth === 0 ||
+            var style  = window.getComputedStyle(bait);
+            var height = bait.offsetHeight;
+            var width  = bait.offsetWidth;
+
+            blocked =
+                height === 0 ||
+                width === 0 ||
                 style.display === 'none' ||
                 style.visibility === 'hidden' ||
                 parseFloat(style.opacity) === 0;
         } catch (e) {
-            baitHidden = true;
+            blocked = false;   // if anything throws, assume NOT blocked
         }
 
-        // Clean up the bait
+        // Clean up
         if (bait.parentNode) bait.parentNode.removeChild(bait);
 
-        if (baitHidden || dnsBlocked) {
+        if (blocked) {
             showAdBlockMessage();
         }
     }, CHECK_DELAY);
 
     // ---------- THE MESSAGE ----------
     function showAdBlockMessage() {
-        // Don't show twice on the same page
         if (document.getElementById('storynest-adblock-banner')) return;
 
-        // Create the banner
         var banner = document.createElement('div');
         banner.id = 'storynest-adblock-banner';
         banner.className = 'storynest-adblock-banner';
@@ -91,12 +82,10 @@
 
         document.body.appendChild(banner);
 
-        // Animate in
         requestAnimationFrame(function () {
             banner.classList.add('visible');
         });
 
-        // Close button
         banner.querySelector('.storynest-adblock-close').addEventListener('click', function () {
             banner.classList.remove('visible');
             sessionStorage.setItem(SESSION_HIDE_KEY, '1');
@@ -105,13 +94,11 @@
             }, 400);
         });
 
-        // "whitelisting us" link → show help modal
         banner.querySelector('#storynest-adblock-how').addEventListener('click', function (e) {
             e.preventDefault();
             showHowToWhitelist();
         });
 
-        // Auto-hide after a while (but keep in session so it doesn't spam)
         setTimeout(function () {
             if (banner.parentNode) {
                 banner.classList.remove('visible');
