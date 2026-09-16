@@ -4755,3 +4755,29 @@ body.ad-free-active .storynest-sidebar-ad {
         font-size: 17px;
     }
 }
+
+
+/* ================= EARNINGS NOTE ================= */
+.earnings-note {
+    margin-top: 20px;
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    background: rgba(155, 92, 255, 0.06);
+    border: 1px solid rgba(155, 92, 255, 0.18);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    line-height: 1.65;
+}
+
+.earnings-note strong {
+    color: #c39aff;
+}
+
+/* ================= TOP EARN BADGE ================= */
+.top-novel .top-earn {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--success);
+    flex-shrink: 0;
+    white-space: nowrap;
+}

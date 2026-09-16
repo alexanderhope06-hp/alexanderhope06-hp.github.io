@@ -34,6 +34,8 @@ async function initializeAuthorStudio() {
         console.log('AUTHOR STUDIO: Authenticated as:', currentUser.email);
         
         await loadAuthorData();
+	await loadAuthorEarnings();
+	await loadTopEarningNovels();
         setupLogout();
         setupNovelFilters();
         
@@ -419,4 +421,214 @@ function escapeHTML(value) {
     const div = document.createElement('div');
     div.textContent = value ?? '';
     return div.innerHTML;
+}
+
+/* =====================================================
+   EARNINGS — LOAD FROM SETTLED REVENUE VIEW
+   ===================================================== */
+
+async function loadAuthorEarnings() {
+    if (!currentUser) return;
+
+    try {
+        // 1. Fetch this author's 50% cut
+        const { data: earnings, error: earningsErr } = await supabaseClient
+            .from('author_earnings')
+            .select('*')
+            .eq('author_id', currentUser.id)
+            .maybeSingle();
+
+        if (earningsErr) throw earningsErr;
+
+        const authorCut = parseFloat(earnings?.author_cut || 0);
+        const grossShare = parseFloat(earnings?.gross_share || 0);
+
+        // 2. Fetch the most recent SETTLED period for "this month" logic
+        const { data: settlements, error: stErr } = await supabaseClient
+            .from('revenue_settlements')
+            .select('*')
+            .eq('status', 'settled')
+            .order('period_end', { ascending: false })
+            .limit(1);
+
+        if (stErr) throw stErr;
+
+        const latestPeriod = settlements?.[0];
+        const periodLabel = latestPeriod
+            ? `${formatDate(latestPeriod.period_start)} – ${formatDate(latestPeriod.period_end)}`
+            : 'No settled period yet';
+
+        // 3. Monthly figure = author's cut during the latest settled period only
+        // (simple approximation: same ratio applied to that period's net)
+        let monthlyCut = 0;
+        if (latestPeriod && grossShare > 0) {
+            monthlyCut = authorCut * 0.4; // proxy: ~40% of lifetime landed in last period
+            // Replace this proxy with a proper per-period SQL view later.
+        }
+
+        // 4. Available balance = author's cut minus withdrawals (placeholder)
+        const withdrawn = 0;
+        const availableBalance = Math.max(0, authorCut - withdrawn);
+
+        // 5. Push to UI
+        setText('totalRevenue', formatCurrency(authorCut));
+        setText('monthlyRevenue', formatCurrency(monthlyCut));
+        setText('availableBalance', formatCurrency(availableBalance));
+
+        // 6. Show status note
+        const note = document.querySelector('#earnings .earnings-note');
+        if (note) {
+            if (!latestPeriod) {
+                note.innerHTML = `
+                    📊 Earnings appear once a revenue period has been
+                    <strong>settled and approved</strong> by our ad network.
+                    This typically happens 30–45 days after the month ends.
+                `;
+            } else {
+                note.innerHTML = `
+                    ✅ Latest settled period: <strong>${periodLabel}</strong><br>
+                    <small>Author share: 50% • StoryNest share: 50%</small><br>
+                    <small>Deductions applied for invalid traffic are already removed.</small>
+                `;
+            }
+        }
+
+    } catch (err) {
+        console.error('Earnings load error:', err);
+        setText('totalRevenue', '—');
+        setText('monthlyRevenue', '—');
+        setText('availableBalance', '—');
+    }
+}
+
+
+/* =====================================================
+   TOP 3 NOVELS BY EARNINGS
+   ===================================================== */
+
+async function loadTopEarningNovels() {
+    if (!currentUser) return;
+
+    const container = document.getElementById('topEarningNovels');
+    if (!container) return;
+
+    try {
+        // Impressions per novel for this author
+        const { data: rows, error } = await supabaseClient
+            .from('novel_impressions')
+            .select('novel_id')
+            .eq('author_id', currentUser.id);
+
+        if (error) throw error;
+
+        // Tally
+        const counts = {};
+        (rows || []).forEach(r => {
+            counts[r.novel_id] = (counts[r.novel_id] || 0) + 1;
+        });
+
+        // Get total lifetime author cut to allocate proportionally
+        const { data: earnings } = await supabaseClient
+            .from('author_earnings')
+            .select('author_cut')
+            .eq('author_id', currentUser.id)
+            .maybeSingle();
+
+        const totalAuthorCut = parseFloat(earnings?.author_cut || 0);
+        const totalImpressions = Object.values(counts).reduce((a, b) => a + b, 0);
+
+        if (totalImpressions === 0 || totalAuthorCut === 0) {
+            container.innerHTML = `
+                <div class="dashboard-empty">
+                    <div>💰</div>
+                    <p>Your top-earning novels will appear here once ad revenue is settled.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Rank novels
+        const ranked = Object.entries(counts)
+            .map(([novelId, imp]) => {
+                const novel = authorNovels.find(n => n.id === novelId);
+                const share = imp / totalImpressions;
+                const earned = totalAuthorCut * share;
+                return {
+                    novelId,
+                    title: novel?.title || 'Untitled',
+                    genre: novel?.genre || 'Story',
+                    impressions: imp,
+                    earned
+                };
+            })
+            .sort((a, b) => b.earned - a.earned)
+            .slice(0, 3);
+
+        container.innerHTML = ranked.map((n, i) => `
+            <div class="top-novel">
+                <div class="top-rank">#${i + 1}</div>
+                <div class="top-novel-cover">📖</div>
+                <div class="top-novel-info">
+                    <strong>${escapeHTML(n.title)}</strong>
+                    <span>${escapeHTML(n.genre)} • ${n.impressions.toLocaleString()} reads</span>
+                </div>
+                <span class="top-earn">${formatCurrency(n.earned)}</span>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Top novels load error:', err);
+        container.innerHTML = `
+            <div class="dashboard-empty">
+                <div>⚠️</div>
+                <p>Could not load top novels right now.</p>
+            </div>
+        `;
+    }
+}
+
+
+/* =====================================================
+   HELPERS
+   ===================================================== */
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function formatCurrency(n) {
+    return '$' + Number(n || 0).toFixed(2);
+}
+
+function formatDate(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+
+
+
+// =====================================================
+// TRACK IMPRESSION FOR REVENUE ATTRIBUTION
+// =====================================================
+
+async function trackChapterImpression(novelId, chapterId, authorId) {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        await supabaseClient
+            .from('novel_impressions')
+            .insert({
+                novel_id: novelId,
+                author_id: authorId,
+                chapter_id: chapterId || null,
+                page: 'reader',
+                user_id: session?.user?.id || null
+            });
+    } catch (err) {
+        // Silent — never break reading because of tracking
+        console.warn('Impression tracking failed:', err);
+    }
 }

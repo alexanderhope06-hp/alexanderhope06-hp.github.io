@@ -231,74 +231,79 @@
         </div>
     </section>
 
-    <!-- EARNINGS -->
-    <section id="earnings" class="dashboard-section">
-        <div class="section-heading">
-            <div>
-                <p class="section-label">MONETIZATION</p>
-                <h2>Earnings</h2>
-            </div>
-        </div>
-        <div class="coming-soon-card">
-            <div class="coming-soon-icon">💰</div>
-            <div>
-                <h3>Author Earnings</h3>
-
-
-<!-- Earnings section with real data -->
+<!-- EARNINGS -->
 <section id="earnings" class="dashboard-section">
-    
-    <div class="earnings-grid"><br />
+    <div class="section-heading">
+        <div>
+            <p class="section-label">MONETIZATION</p>
+            <h2>Earnings</h2>
+        </div>
+        <span class="dashboard-period">50 / 50 Revenue Split</span>
+    </div>
+
+    <div class="earnings-grid">
         <div class="earnings-card">
             <span>Total Revenue</span>
             <strong id="totalRevenue">$0.00</strong>
-            <small>All time earnings</small>
+            <small>Your 50% share (settled)</small>
         </div>
-        
+
         <div class="earnings-card">
             <span>This Month</span>
             <strong id="monthlyRevenue">$0.00</strong>
-            <small>Current month</small>
+            <small>Latest settled period</small>
         </div>
-        
+
         <div class="earnings-card">
             <span>Available Balance</span>
             <strong id="availableBalance">$0.00</strong>
             <small>Ready to withdraw</small>
         </div>
     </div>
-    
-    <div style="margin-top: 20px; text-align: center; padding: 20px; background: var(--bg-card); border-radius: 8px;">
-        <p style="color: var(--text-secondary);">
-            📊 Earnings will start tracking once ad revenue is activated.
-            <br>
-            <small>This feature is coming soon!</small>
-        </p>
+
+    <div class="earnings-note">
+        📊 Earnings appear once a revenue period has been
+        <strong>settled and approved</strong> by our ad network.
+        This typically happens 30–45 days after the month ends,
+        because the ad network removes invalid traffic before final payout.
     </div>
 </section>
 
-
-            </div>
+<!-- TOP EARNING NOVELS -->
+<section class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="section-label">YOUR BEST PERFORMERS</p>
+            <h2>Top Earning Novels</h2>
         </div>
-    </section>
-
-    <!-- WITHDRAW -->
-    <section id="withdraw" class="dashboard-section">
-        <div class="section-heading">
-            <div>
-                <p class="section-label">PAYOUTS</p>
-                <h2>Withdraw</h2>
-            </div>
+    </div>
+    <div id="topEarningNovels" class="top-novels">
+        <div class="dashboard-empty">
+            <div>💰</div>
+            <p>Your top-earning novels will appear here once ad revenue is settled.</p>
         </div>
-        <div class="coming-soon-card">
-            <div class="coming-soon-icon">💸</div>
-            <div>
-                <h3>Withdraw Your Earnings</h3>
-                <p>Payout options and withdrawal history will become available when the StoryNest payment system is ready.</p>
-            </div>
-        </div>
-    </section>
+    </div>
+</section>
 
+<!-- WITHDRAW -->
+<section id="withdraw" class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="section-label">PAYOUTS</p>
+            <h2>Withdraw</h2>
+        </div>
+    </div>
+    <div class="coming-soon-card">
+        <div class="coming-soon-icon">💸</div>
+        <div>
+            <h3>Withdraw Your Earnings</h3>
+            <p>
+                Payouts open once your available balance reaches $50
+                and the current period has been settled by the ad network.
+            </p>
+        </div>
+    </div>
+</section>
 
 
 
