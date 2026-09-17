@@ -774,6 +774,127 @@ function escapeHTML(value) {
 
 
 
+// =====================================================
+// AD-FREE REWARD SYSTEM — Session-only, per-tab
+// =====================================================
+
+const AD_FREE_DURATION_MS = 15 * 60 * 1000;   // 15 minutes
+const AD_FREE_KEY = 'storynestAdFreeUntil';
+const SMARTPLINK_URL = 'https://www.highrevenueformat.com/YOUR_SMARTPLINK_HERE'; // Make sure to change this!
+
+let adFreeInterval = null;
+
+// --- Is ad-free active right now? ---
+function isAdFree() {
+    const until = parseInt(sessionStorage.getItem(AD_FREE_KEY) || '0', 10);
+    return Date.now() < until;
+}
+
+// --- Grant 15 minutes to THIS TAB ONLY ---
+function grantAdFree() {
+    const until = Date.now() + AD_FREE_DURATION_MS;
+    sessionStorage.setItem(AD_FREE_KEY, until);
+    applyAdFreeState();
+}
+
+// --- Clear the reward (used when tab unloads) ---
+function clearAdFree() {
+    sessionStorage.removeItem(AD_FREE_KEY);
+}
+
+// --- Apply visual state ---
+function applyAdFreeState() {
+    const active = isAdFree();
+
+    document.body.classList.toggle('ad-free-active', active);
+
+    const badge = document.getElementById('adFreeBadge');
+    if (badge) {
+        badge.style.display = active ? 'inline-flex' : 'none';
+        if (active) updateAdFreeBadge();
+    }
+
+    const btn = document.getElementById('adFreeBtn');
+    if (btn) {
+        btn.textContent = active
+            ? '⏱ Ad-Free Active'
+            : '🎁 Get Ad-Free (15 min)';
+    }
+
+    // Start / stop the countdown ticker
+    if (active && !adFreeInterval) {
+        adFreeInterval = setInterval(updateAdFreeBadge, 1000);
+    } else if (!active && adFreeInterval) {
+        clearInterval(adFreeInterval);
+        adFreeInterval = null;
+    }
+}
+
+// --- Update the countdown text ---
+function updateAdFreeBadge() {
+    const badge = document.getElementById('adFreeBadge');
+    if (!badge) return;
+
+    const until = parseInt(sessionStorage.getItem(AD_FREE_KEY) || '0', 10);
+    const remaining = until - Date.now();
+
+    if (remaining <= 0) {
+        clearAdFree();
+        applyAdFreeState();
+        return;
+    }
+
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    badge.textContent = `Ad-Free ${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// --- User clicked "Get Ad-Free" (FIXED VERSION) ---
+function unlockAdFree() {
+    if (isAdFree()) {
+        alert('You already have ad-free time active in this tab! Enjoy 🎉');
+        return;
+    }
+
+    const win = window.open(SMARTPLINK_URL, '_blank');
+
+    if (!win) {
+        alert('Please allow pop-ups for this site to unlock ad-free reading.');
+        return;
+    }
+
+    // Flag to ensure reward is only given once
+    let rewarded = false;
+
+    const triggerReward = () => {
+        if (rewarded) return;
+        rewarded = true;
+        clearInterval(check);
+        clearTimeout(safetyNet);
+        grantAdFree();
+        alert('🎉 Ad-free unlocked for 15 minutes in this tab!');
+    };
+
+    // Wait for the Smartlink tab to close
+    const check = setInterval(() => {
+        if (win.closed) {
+            triggerReward();
+        }
+    }, 800);
+
+    // Safety net — grant after 45s even if the tab stays open
+    const safetyNet = setTimeout(() => {
+        triggerReward();
+    }, 45000);
+}
+
+// --- Automatically run on page load to check if ad-free is already active ---
+document.addEventListener('DOMContentLoaded', applyAdFreeState);
+
+
+
+
+
 
 // =====================================================
 // TRACK IMPRESSION FOR REVENUE ATTRIBUTION

@@ -649,7 +649,7 @@
 
 const AD_FREE_DURATION_MS = 15 * 60 * 1000;   // 15 minutes
 const AD_FREE_KEY = 'storynestAdFreeUntil';
-const SMARTPLINK_URL = 'https://www.highrevenueformat.com/YOUR_SMARTPLINK_HERE';
+const SMARTPLINK_URL = 'https://www.highrevenueformat.com/YOUR_SMARTPLINK_HERE'; // Make sure to change this!
 
 let adFreeInterval = null;
 
@@ -718,7 +718,7 @@ function updateAdFreeBadge() {
     badge.textContent = `Ad-Free ${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// --- User clicked "Get Ad-Free" ---
+// --- User clicked "Get Ad-Free" (FIXED VERSION) ---
 function unlockAdFree() {
     if (isAdFree()) {
         alert('You already have ad-free time active in this tab! Enjoy 🎉');
@@ -732,21 +732,36 @@ function unlockAdFree() {
         return;
     }
 
+    // Flag to ensure reward is only given once
+    let rewarded = false;
+
+    const triggerReward = () => {
+        if (rewarded) return;
+        rewarded = true;
+        clearInterval(check);
+        clearTimeout(safetyNet);
+        grantAdFree();
+        alert('🎉 Ad-free unlocked for 15 minutes in this tab!');
+    };
+
     // Wait for the Smartlink tab to close
     const check = setInterval(() => {
         if (win.closed) {
-            clearInterval(check);
-            grantAdFree();
-            alert('🎉 Ad-free unlocked for 15 minutes in this tab!');
+            triggerReward();
         }
     }, 800);
 
     // Safety net — grant after 45s even if the tab stays open
-    setTimeout(() => {
-        clearInterval(check);
-        if (!isAdFree()) grantAdFree();
+    const safetyNet = setTimeout(() => {
+        triggerReward();
     }, 45000);
 }
+
+// --- Automatically run on page load to check if ad-free is already active ---
+document.addEventListener('DOMContentLoaded', applyAdFreeState);
+
+
+
 
 // --- Initialize ---
 document.addEventListener('DOMContentLoaded', () => {
