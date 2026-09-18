@@ -1,19 +1,84 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reading — StoryNest</title>
+    <title>Reading — StoryNest</title>
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" type="image/png" href="image/fav.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+</head>
+
+<body class="reader-page">
+
+<!-- =====================================================
+     READER HEADER
+===================================================== -->
+
+<header class="reader-header">
+
+    <div class="reader-header-left">
+
+        <a href="index.html" class="reader-back" title="Home">←</a>
+
+        <div class="reader-header-info">
+            <strong id="readerNovelTitle">Loading...</strong>
+            <span id="chapterHeader">Chapter 1</span>
+        </div>
+
+        <!-- Ad-free countdown badge -->
+        <span id="adFreeBadge" class="ad-free-badge" style="display:none;"></span>
+
+    </div>
+
+    <div class="reader-actions">
+
+        <button
+            id="readerMenuBtn"
+            class="reader-menu-btn"
+            onclick="toggleReaderMenu(event)"
+            title="Menu">
+            ⋮
+        </button>
+
+        <div class="reader-dropdown" id="readerDropdown">
+
+            <a href="#" onclick="goToNovelDetails(); return false;">
+                📚 Novel Details
+            </a>
+
+            <a href="#" onclick="goHome(); return false;">
+                🏠 Home
+            </a>
+
+            <a href="#" onclick="toggleFontSize(); return false;" id="fontSizeBtn">
+                🔤 18px
+            </a>
+
+            <a href="#" onclick="toggleTheme(); return false;" id="themeBtn">
+                🌙 Dark Mode
+            </a>
+
+            <a href="https://unprofessionalginger.com/kpmqpcbd?key=337164613e9e4f3099a975553e256fa2"
+               onclick="unlockAdFree();"
+               target="_blank"
+               id="adFreeBtn">
+                🎁 Get Ad-Free (15 min)
+            </a>
+
+        </div>
+
+    </div>
 
 </header>
 
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
+
+<!-- =====================================================
+     TOP LEADERBOARD AD (728x90) — Desktop & Tablet only
+===================================================== -->
+
 <div class="storynest-top-ad">
     <div class="storynest-top-ad-inner">
         <script type="text/javascript">
@@ -30,95 +95,11 @@
 </div>
 
 
-</head>
-
-<body class="reader-page">
-
-<!-- =====================================================
-     READER HEADER
-===================================================== -->
-
-<header class="reader-header">
-
-    <div class="reader-header-left">
-
-        <a href="index.html"
-           class="reader-back"
-           title="Home">
-            ←
-        </a>
-
-        <div class="reader-header-info">
-            <strong id="readerNovelTitle">
-                Loading...
-            </strong>
-
-            <span id="chapterHeader">
-                Chapter 1
-            </span>
-        </div>
-
-	<!-- NEW: ad-free countdown badge -->
-	<span id="adFreeBadge" class="ad-free-badge" style="display:none;"></span>
-
-    </div>
-
-    <div class="reader-actions">
-
-        <button
-            id="readerMenuBtn"
-            class="reader-menu-btn"
-            onclick="toggleReaderMenu(event)"
-            title="Menu">
-            ⋮
-        </button>
-
-        <div
-            class="reader-dropdown"
-            id="readerDropdown">
-
-            <a href="#"
-               onclick="goToNovelDetails(); return false;">
-                📚 Novel Details
-            </a>
-
-            <a href="#"
-               onclick="goHome(); return false;">
-                🏠 Home
-            </a>
-
-            <a href="#"
-               onclick="toggleFontSize(); return false;"
-               id="fontSizeBtn">
-                🔤 18px
-            </a>
-
-            <a href="#"
-               onclick="toggleTheme(); return false;"
-               id="themeBtn">
-                🌙 Dark Mode
-            </a>
-
-	    <!-- ad -->
-            <a href="https://unprofessionalginger.com/kpmqpcbd?key=337164613e9e4f3099a975553e256fa2" onclick="unlockAdFree();" target="_blank" id="adFreeBtn">
-                🎁 Get Ad-Free (15  min)
-            </a>
-
-        </div>
-
-    </div>
-
-</header>
-
-
 <!-- =====================================================
      READING PROGRESS BAR
 ===================================================== -->
 
-<div
-    class="reading-progress"
-    id="readingProgress">
-</div>
+<div class="reading-progress" id="readingProgress"></div>
 
 
 <!-- =====================================================
@@ -131,32 +112,9 @@
         <div class="story" id="storyContent">
             <p>Loading chapter...</p>
         </div>
-
-        <!-- ================= IN-CONTENT AD (300x250) ================= -->
-        <div class="storynest-in-content-ad">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '665e254e1c5fe98bcbd641aa25f400df',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://unprofessionalginger.com/665e254e1c5fe98bcbd641aa25f400df/invoke.js"></script>
-        </div>
+        <!-- In-content ads are injected dynamically by reader.js -->
     </div>
 </main>
-
-
-<!-- =====================================================
-     AD SPACE
-===================================================== -->
-
-<div
-    class="reader-ad-space"
-    id="readerAdSpace">
-</div>
 
 
 <!-- =====================================================
@@ -164,9 +122,7 @@
 ===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="js/supabase.js"></script>
-
 <script src="js/reader.js"></script>
 
 
@@ -181,37 +137,17 @@
     // =====================================================
 
     function toggleReaderMenu(event) {
-
         event.stopPropagation();
-
-        const dropdown =
-            document.getElementById('readerDropdown');
-
-        if (dropdown) {
-            dropdown.classList.toggle('active');
-        }
+        const dropdown = document.getElementById('readerDropdown');
+        if (dropdown) dropdown.classList.toggle('active');
     }
 
-
-    // Close menu when clicking elsewhere
-
     document.addEventListener('click', function(e) {
-
-        const dropdown =
-            document.getElementById('readerDropdown');
-
-        const menuBtn =
-            document.getElementById('readerMenuBtn');
-
-        if (
-            dropdown &&
-            menuBtn &&
-            !dropdown.contains(e.target) &&
-            e.target !== menuBtn
-        ) {
+        const dropdown = document.getElementById('readerDropdown');
+        const menuBtn = document.getElementById('readerMenuBtn');
+        if (dropdown && menuBtn && !dropdown.contains(e.target) && e.target !== menuBtn) {
             dropdown.classList.remove('active');
         }
-
     });
 
 
@@ -220,27 +156,13 @@
     // =====================================================
 
     function goToNovelDetails() {
-
-        const params =
-            new URLSearchParams(window.location.search);
-
+        const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
-
-        if (id) {
-
-            window.location.href =
-                'novel.html?id=' + id;
-
-        }
-
+        if (id) window.location.href = 'novel.html?id=' + id;
     }
 
-
     function goHome() {
-
-        window.location.href =
-            'index.html';
-
+        window.location.href = 'index.html';
     }
 
 
@@ -248,98 +170,38 @@
     // FONT SIZE
     // =====================================================
 
-    let currentFontSize =
-        parseInt(
-            localStorage.getItem('readerFontSize')
-        ) || 18;
-
+    let currentFontSize = parseInt(localStorage.getItem('readerFontSize')) || 18;
 
     function toggleFontSize() {
+        const sizes = [16, 18, 20, 22, 24, 26];
+        let index = sizes.indexOf(currentFontSize);
 
-        const sizes =
-            [16, 18, 20, 22, 24, 26];
-
-        let index =
-            sizes.indexOf(currentFontSize);
-
-        if (
-            index === -1 ||
-            index === sizes.length - 1
-        ) {
-
-            currentFontSize =
-                sizes[0];
-
+        if (index === -1 || index === sizes.length - 1) {
+            currentFontSize = sizes[0];
         } else {
-
-            currentFontSize =
-                sizes[index + 1];
-
+            currentFontSize = sizes[index + 1];
         }
 
         applyFontSize(currentFontSize);
+        localStorage.setItem('readerFontSize', currentFontSize);
 
-        localStorage.setItem(
-            'readerFontSize',
-            currentFontSize
-        );
+        const btn = document.getElementById('fontSizeBtn');
+        if (btn) btn.textContent = '🔤 ' + currentFontSize + 'px';
 
-        const btn =
-            document.getElementById('fontSizeBtn');
-
-        if (btn) {
-
-            btn.textContent =
-                '🔤 ' +
-                currentFontSize +
-                'px';
-
-        }
-
+        // Notify reader.js so it can re-apply to newly rendered content
+        window.dispatchEvent(new CustomEvent('readerFontSizeChanged', {
+            detail: { size: currentFontSize }
+        }));
     }
 
-
     function applyFontSize(size) {
+        const content = document.querySelector('.reader-page-content');
+        const story = document.querySelector('.story');
+        const paragraphs = document.querySelectorAll('.reader-page-content p, .story p');
 
-        const content =
-            document.querySelector(
-                '.reader-page-content'
-            );
-
-        const story =
-            document.querySelector(
-                '.story'
-            );
-
-        const paragraphs =
-            document.querySelectorAll(
-                '.reader-page-content p, .story p'
-            );
-
-
-        if (content) {
-
-            content.style.fontSize =
-                size + 'px';
-
-        }
-
-
-        if (story) {
-
-            story.style.fontSize =
-                size + 'px';
-
-        }
-
-
-        paragraphs.forEach(function(p) {
-
-            p.style.fontSize =
-                size + 'px';
-
-        });
-
+        if (content) content.style.fontSize = size + 'px';
+        if (story) story.style.fontSize = size + 'px';
+        paragraphs.forEach(function(p) { p.style.fontSize = size + 'px'; });
     }
 
 
@@ -347,108 +209,38 @@
     // THEME
     // =====================================================
 
-    let currentTheme =
-        localStorage.getItem('readerTheme') ||
-        'light';
-
+    let currentTheme = localStorage.getItem('readerTheme') || 'light';
 
     function toggleTheme() {
-
-        const body =
-            document.body;
-
-        const btn =
-            document.getElementById('themeBtn');
-
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
 
         if (currentTheme === 'light') {
-
-            body.classList.add(
-                'dark-theme'
-            );
-
-            currentTheme =
-                'dark';
-
-
-            if (btn) {
-
-                btn.textContent =
-                    '☀️ Light Mode';
-
-            }
-
+            body.classList.add('dark-theme');
+            currentTheme = 'dark';
+            if (btn) btn.textContent = '☀️ Light Mode';
         } else {
-
-            body.classList.remove(
-                'dark-theme'
-            );
-
-            currentTheme =
-                'light';
-
-
-            if (btn) {
-
-                btn.textContent =
-                    '🌙 Dark Mode';
-
-            }
-
+            body.classList.remove('dark-theme');
+            currentTheme = 'light';
+            if (btn) btn.textContent = '🌙 Dark Mode';
         }
 
-
-        localStorage.setItem(
-            'readerTheme',
-            currentTheme
-        );
-
+        localStorage.setItem('readerTheme', currentTheme);
     }
 
-
     function applyTheme(theme) {
-
-        const body =
-            document.body;
-
-        const btn =
-            document.getElementById('themeBtn');
-
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
 
         if (theme === 'dark') {
-
-            body.classList.add(
-                'dark-theme'
-            );
-
-
-            if (btn) {
-
-                btn.textContent =
-                    '☀️ Light Mode';
-
-            }
-
+            body.classList.add('dark-theme');
+            if (btn) btn.textContent = '☀️ Light Mode';
         } else {
-
-            body.classList.remove(
-                'dark-theme'
-            );
-
-
-            if (btn) {
-
-                btn.textContent =
-                    '🌙 Dark Mode';
-
-            }
-
+            body.classList.remove('dark-theme');
+            if (btn) btn.textContent = '🌙 Dark Mode';
         }
 
-
-        currentTheme =
-            theme;
-
+        currentTheme = theme;
     }
 
 
@@ -456,156 +248,45 @@
     // RESTORE PREFERENCES
     // =====================================================
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
-            // Restore font size
+        const savedSize = localStorage.getItem('readerFontSize');
+        if (savedSize) {
+            currentFontSize = parseInt(savedSize);
+            applyFontSize(currentFontSize);
 
-            const savedSize =
-                localStorage.getItem(
-                    'readerFontSize'
-                );
-
-
-            if (savedSize) {
-
-                currentFontSize =
-                    parseInt(savedSize);
-
-                applyFontSize(
-                    currentFontSize
-                );
-
-
-                const btn =
-                    document.getElementById(
-                        'fontSizeBtn'
-                    );
-
-
-                if (btn) {
-
-                    btn.textContent =
-                        '🔤 ' +
-                        currentFontSize +
-                        'px';
-
-                }
-
-            }
-
-
-            // Restore theme
-
-            const savedTheme =
-                localStorage.getItem(
-                    'readerTheme'
-                );
-
-
-            if (savedTheme) {
-
-                applyTheme(
-                    savedTheme
-                );
-
-            }
-
-
-            // Hide chapter progress counter on mobile
-
-            const progressEl =
-                document.querySelector(
-                    '.chapter-progress'
-                );
-
-
-            if (
-                progressEl &&
-                window.innerWidth < 768
-            ) {
-
-                progressEl.style.display =
-                    'none';
-
-            }
-
+            const btn = document.getElementById('fontSizeBtn');
+            if (btn) btn.textContent = '🔤 ' + currentFontSize + 'px';
         }
-    );
 
+        const savedTheme = localStorage.getItem('readerTheme');
+        if (savedTheme) applyTheme(savedTheme);
 
-    // =====================================================
-    // HANDLE RESIZE
-    // =====================================================
-
-    window.addEventListener(
-        'resize',
-        function() {
-
-            const progressEl =
-                document.querySelector(
-                    '.chapter-progress'
-                );
-
-
-            if (progressEl) {
-
-                if (
-                    window.innerWidth < 768
-                ) {
-
-                    progressEl.style.display =
-                        'none';
-
-                } else {
-
-                    progressEl.style.display =
-                        'block';
-
-                }
-
-            }
-
-        }
-    );
+    });
 
 
     // =====================================================
     // FORCE NORMAL PAGE SCROLL
     // =====================================================
 
-    window.addEventListener(
-        'load',
-        function() {
-
-            document.documentElement.style.height =
-                'auto';
-
-            document.body.style.height =
-                'auto';
-
-            document.documentElement.style.overflowY =
-                'auto';
-
-            document.body.style.overflowY =
-                'auto';
-
-            document.body.style.overflowX =
-                'hidden';
-
-        }
-    );
+    window.addEventListener('load', function() {
+        document.documentElement.style.height = 'auto';
+        document.body.style.height = 'auto';
+        document.documentElement.style.overflowY = 'auto';
+        document.body.style.overflowY = 'auto';
+        document.body.style.overflowX = 'hidden';
+    });
 
 
-    console.log(
-        '📖 StoryNest reader loaded with normal scrolling.'
-    );
+    console.log('📖 StoryNest reader loaded.');
 
 </script>
 
 
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
+<!-- =====================================================
+     STICKY BOTTOM AD BAR (320x50)
+===================================================== -->
+
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
@@ -640,163 +321,10 @@
         sessionStorage.setItem('storynest_ad_closed', '1');
     });
 })();
-
-
-
-// =====================================================
-// AD-FREE REWARD SYSTEM — Session-only, per-tab
-// =====================================================
-
-const AD_FREE_DURATION_MS = 15 * 60 * 1000;   // 15 minutes
-const AD_FREE_KEY = 'storynestAdFreeUntil';
-const SMARTPLINK_URL = 'https://www.highrevenueformat.com/YOUR_SMARTPLINK_HERE'; // Make sure to change this!
-
-let adFreeInterval = null;
-
-// --- Is ad-free active right now? ---
-function isAdFree() {
-    const until = parseInt(sessionStorage.getItem(AD_FREE_KEY) || '0', 10);
-    return Date.now() < until;
-}
-
-// --- Grant 15 minutes to THIS TAB ONLY ---
-function grantAdFree() {
-    const until = Date.now() + AD_FREE_DURATION_MS;
-    sessionStorage.setItem(AD_FREE_KEY, until);
-    applyAdFreeState();
-}
-
-// --- Clear the reward (used when tab unloads) ---
-function clearAdFree() {
-    sessionStorage.removeItem(AD_FREE_KEY);
-}
-
-// --- Apply visual state ---
-function applyAdFreeState() {
-    const active = isAdFree();
-
-    document.body.classList.toggle('ad-free-active', active);
-
-    const badge = document.getElementById('adFreeBadge');
-    if (badge) {
-        badge.style.display = active ? 'inline-flex' : 'none';
-        if (active) updateAdFreeBadge();
-    }
-
-    const btn = document.getElementById('adFreeBtn');
-    if (btn) {
-        btn.textContent = active
-            ? '⏱ Ad-Free Active'
-            : '🎁 Get Ad-Free (15 min)';
-    }
-
-    // Start / stop the countdown ticker
-    if (active && !adFreeInterval) {
-        adFreeInterval = setInterval(updateAdFreeBadge, 1000);
-    } else if (!active && adFreeInterval) {
-        clearInterval(adFreeInterval);
-        adFreeInterval = null;
-    }
-}
-
-// --- Update the countdown text ---
-function updateAdFreeBadge() {
-    const badge = document.getElementById('adFreeBadge');
-    if (!badge) return;
-
-    const until = parseInt(sessionStorage.getItem(AD_FREE_KEY) || '0', 10);
-    const remaining = until - Date.now();
-
-    if (remaining <= 0) {
-        clearAdFree();
-        applyAdFreeState();
-        return;
-    }
-
-    const mins = Math.floor(remaining / 60000);
-    const secs = Math.floor((remaining % 60000) / 1000);
-    badge.textContent = `Ad-Free ${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-// --- User clicked "Get Ad-Free" (FIXED VERSION) ---
-function unlockAdFree() {
-    if (isAdFree()) {
-        alert('You already have ad-free time active in this tab! Enjoy 🎉');
-        return;
-    }
-
-    const win = window.open(SMARTPLINK_URL, '_blank');
-
-    if (!win) {
-        alert('Please allow pop-ups for this site to unlock ad-free reading.');
-        return;
-    }
-
-    // Flag to ensure reward is only given once
-    let rewarded = false;
-
-    const triggerReward = () => {
-        if (rewarded) return;
-        rewarded = true;
-        clearInterval(check);
-        clearTimeout(safetyNet);
-        grantAdFree();
-        alert('🎉 Ad-free unlocked for 15 minutes in this tab!');
-    };
-
-    // Wait for the Smartlink tab to close
-    const check = setInterval(() => {
-        if (win.closed) {
-            triggerReward();
-        }
-    }, 800);
-
-    // Safety net — grant after 45s even if the tab stays open
-    const safetyNet = setTimeout(() => {
-        triggerReward();
-    }, 45000);
-}
-
-// --- Automatically run on page load to check if ad-free is already active ---
-document.addEventListener('DOMContentLoaded', applyAdFreeState);
-
-
-
-
-// --- Initialize ---
-document.addEventListener('DOMContentLoaded', () => {
-    applyAdFreeState();
-});
-
-// --- CRITICAL: end reward when leaving the page ---
-// sessionStorage is per-tab, but this adds an extra guarantee:
-window.addEventListener('beforeunload', () => {
-    clearAdFree();
-});
-
-// Also end reward if the tab becomes hidden for too long (e.g. user switched tabs for 30+ min)
-let hiddenAt = null;
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        hiddenAt = Date.now();
-    } else {
-        // If the tab was hidden for more than 15 min, wipe the reward
-        if (hiddenAt && Date.now() - hiddenAt > AD_FREE_DURATION_MS) {
-            clearAdFree();
-        }
-        hiddenAt = null;
-        applyAdFreeState();
-    }
-});
-
-// Re-check state when the tab regains focus
-window.addEventListener('focus', applyAdFreeState);
-
 </script>
 
 <!-- ================= AD BLOCK DETECTION ================= -->
 <script src="js/adblock-detect.js"></script>
 
 </body>
-
 </html>
