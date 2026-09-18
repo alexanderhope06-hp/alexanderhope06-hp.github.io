@@ -294,32 +294,76 @@ function renderChapter(chapter) {
 
 
 /* =====================================================
-   INJECT AD SCRIPTS
-   (innerHTML does not execute <script> tags)
+   INJECT AD SCRIPTS — iframe srcdoc (Adsterra-safe)
+   Each slot gets its own isolated iframe so multiple
+   instances of the same ad unit can coexist.
    ===================================================== */
 
 function injectAdScripts(container) {
 
     if (!container) return;
-
-    // Skip if ad-free is active
     if (typeof isAdFree === 'function' && isAdFree()) return;
 
-    container
-        .querySelectorAll(".storynest-in-content-ad script")
-        .forEach(oldScript => {
+    const adSlots = container.querySelectorAll(".storynest-in-content-ad");
 
-            const newScript = document.createElement("script");
+    adSlots.forEach((slot, index) => {
 
-            if (oldScript.src) {
-                newScript.src = oldScript.src;
-                newScript.async = true;
-            } else {
-                newScript.textContent = oldScript.textContent;
+        setTimeout(() => {
+
+            if (typeof isAdFree === 'function' && isAdFree()) {
+                slot.style.display = 'none';
+                return;
             }
 
-            oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
+            // Build the isolated HTML for the iframe
+            const adHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        html, body {
+                            margin: 0;
+                            padding: 0;
+                            width: 300px;
+                            height: 250px;
+                            overflow: hidden;
+                            background: transparent;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '665e254e1c5fe98bcbd641aa25f400df',
+                            'format' : 'iframe',
+                            'height' : 250,
+                            'width' : 300,
+                            'params' : {}
+                        };
+                    <\/script>
+                    <script type="text/javascript"
+                            src="https://unprofessionalginger.com/665e254e1c5fe98bcbd641aa25f400df/invoke.js"><\/script>
+                </body>
+                </html>
+            `;
+
+            // Create the iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '300px';
+            iframe.style.height = '250px';
+            iframe.style.border = '0';
+            iframe.style.display = 'block';
+            iframe.setAttribute('scrolling', 'no');
+            iframe.setAttribute('frameborder', '0');
+            iframe.srcdoc = adHTML;
+
+            // Clear the slot and inject the iframe
+            slot.innerHTML = '';
+            slot.appendChild(iframe);
+
+        }, index * 300);   // stagger 300ms apart
+    });
 }
 
 
