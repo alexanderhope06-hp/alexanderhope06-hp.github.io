@@ -1,16 +1,11 @@
-/* =====================================================
-   STORYNEST - SUPABASE CONNECTION
-   ===================================================== */
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const SUPABASE_URL =
-    "https://frtvsuxvhvnjrrffyeot.supabase.co";
+const SUPABASE_URL = 'https://pgnkpwhnrmjciqnfujjn.supabase.co';
 
 const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_11ENpggEwgjSV4z-vcD-nw_IEoM86Bc";
+    'sb_publishable_F22XDwRFlSoUo_VsODx9gQ_XuJrSkQk';
 
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+export const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
