@@ -36,6 +36,7 @@ async function initializeAuthorStudio() {
         await loadAuthorData();
 	await loadAuthorEarnings();
 	await loadTopEarningNovels();
+	await loadAuthorStatistics();
         setupLogout();
         setupNovelFilters();
         
@@ -237,6 +238,331 @@ function updateDashboardStatistics() {
 }
 
 /* =====================================================
+   STATISTICS
+   ===================================================== */
+
+let statsRangeDays = 30;
+let readsChartInstance = null;
+let genreChartInstance = null;
+
+/* Called from initializeAuthorStudio after novels load */
+async function loadAuthorStatistics() {
+    if (!currentUser) return;
+
+    try {
+        const since = statsRangeDays === 'all'
+            ? null
+            : new Date(Date.now() - statsRangeDays * 86400000).toISOString();
+
+        // 1. Impressions in range
+        let impressionsQuery = supabaseClient
+            .from('novel_impressions')
+            .select('novel_id, created_at')
+            .eq('author_id', currentUser.id);
+
+        if (since) impressionsQuery = impressionsQuery.gte('created_at', since);
+
+        const { data: impressions, error: impErr } = await impressionsQuery;
+        if (impErr) throw impErr;
+
+        const rows = impressions || [];
+
+        // 2. Total reads (all-time, separate small query)
+        const { count: totalReadsAllTime } = await supabaseClient
+            .from('novel_impressions')
+            .select('*', { count: 'exact', head: true })
+            .eq('author_id', currentUser.id);
+
+        // 3. Chapters created in range
+        const novelIds = authorNovels.map(n => n.id);
+        let chaptersInRange = [];
+        if (novelIds.length) {
+            let chapQuery = supabaseClient
+                .from('chapters')
+                .select('id, novel_id, created_at')
+                .in('novel_id', novelIds);
+            if (since) chapQuery = chapQuery.gte('created_at', since);
+            const { data: chaps } = await chapQuery;
+            chaptersInRange = chaps || [];
+        }
+
+        // 4. Lifetime author cut
+        const { data: earnings } = await supabaseClient
+            .from('author_earnings')
+            .select('author_cut')
+            .eq('author_id', currentUser.id)
+            .maybeSingle();
+        const lifetimeEarned = parseFloat(earnings?.author_cut || 0);
+
+        // ---- KPI ROW ----
+        setText('statTotalReads', (totalReadsAllTime || 0).toLocaleString());
+        setText('statTotalReadsDelta',
+            rows.length
+                ? `+${rows.length.toLocaleString()} in period`
+                : 'No reads in period'
+        );
+
+        const publishedCount = authorNovels.filter(n => n.status === 'published').length;
+        const draftCount = authorNovels.length - publishedCount;
+        setText('statNovelCount', authorNovels.length);
+        setText('statNovelBreakdown',
+            `${publishedCount} published • ${draftCount} draft${draftCount === 1 ? '' : 's'}`
+        );
+
+        const totalChapters = authorNovels.reduce((sum, n) => sum + (n.chapterCount || 0), 0);
+        setText('statChapterCount', totalChapters);
+        setText('statChapterDelta',
+            chaptersInRange.length
+                ? `+${chaptersInRange.length} in period`
+                : 'No new chapters in period'
+        );
+
+        setText('statEarned', formatCurrency(lifetimeEarned));
+
+        // ---- READS OVER TIME ----
+        renderReadsChart(rows);
+
+        // ---- GENRE DISTRIBUTION ----
+        renderGenreChart();
+
+        // ---- TOP NOVELS BY READS ----
+        renderTopNovelsByReads(rows);
+
+        // ---- TABLE ----
+        renderStatsTable(rows);
+
+    } catch (err) {
+        console.error('Statistics load error:', err);
+        showToast('Could not load statistics.', 'error');
+    }
+}
+
+/* ---------------------------------------------
+   Reads over time — bucketed by day
+--------------------------------------------- */
+function renderReadsChart(rows) {
+    const canvas = document.getElementById('readsChart');
+    const empty  = document.getElementById('readsChartEmpty');
+    if (!canvas || !empty) return;
+
+    const buckets = {};
+    rows.forEach(r => {
+        const day = (r.created_at || '').slice(0, 10);
+        if (!day) return;
+        buckets[day] = (buckets[day] || 0) + 1;
+    });
+
+    const labels = Object.keys(buckets).sort();
+    const values = labels.map(d => buckets[d]);
+
+    if (labels.length === 0) {
+        canvas.hidden = true;
+        empty.hidden = false;
+        setText('readsChartPeriod', periodLabelForRange());
+        return;
+    }
+
+    canvas.hidden = false;
+    empty.hidden = true;
+    setText('readsChartPeriod', periodLabelForRange());
+
+    if (readsChartInstance) readsChartInstance.destroy();
+
+    readsChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Reads',
+                data: values,
+                borderColor: '#7c5cff',
+                backgroundColor: 'rgba(124,92,255,0.15)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 0,
+                pointHoverRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    ticks: { color: '#9a9ab0', maxTicksLimit: 8 },
+                    grid:  { color: 'rgba(255,255,255,0.04)' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#9a9ab0', precision: 0 },
+                    grid:  { color: 'rgba(255,255,255,0.04)' }
+                }
+            }
+        }
+    });
+}
+
+/* ---------------------------------------------
+   Genre donut
+--------------------------------------------- */
+function renderGenreChart() {
+    const canvas = document.getElementById('genreChart');
+    const empty  = document.getElementById('genreChartEmpty');
+    if (!canvas || !empty) return;
+
+    const counts = {};
+    authorNovels.forEach(n => {
+        const g = (n.genre || 'Uncategorized').trim() || 'Uncategorized';
+        counts[g] = (counts[g] || 0) + 1;
+    });
+
+    const labels = Object.keys(counts);
+    const values = labels.map(l => counts[l]);
+
+    if (labels.length === 0) {
+        canvas.hidden = true;
+        empty.hidden = false;
+        return;
+    }
+
+    canvas.hidden = false;
+    empty.hidden = true;
+
+    if (genreChartInstance) genreChartInstance.destroy();
+
+    const palette = ['#7c5cff', '#f5a623', '#7ee0a0', '#ff6b9d', '#4dd0e1', '#ffb74d'];
+
+    genreChartInstance = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#e6e6ef', boxWidth: 12, padding: 12 }
+                }
+            }
+        }
+    });
+}
+
+/* ---------------------------------------------
+   Top novels by reads (uses in-range rows)
+--------------------------------------------- */
+function renderTopNovelsByReads(rows) {
+    const container = document.getElementById('statsTopNovels');
+    if (!container) return;
+
+    const counts = {};
+    rows.forEach(r => {
+        counts[r.novel_id] = (counts[r.novel_id] || 0) + 1;
+    });
+
+    const ranked = Object.entries(counts)
+        .map(([id, reads]) => {
+            const novel = authorNovels.find(n => n.id === id);
+            return {
+                title: novel?.title || 'Untitled',
+                genre: novel?.genre || 'Story',
+                reads
+            };
+        })
+        .sort((a, b) => b.reads - a.reads)
+        .slice(0, 5);
+
+    if (ranked.length === 0) {
+        container.innerHTML = `
+            <div class="dashboard-empty">
+                <div>📚</div>
+                <p>No reads in this period.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = ranked.map((n, i) => `
+        <div class="stats-top-row">
+            <div class="stats-top-rank">#${i + 1}</div>
+            <div class="stats-top-info">
+                <strong>${escapeHTML(n.title)}</strong>
+                <span>${escapeHTML(n.genre)}</span>
+            </div>
+            <div class="stats-top-value">${n.reads.toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+
+/* ---------------------------------------------
+   Full per-novel table
+--------------------------------------------- */
+function renderStatsTable(rows) {
+    const tbody = document.getElementById('statsTableBody');
+    if (!tbody) return;
+
+    const counts = {};
+    rows.forEach(r => {
+        counts[r.novel_id] = (counts[r.novel_id] || 0) + 1;
+    });
+
+    if (!authorNovels.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="stats-loading">No novels yet.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = authorNovels.map(n => {
+        const reads = counts[n.id] || 0;
+        const chapters = n.chapterCount || 0;
+        const perChapter = chapters ? (reads / chapters).toFixed(1) : '—';
+        const status = n.status === 'published' ? 'published' : 'draft';
+        const statusLabel = n.status === 'published' ? 'Published' : 'Draft';
+
+        return `
+            <tr>
+                <td>${escapeHTML(n.title)}</td>
+                <td>${escapeHTML(n.genre || '—')}</td>
+                <td><span class="stats-badge ${status}">${statusLabel}</span></td>
+                <td>${chapters}</td>
+                <td>${reads.toLocaleString()}</td>
+                <td>${perChapter}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/* ---------------------------------------------
+   Helpers
+--------------------------------------------- */
+function periodLabelForRange() {
+    if (statsRangeDays === 'all') return 'All time';
+    if (statsRangeDays === 7)   return 'Last 7 days';
+    if (statsRangeDays === 30)  return 'Last 30 days';
+    if (statsRangeDays === 90)  return 'Last 90 days';
+    if (statsRangeDays === 365) return 'Last 12 months';
+    return `Last ${statsRangeDays} days`;
+}
+
+function setupStatsRangeFilter() {
+    const select = document.getElementById('statsRange');
+    if (!select) return;
+    select.addEventListener('change', function () {
+        statsRangeDays = this.value === 'all' ? 'all' : parseInt(this.value, 10);
+        loadAuthorStatistics();
+    });
+}
+
+
+
+/* =====================================================
    DISPLAY NOVELS
    ===================================================== */
 
@@ -345,6 +671,7 @@ async function deleteNovel(novelId) {
         
         showToast(`"${novel.title}" has been deleted.`);
         await loadAuthorNovels();
+	await loadAuthorStatistics();
         
     } catch (error) {
         console.error('Delete error:', error);

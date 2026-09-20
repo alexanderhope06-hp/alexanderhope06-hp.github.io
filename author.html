@@ -143,23 +143,125 @@
         </div>
     </section>
 
-    <!-- PERFORMANCE -->
-    <section id="statistics" class="dashboard-section">
-        <div class="section-heading">
+<!-- STATISTICS -->
+<section id="statistics" class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="section-label">PERFORMANCE</p>
+            <h2>Statistics</h2>
+        </div>
+        <select id="statsRange" class="dashboard-period-select">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last 12 months</option>
+            <option value="all">All time</option>
+        </select>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="author-stats">
+        <div class="author-stat">
+            <div class="stat-icon">👁️</div>
             <div>
-                <p class="section-label">PERFORMANCE</p>
-                <h2>Reader Growth</h2>
+                <span>Total Reads</span>
+                <strong id="statTotalReads">0</strong>
+                <small id="statTotalReadsDelta">—</small>
             </div>
-            <span class="dashboard-period">Last 6 months</span>
         </div>
+        <div class="author-stat">
+            <div class="stat-icon">📚</div>
+            <div>
+                <span>Novels</span>
+                <strong id="statNovelCount">0</strong>
+                <small id="statNovelBreakdown">—</small>
+            </div>
+        </div>
+        <div class="author-stat">
+            <div class="stat-icon">📖</div>
+            <div>
+                <span>Chapters</span>
+                <strong id="statChapterCount">0</strong>
+                <small id="statChapterDelta">—</small>
+            </div>
+        </div>
+        <div class="author-stat">
+            <div class="stat-icon">💰</div>
+            <div>
+                <span>Earned</span>
+                <strong id="statEarned">$0.00</strong>
+                <small>Lifetime settled</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- READS OVER TIME -->
+    <div class="analytics-card">
+        <div class="analytics-card-header">
+            <h3>Reads Over Time</h3>
+            <span class="analytics-sub" id="readsChartPeriod">Last 30 days</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="readsChart" height="220"></canvas>
+            <div class="chart-empty" id="readsChartEmpty" hidden>
+                <div>📈</div>
+                <p>No reads recorded in this period yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- GENRE + PER-NOVEL BREAKDOWN -->
+    <div class="analytics-split">
         <div class="analytics-card">
-            <div class="analytics-empty">
-                <div class="analytics-icon">📈</div>
-                <h3>Reader analytics coming soon</h3>
-                <p>Once StoryNest begins tracking readers, your monthly growth will appear here.</p>
+            <div class="analytics-card-header">
+                <h3>Genre Distribution</h3>
+            </div>
+            <div class="chart-wrap chart-wrap-sm">
+                <canvas id="genreChart" height="200"></canvas>
+                <div class="chart-empty" id="genreChartEmpty" hidden>
+                    <div>🥧</div>
+                    <p>Add novels with genres to see this.</p>
+                </div>
             </div>
         </div>
-    </section>
+
+        <div class="analytics-card">
+            <div class="analytics-card-header">
+                <h3>Top Novels by Reads</h3>
+            </div>
+            <div id="statsTopNovels" class="stats-top-list">
+                <div class="dashboard-empty">
+                    <div>📚</div>
+                    <p>No reads yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PER-NOVEL TABLE -->
+    <div class="analytics-card">
+        <div class="analytics-card-header">
+            <h3>Novel Breakdown</h3>
+        </div>
+        <div class="stats-table-wrap">
+            <table class="stats-table" id="statsTable">
+                <thead>
+                    <tr>
+                        <th>Novel</th>
+                        <th>Genre</th>
+                        <th>Status</th>
+                        <th>Chapters</th>
+                        <th>Reads</th>
+                        <th>Reads / Chapter</th>
+                    </tr>
+                </thead>
+                <tbody id="statsTableBody">
+                    <tr><td colspan="6" class="stats-loading">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
     <!-- PUBLISHING ACTIVITY -->
     <section class="dashboard-section">
@@ -363,6 +465,7 @@
 </footer>
 
 <!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/auth.js"></script>
