@@ -323,47 +323,95 @@ function updateChapterCount(count) {
 publishNovelButton.addEventListener('click', publishNovel);
 
 async function publishNovel() {
-    const { data: chapters, error: chaptersError } = await supabaseClient
-        .from('chapters')
-        .select('id')
-        .eq('novel_id', novelId);
-    
+
+    /*
+     * Get current chapters
+     */
+    const { data: chapters, error: chaptersError } =
+        await supabaseClient
+            .from('chapters')
+            .select('id, status')
+            .eq('novel_id', novelId);
+
     if (chaptersError) {
         console.error(chaptersError);
         showToast('Could not check chapters.', 'error');
         return;
     }
-    
+
+    /*
+     * A novel must have at least one chapter
+     */
     if (!chapters || chapters.length === 0) {
-        showToast('Add at least one chapter before publishing.', 'error');
+        showToast(
+            'Add at least one chapter before publishing.',
+            'error'
+        );
         return;
     }
-    
-    const confirmed = confirm(`Publish "${novel.title}"?\n\nReaders will be able to see this novel.`);
-    if (!confirmed) return;
-    
+
+    /*
+     * Confirm publication
+     */
+    const confirmed = confirm(
+        `Publish "${novel.title}"?\n\n` +
+        `The novel and its current chapters will become visible to readers.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    /*
+     * Loading state
+     */
     publishNovelButton.disabled = true;
     publishNovelButton.textContent = 'Publishing...';
-    
+
+    /*
+     * Publish everything through the secure
+     * database function.
+     *
+     * The database verifies ownership and
+     * publishes the novel + its chapters.
+     */
     const { data, error } = await supabaseClient
-        .from('novels')
-        .update({ status: 'published' })
-        .eq('id', novelId)
-        .eq('author_id', currentUser.id)
-        .select()
-        .single();
-    
+        .rpc('publish_novel', {
+            p_novel_id: novelId
+        });
+
+    /*
+     * Handle error
+     */
     if (error) {
         console.error('Could not publish novel:', error);
-        showToast('Could not publish novel: ' + error.message, 'error');
+
+        showToast(
+            'Could not publish novel: ' + error.message,
+            'error'
+        );
+
         publishNovelButton.disabled = false;
         publishNovelButton.textContent = '🚀 Publish Novel';
+
         return;
     }
-    
+
+    /*
+     * Success
+     */
     console.log('Published novel:', data);
-    showToast(`"${novel.title}" has been published!`);
-    setTimeout(() => window.location.href = 'author.html', 1000);
+
+    showToast(
+        `"${novel.title}" has been published!`
+    );
+
+    /*
+     * Return to Author Dashboard
+     */
+    setTimeout(() => {
+        window.location.href = 'author.html';
+    }, 1000);
 }
 
 /* =====================================================
