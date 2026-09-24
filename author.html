@@ -29,28 +29,6 @@
         <button class="logout-btn" id="logoutButton">🚪 Logout</button>
         <a href="profile.html" class="login-btn" id="profileButton">Profile</a>
     </div>
-
-</header>
-
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
-<div class="storynest-top-ad">
-    <div class="storynest-top-ad-inner">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
-    </div>
-</div>
-
-
-
-
 </header>
 
 <!-- =====================================================
@@ -143,125 +121,23 @@
         </div>
     </section>
 
-<!-- STATISTICS -->
-<section id="statistics" class="dashboard-section">
-    <div class="section-heading">
-        <div>
-            <p class="section-label">PERFORMANCE</p>
-            <h2>Statistics</h2>
-        </div>
-        <select id="statsRange" class="dashboard-period-select">
-            <option value="7">Last 7 days</option>
-            <option value="30" selected>Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="365">Last 12 months</option>
-            <option value="all">All time</option>
-        </select>
-    </div>
-
-    <!-- KPI ROW -->
-    <div class="author-stats">
-        <div class="author-stat">
-            <div class="stat-icon">👁️</div>
+    <!-- PERFORMANCE -->
+    <section id="statistics" class="dashboard-section">
+        <div class="section-heading">
             <div>
-                <span>Total Reads</span>
-                <strong id="statTotalReads">0</strong>
-                <small id="statTotalReadsDelta">—</small>
+                <p class="section-label">PERFORMANCE</p>
+                <h2>Reader Growth</h2>
             </div>
+            <span class="dashboard-period">Last 6 months</span>
         </div>
-        <div class="author-stat">
-            <div class="stat-icon">📚</div>
-            <div>
-                <span>Novels</span>
-                <strong id="statNovelCount">0</strong>
-                <small id="statNovelBreakdown">—</small>
-            </div>
-        </div>
-        <div class="author-stat">
-            <div class="stat-icon">📖</div>
-            <div>
-                <span>Chapters</span>
-                <strong id="statChapterCount">0</strong>
-                <small id="statChapterDelta">—</small>
-            </div>
-        </div>
-        <div class="author-stat">
-            <div class="stat-icon">💰</div>
-            <div>
-                <span>Earned</span>
-                <strong id="statEarned">$0.00</strong>
-                <small>Lifetime settled</small>
-            </div>
-        </div>
-    </div>
-
-    <!-- READS OVER TIME -->
-    <div class="analytics-card">
-        <div class="analytics-card-header">
-            <h3>Reads Over Time</h3>
-            <span class="analytics-sub" id="readsChartPeriod">Last 30 days</span>
-        </div>
-        <div class="chart-wrap">
-            <canvas id="readsChart" height="220"></canvas>
-            <div class="chart-empty" id="readsChartEmpty" hidden>
-                <div>📈</div>
-                <p>No reads recorded in this period yet.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- GENRE + PER-NOVEL BREAKDOWN -->
-    <div class="analytics-split">
         <div class="analytics-card">
-            <div class="analytics-card-header">
-                <h3>Genre Distribution</h3>
-            </div>
-            <div class="chart-wrap chart-wrap-sm">
-                <canvas id="genreChart" height="200"></canvas>
-                <div class="chart-empty" id="genreChartEmpty" hidden>
-                    <div>🥧</div>
-                    <p>Add novels with genres to see this.</p>
-                </div>
+            <div class="analytics-empty">
+                <div class="analytics-icon">📈</div>
+                <h3>Reader analytics coming soon</h3>
+                <p>Once StoryNest begins tracking readers, your monthly growth will appear here.</p>
             </div>
         </div>
-
-        <div class="analytics-card">
-            <div class="analytics-card-header">
-                <h3>Top Novels by Reads</h3>
-            </div>
-            <div id="statsTopNovels" class="stats-top-list">
-                <div class="dashboard-empty">
-                    <div>📚</div>
-                    <p>No reads yet.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PER-NOVEL TABLE -->
-    <div class="analytics-card">
-        <div class="analytics-card-header">
-            <h3>Novel Breakdown</h3>
-        </div>
-        <div class="stats-table-wrap">
-            <table class="stats-table" id="statsTable">
-                <thead>
-                    <tr>
-                        <th>Novel</th>
-                        <th>Genre</th>
-                        <th>Status</th>
-                        <th>Chapters</th>
-                        <th>Reads</th>
-                        <th>Reads / Chapter</th>
-                    </tr>
-                </thead>
-                <tbody id="statsTableBody">
-                    <tr><td colspan="6" class="stats-loading">Loading…</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
+    </section>
 
     <!-- PUBLISHING ACTIVITY -->
     <section class="dashboard-section">
@@ -333,79 +209,74 @@
         </div>
     </section>
 
-<!-- EARNINGS -->
-<section id="earnings" class="dashboard-section">
-    <div class="section-heading">
-        <div>
-            <p class="section-label">MONETIZATION</p>
-            <h2>Earnings</h2>
+    <!-- EARNINGS -->
+    <section id="earnings" class="dashboard-section">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">MONETIZATION</p>
+                <h2>Earnings</h2>
+            </div>
         </div>
-        <span class="dashboard-period">50 / 50 Revenue Split</span>
-    </div>
+        <div class="coming-soon-card">
+            <div class="coming-soon-icon">💰</div>
+            <div>
+                <h3>Author Earnings</h3>
 
-    <div class="earnings-grid">
+
+<!-- Earnings section with real data -->
+<section id="earnings" class="dashboard-section">
+    
+    <div class="earnings-grid"><br />
         <div class="earnings-card">
             <span>Total Revenue</span>
             <strong id="totalRevenue">$0.00</strong>
-            <small>Your 50% share (settled)</small>
+            <small>All time earnings</small>
         </div>
-
+        
         <div class="earnings-card">
             <span>This Month</span>
             <strong id="monthlyRevenue">$0.00</strong>
-            <small>Latest settled period</small>
+            <small>Current month</small>
         </div>
-
+        
         <div class="earnings-card">
             <span>Available Balance</span>
             <strong id="availableBalance">$0.00</strong>
             <small>Ready to withdraw</small>
         </div>
     </div>
-
-    <div class="earnings-note">
-        📊 Earnings appear once a revenue period has been
-        <strong>settled and approved</strong> by our ad network.
-        This typically happens 30–45 days after the month ends,
-        because the ad network removes invalid traffic before final payout.
+    
+    <div style="margin-top: 20px; text-align: center; padding: 20px; background: var(--bg-card); border-radius: 8px;">
+        <p style="color: var(--text-secondary);">
+            📊 Earnings will start tracking once ad revenue is activated.
+            <br>
+            <small>This feature is coming soon!</small>
+        </p>
     </div>
 </section>
 
-<!-- TOP EARNING NOVELS -->
-<section class="dashboard-section">
-    <div class="section-heading">
-        <div>
-            <p class="section-label">YOUR BEST PERFORMERS</p>
-            <h2>Top Earning Novels</h2>
-        </div>
-    </div>
-    <div id="topEarningNovels" class="top-novels">
-        <div class="dashboard-empty">
-            <div>💰</div>
-            <p>Your top-earning novels will appear here once ad revenue is settled.</p>
-        </div>
-    </div>
-</section>
 
-<!-- WITHDRAW -->
-<section id="withdraw" class="dashboard-section">
-    <div class="section-heading">
-        <div>
-            <p class="section-label">PAYOUTS</p>
-            <h2>Withdraw</h2>
+            </div>
         </div>
-    </div>
-    <div class="coming-soon-card">
-        <div class="coming-soon-icon">💸</div>
-        <div>
-            <h3>Withdraw Your Earnings</h3>
-            <p>
-                Payouts open once your available balance reaches $50
-                and the current period has been settled by the ad network.
-            </p>
+    </section>
+
+    <!-- WITHDRAW -->
+    <section id="withdraw" class="dashboard-section">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">PAYOUTS</p>
+                <h2>Withdraw</h2>
+            </div>
         </div>
-    </div>
-</section>
+        <div class="coming-soon-card">
+            <div class="coming-soon-icon">💸</div>
+            <div>
+                <h3>Withdraw Your Earnings</h3>
+                <p>Payout options and withdrawal history will become available when the StoryNest payment system is ready.</p>
+            </div>
+        </div>
+    </section>
+
 
 
 
@@ -452,65 +323,13 @@
 <footer>
     <div class="footer-logo">📖 StoryNest</div>
     <p>Discover. Read. Imagine.</p>
-    <div class="footer-links">
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="faq.html">FAQ</a>
-        <a href="guidelines.html">Guidelines</a>
-        <a href="sitemap.html">Sitemap</a>
-    </div>
-    <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
+    <p class="copyright">© 2026 StoryNest.</p>
 </footer>
 
 <!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/author.js"></script>
-
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
-<div class="storynest-bottom-ad" id="storynestBottomAd">
-    <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
-    <div class="storynest-ad-content">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
-    </div>
-</div>
-
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
-
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
-
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-<!-- ================= AD BLOCK DETECTION ================= -->
-<script src="js/adblock-detect.js"></script>
-
 </body>
 </html>
