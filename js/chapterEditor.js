@@ -313,7 +313,7 @@ async function saveChapter() {
             novel_id: novelId,
             chapter_number: nextNumber,
             title: title,
-            content: content
+            content: content,
 	    status: 'draft'
         })
         .select()
