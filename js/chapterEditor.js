@@ -115,6 +115,7 @@ async function loadChapters() {
     chapters.forEach(chapter => displayChapter(chapter));
 }
 
+
 /* =====================================================
    DISPLAY CHAPTER
    ===================================================== */
@@ -122,23 +123,130 @@ async function loadChapters() {
 function displayChapter(chapter) {
     const item = document.createElement('div');
     item.className = 'editor-chapter';
+
+    const isPublished = chapter.status === 'published';
+
     item.innerHTML = `
-        <div class="editor-chapter-number">${chapter.chapter_number}</div>
+        <div class="editor-chapter-number">
+            ${chapter.chapter_number}
+        </div>
+
         <div class="editor-chapter-info">
             <strong>${escapeHTML(chapter.title)}</strong>
-            <span>${escapeHTML(chapter.content || '').length} characters</span>
+
+            <span>
+                ${escapeHTML(chapter.content || '').length} characters
+            </span>
+
+            <span class="chapter-status ${isPublished ? 'published' : 'draft'}">
+                ${isPublished ? 'Published' : 'Draft'}
+            </span>
         </div>
+
         <div class="editor-chapter-actions">
-            <button class="secondary-btn edit-chapter" data-id="${chapter.id}">Edit</button>
-            <button class="delete-chapter" data-id="${chapter.id}">Delete</button>
+
+            <button
+                class="secondary-btn edit-chapter"
+                data-id="${chapter.id}">
+                Edit
+            </button>
+
+            <button
+                class="delete-chapter"
+                data-id="${chapter.id}">
+                Delete
+            </button>
+
+            ${
+                !isPublished
+                    ? `
+                        <button
+                            class="primary-btn publish-chapter"
+                            data-id="${chapter.id}">
+                            🚀 Publish Chapter
+                        </button>
+                    `
+                    : ''
+            }
+
         </div>
     `;
-    
-    item.querySelector('.edit-chapter').addEventListener('click', () => editChapter(chapter));
-    item.querySelector('.delete-chapter').addEventListener('click', () => deleteChapter(chapter.id));
-    
+
+    item
+        .querySelector('.edit-chapter')
+        .addEventListener('click', () => editChapter(chapter));
+
+    item
+        .querySelector('.delete-chapter')
+        .addEventListener('click', () => deleteChapter(chapter.id));
+
+    const publishButton = item.querySelector('.publish-chapter');
+
+    if (publishButton) {
+        publishButton.addEventListener('click', () => {
+            publishChapter(chapter.id);
+        });
+    }
+
     chapterList.appendChild(item);
 }
+
+
+/* =====================================================
+   PUBLISH INDIVIDUAL CHAPTER
+   ===================================================== */
+
+async function publishChapter(chapterId) {
+
+    const confirmed = confirm(
+        'Publish this chapter?\n\n' +
+        'Readers will be able to read this chapter once the novel is published.'
+    );
+
+    if (!confirmed) return;
+
+    const publishButton = document.querySelector(
+        `.publish-chapter[data-id="${chapterId}"]`
+    );
+
+    if (publishButton) {
+        publishButton.disabled = true;
+        publishButton.textContent = 'Publishing...';
+    }
+
+    const { data, error } = await supabaseClient
+        .from('chapters')
+        .update({
+            status: 'published',
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', chapterId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Could not publish chapter:', error);
+
+        showToast(
+            'Could not publish chapter: ' + error.message,
+            'error'
+        );
+
+        if (publishButton) {
+            publishButton.disabled = false;
+            publishButton.textContent = '🚀 Publish Chapter';
+        }
+
+        return;
+    }
+
+    console.log('Published chapter:', data);
+
+    showToast('Chapter published successfully!');
+
+    await loadChapters();
+}
+
 
 /* =====================================================
    SAVE CHAPTER
@@ -206,6 +314,7 @@ async function saveChapter() {
             chapter_number: nextNumber,
             title: title,
             content: content
+	    status: 'draft'
         })
         .select()
         .single();
