@@ -226,3 +226,26 @@ if (loginForm) {
         }
     });
 }
+
+
+/* =====================================================
+   PASSWORD VISIBILITY TOGGLE
+   ===================================================== */
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.password-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            this.textContent = isHidden ? '🙈' : '👁️';
+            this.setAttribute(
+                'aria-label',
+                isHidden ? 'Hide password' : 'Show password'
+            );
+        });
+    });
+});
