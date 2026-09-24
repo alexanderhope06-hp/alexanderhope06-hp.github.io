@@ -9,7 +9,6 @@ const AUTH_STORAGE_KEY = 'sb-frtvsuxvhvnjrrffyeot-auth-token';
    ===================================================== */
 
 async function getCurrentSession() {
-    // Check localStorage first
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     if (stored) {
         try {
@@ -21,8 +20,7 @@ async function getCurrentSession() {
             localStorage.removeItem(AUTH_STORAGE_KEY);
         }
     }
-    
-    // Fallback to Supabase
+
     const { data } = await supabaseClient.auth.getSession();
     if (data?.session) {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
@@ -48,20 +46,20 @@ function showToast(message, type = 'success') {
         container.className = 'toast-container';
         document.body.appendChild(container);
     }
-    
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
         <span>${message}</span>
         <button class="toast-close">&times;</button>
     `;
-    
+
     container.appendChild(toast);
-    
+
     toast.querySelector('.toast-close').addEventListener('click', () => {
         toast.remove();
     });
-    
+
     setTimeout(() => {
         toast.classList.add('toast-fade-out');
         setTimeout(() => toast.remove(), 300);
@@ -93,26 +91,26 @@ function showMessage(message, error = false) {
 if (signupForm) {
     signupForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        
+
         const displayName = document.getElementById('displayName').value.trim();
         const email = document.getElementById('signupEmail').value.trim();
         const password = document.getElementById('signupPassword').value;
         const submitBtn = signupForm.querySelector('button[type="submit"]');
-        
+
         if (!displayName || !email || !password) {
             showMessage('Please complete all fields.', true);
             return;
         }
-        
+
         if (password.length < 6) {
             showMessage('Password must be at least 6 characters.', true);
             return;
         }
-        
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating account...';
         showMessage('Creating account...');
-        
+
         try {
             const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
@@ -123,7 +121,7 @@ if (signupForm) {
                     }
                 }
             });
-            
+
             if (error) {
                 console.error('SIGNUP ERROR:', error);
                 showMessage(error.message, true);
@@ -131,8 +129,7 @@ if (signupForm) {
                 submitBtn.textContent = 'Create Account';
                 return;
             }
-            
-            // Session created immediately
+
             if (data && data.session && data.user) {
                 localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
                 showMessage('Account created! Opening Author Studio...');
@@ -140,12 +137,11 @@ if (signupForm) {
                 window.location.replace('author.html');
                 return;
             }
-            
-            // Email confirmation required
+
             showMessage('Account created! Please check your email to confirm your account.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Create Account';
-            
+
         } catch (error) {
             console.error('SIGNUP ERROR:', error);
             showMessage('An unexpected error occurred.', true);
@@ -162,26 +158,26 @@ if (signupForm) {
 if (loginForm) {
     loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        
+
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
         const submitBtn = loginForm.querySelector('button[type="submit"]');
-        
+
         if (!email || !password) {
             showMessage('Please enter your email and password.', true);
             return;
         }
-        
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Logging in...';
         showMessage('Logging in...');
-        
+
         try {
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password
             });
-            
+
             if (error) {
                 console.error('LOGIN ERROR:', error);
                 showMessage(error.message, true);
@@ -189,7 +185,7 @@ if (loginForm) {
                 submitBtn.textContent = 'Login';
                 return;
             }
-            
+
             if (!data || !data.session || !data.user) {
                 console.error('LOGIN SESSION MISSING:', data);
                 showMessage('Login succeeded, but no session was created.', true);
@@ -197,27 +193,24 @@ if (loginForm) {
                 submitBtn.textContent = 'Login';
                 return;
             }
-            
-            // Store session
+
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
             console.log('LOGIN SUCCESS:', data.user.email);
-            
-            // Get redirect destination
+
             const params = new URLSearchParams(window.location.search);
             const redirect = params.get('redirect');
-            
+
             let destination = 'author.html';
             if (redirect && !redirect.includes('://') && !redirect.startsWith('//')) {
                 destination = redirect;
             }
-            
+
             showMessage('Login successful! Redirecting...');
-            
-            // Small delay for storage persistence
+
             setTimeout(() => {
                 window.location.replace(destination);
             }, 300);
-            
+
         } catch (error) {
             console.error('LOGIN ERROR:', error);
             showMessage('An unexpected error occurred.', true);
@@ -227,25 +220,34 @@ if (loginForm) {
     });
 }
 
-
 /* =====================================================
    PASSWORD VISIBILITY TOGGLE
+   Works on any page that has .password-toggle buttons.
    ===================================================== */
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.password-toggle').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (event) {
+            event.preventDefault();
+
             const targetId = this.dataset.target;
+            if (!targetId) return;
+
             const input = document.getElementById(targetId);
             if (!input) return;
 
             const isHidden = input.type === 'password';
             input.type = isHidden ? 'text' : 'password';
+
             this.textContent = isHidden ? '🙈' : '👁️';
             this.setAttribute(
                 'aria-label',
                 isHidden ? 'Hide password' : 'Show password'
             );
+
+            const pos = input.value.length;
+            input.focus();
+            try { input.setSelectionRange(pos, pos); } catch (e) {}
         });
     });
 });

@@ -4960,20 +4960,21 @@ body.ad-free-active .storynest-sidebar-ad {
 
 
 /* Password field with eye toggle */
-.password-field {
+.form-group .password-field {
     position: relative;
-    display: flex;
-    align-items: center;
+    display: block;      /* not flex — that's the bug if you used flex */
+    width: 100%;
 }
 
-.password-field input {
+.form-group .password-field input {
     width: 100%;
-    padding-right: 44px; /* room for the button */
+    box-sizing: border-box;
+    padding-right: 48px; /* leave room for the eye */
 }
 
 .password-toggle {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -4982,9 +4983,10 @@ body.ad-free-active .storynest-sidebar-ad {
     font-size: 18px;
     line-height: 1;
     padding: 4px 6px;
-    color: var(--text-secondary, #888);
+    color: #888;
     opacity: 0.7;
     transition: opacity 0.2s ease;
+    z-index: 2;
 }
 
 .password-toggle:hover {
@@ -4992,7 +4994,7 @@ body.ad-free-active .storynest-sidebar-ad {
 }
 
 .password-toggle:focus-visible {
-    outline: 2px solid var(--accent, #7c5cff);
+    outline: 2px solid #7c5cff;
     outline-offset: 2px;
     border-radius: 4px;
 }
