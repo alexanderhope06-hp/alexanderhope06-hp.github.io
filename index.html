@@ -22,52 +22,32 @@
         <nav class="nav-links">
             <a href="#home">Home</a>
             <a href="#trending">Trending</a>
-	    <a href="#wisdom">Wisdom</a>
+            <a href="#wisdom">Wisdom</a>
             <a href="#genres">Genres</a>
             <a href="#new">New Releases</a>
         </nav>
 
         <div class="nav-actions">
-            <button class="search-btn" id="searchBtn">🔍</button>
             <a href="login.html">
                 <button class="login-btn">Login</button>
             </a>
         </div>
-
-
-</header>
-
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
-<div class="storynest-top-ad">
-    <div class="storynest-top-ad-inner">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
-    </div>
-</div>
-
-
-
-
     </header>
 
-
-
-    <!-- ================= SEARCH ================= -->
-    <div class="search-panel" id="searchPanel">
-        <input
-            type="text"
-            id="searchInput"
-            placeholder="Search novels by title, author, genre..."
-            autocomplete="off"
-        >
+    <!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
+    <div class="storynest-top-ad">
+        <div class="storynest-top-ad-inner">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '6e386924edca4892ed33ab2caa248000',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        </div>
     </div>
 
     <!-- ================= HERO ================= -->
@@ -135,9 +115,56 @@
             </div>
         </section>
 
-        <!-- ================= SEARCH RESULTS ================= -->
-        <section class="section" id="searchResults" style="display:none;">
-            <!-- Dynamically populated -->
+        <!-- ================= HOME SEARCH PILL ================= -->
+        <section class="home-search-section" id="homeSearchSection">
+            <form class="home-search" id="homeSearchForm" role="search">
+                <button type="submit" class="home-search-icon-btn" aria-label="Search">
+                    <span class="search-glass">🔍</span>
+                </button>
+
+                <input
+                    type="search"
+                    id="homeSearchInput"
+                    placeholder="Search stories, authors, genres..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+
+                <button type="button" class="home-search-mic" id="homeSearchMic" aria-label="Voice search">
+                    🎤
+                </button>
+
+                <button type="button" class="home-search-clear" id="homeSearchClear" aria-label="Clear search" hidden>
+                    ✕
+                </button>
+            </form>
+
+            <p class="home-search-hint" id="homeSearchHint">
+                Try “dragons”, “romance”, “Sarah Miller”…
+            </p>
+        </section>
+
+        <!-- ================= INLINE SEARCH RESULTS (single results section) ================= -->
+        <section class="section" id="homeSearchResults" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">SEARCH RESULTS</p>
+                    <h2 id="homeSearchResultsHeading">Results</h2>
+                </div>
+                <button class="view-all" id="homeSearchClearAll" type="button">
+                    Clear search ✕
+                </button>
+            </div>
+
+            <div class="novel-grid" id="homeSearchResultsGrid">
+                <!-- filled by home-search.js -->
+            </div>
+
+            <div class="empty-state" id="homeSearchEmptyState" hidden>
+                <div class="empty-icon">🔍</div>
+                <h2>No results found</h2>
+                <p>Try a different search term.</p>
+            </div>
         </section>
 
         <!-- ================= TRENDING ================= -->
@@ -147,10 +174,10 @@
                     <p class="section-label">WHAT PEOPLE ARE READING</p>
                     <h2>🔥 Trending Novels</h2>
                 </div>
-		
-                <button class="view-all"> <a href="novel-view.html" class="view-all">
-                View All →
-                </a></button>
+
+                <a href="novel-view.html" class="view-all">
+                    View All →
+                </a>
             </div>
 
             <div class="novel-grid" id="trendingNovels">
@@ -158,24 +185,19 @@
             </div>
         </section>
 
-
-
-<!-- ================= IN-CONTENT AD (300x250) ================= -->
-<div class="storynest-in-content-ad">
-    <script type="text/javascript">
-        atOptions = {
-            'key' : '665e254e1c5fe98bcbd641aa25f400df',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-        };
-    </script>
-    <script type="text/javascript" src="https://unprofessionalginger.com/665e254e1c5fe98bcbd641aa25f400df/invoke.js"></script>
-</div>
-
-
-
+        <!-- ================= IN-CONTENT AD (300x250) ================= -->
+        <div class="storynest-in-content-ad">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '665e254e1c5fe98bcbd641aa25f400df',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://unprofessionalginger.com/665e254e1c5fe98bcbd641aa25f400df/invoke.js"></script>
+        </div>
 
         <!-- ================= LIFE & WISDOM ================= -->
         <section class="section wisdom-section" id="wisdom">
@@ -193,7 +215,6 @@
 
             <div class="wisdom-grid">
 
-                <!-- MY SON -->
                 <a href="wisdom.html?category=my-son" class="wisdom-card">
                     <div class="wisdom-icon">👨‍👦</div>
                     <div class="wisdom-content">
@@ -205,7 +226,6 @@
                     </div>
                 </a>
 
-                <!-- MY DAUGHTER -->
                 <a href="wisdom.html?category=my-daughter" class="wisdom-card">
                     <div class="wisdom-icon">👨‍👧</div>
                     <div class="wisdom-content">
@@ -217,7 +237,6 @@
                     </div>
                 </a>
 
-                <!-- THINGS NOBODY TELLS YOU -->
                 <a href="wisdom.html?category=things-nobody-tells-you" class="wisdom-card">
                     <div class="wisdom-icon">🤫</div>
                     <div class="wisdom-content">
@@ -229,7 +248,6 @@
                     </div>
                 </a>
 
-                <!-- LIFE IS FUNNY -->
                 <a href="wisdom.html?category=life-is-funny" class="wisdom-card">
                     <div class="wisdom-icon">😂</div>
                     <div class="wisdom-content">
@@ -241,7 +259,6 @@
                     </div>
                 </a>
 
-                <!-- HARD TRUTHS -->
                 <a href="wisdom.html?category=hard-truths" class="wisdom-card">
                     <div class="wisdom-icon">🔥</div>
                     <div class="wisdom-content">
@@ -253,7 +270,6 @@
                     </div>
                 </a>
 
-                <!-- BEFORE YOU LOVE SOMEONE -->
                 <a href="wisdom.html?category=before-you-love-someone" class="wisdom-card">
                     <div class="wisdom-icon">❤️</div>
                     <div class="wisdom-content">
@@ -265,7 +281,6 @@
                     </div>
                 </a>
 
-                <!-- ONE MINUTE WISDOM -->
                 <a href="wisdom.html?category=one-minute-wisdom" class="wisdom-card">
                     <div class="wisdom-icon">⏱️</div>
                     <div class="wisdom-content">
@@ -277,32 +292,30 @@
                     </div>
                 </a>
 
-<a href="wisdom.html?category=my-friend" class="wisdom-card">
-    <div class="wisdom-icon">🤝</div>
-    <div class="wisdom-content">
-        <h3>My Friend</h3>
-        <p>
-            Friendship, loyalty, trust, betrayal and the people
-            who walk through life with us.
-        </p>
-    </div>
-</a>
+                <a href="wisdom.html?category=my-friend" class="wisdom-card">
+                    <div class="wisdom-icon">🤝</div>
+                    <div class="wisdom-content">
+                        <h3>My Friend</h3>
+                        <p>
+                            Friendship, loyalty, trust, betrayal and the people
+                            who walk through life with us.
+                        </p>
+                    </div>
+                </a>
 
-<a href="wisdom.html?category=my-enemy" class="wisdom-card">
-    <div class="wisdom-icon">🥀</div>
-    <div class="wisdom-content">
-        <h3>My Enemy</h3>
-        <p>
-            Lessons about rivals, difficult people, jealousy,
-            boundaries and overcoming opposition.
-        </p>
-    </div>
-</a>
-
+                <a href="wisdom.html?category=my-enemy" class="wisdom-card">
+                    <div class="wisdom-icon">🥀</div>
+                    <div class="wisdom-content">
+                        <h3>My Enemy</h3>
+                        <p>
+                            Lessons about rivals, difficult people, jealousy,
+                            boundaries and overcoming opposition.
+                        </p>
+                    </div>
+                </a>
 
             </div>
         </section>
-
 
         <!-- ================= GENRES ================= -->
         <section class="section genres-section" id="genres">
@@ -328,7 +341,6 @@
             </div>
         </section>
 
-
         <!-- ================= NEW RELEASES ================= -->
         <section class="section" id="new">
 
@@ -338,9 +350,9 @@
                     <h2>New Releases</h2>
                 </div>
 
-                <button class="view-all"> <a href="novel-view.html" class="view-all">
-                View All →
-                </a></button>
+                <a href="novel-view.html" class="view-all">
+                    View All →
+                </a>
             </div>
 
             <div class="novel-list" id="newNovels">
@@ -350,9 +362,7 @@
         </section>
     </main>
 
-
     <!-- ================= FOOTER ================= -->
-
     <footer>
         <div class="footer-logo">📖 StoryNest</div>
 
@@ -373,57 +383,51 @@
         </p>
     </footer>
 
-
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
-<div class="storynest-bottom-ad" id="storynestBottomAd">
-    <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
-    <div class="storynest-ad-content">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+    <!-- ================= STICKY BOTTOM AD BAR ================= -->
+    <div class="storynest-bottom-ad" id="storynestBottomAd">
+        <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
+        <div class="storynest-ad-content">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'ff80d71ae4bd0291f749548e7f51685e',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+        </div>
     </div>
-</div>
 
-<!-- ================= AD BAR SCRIPT ================= -->
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
+    <!-- ================= AD BAR SCRIPT ================= -->
+    <script>
+    (function () {
+        var adBar = document.getElementById('storynestBottomAd');
+        var closeBtn = document.getElementById('closeBottomAd');
+        if (!adBar || !closeBtn) return;
 
-    // If user already closed it in this session, hide immediately
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
+        if (sessionStorage.getItem('storynest_ad_closed') === '1') {
+            adBar.classList.add('hidden');
+            document.body.classList.add('bottom-ad-hidden');
+            return;
+        }
 
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-
+        closeBtn.addEventListener('click', function () {
+            adBar.classList.add('hidden');
+            document.body.classList.add('bottom-ad-hidden');
+            sessionStorage.setItem('storynest_ad_closed', '1');
+        });
+    })();
+    </script>
 
     <!-- ================= SCRIPTS ================= -->
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/home-search.js"></script>
 
     <!-- ================= AD BLOCK DETECTION ================= -->
     <script src="js/adblock-detect.js"></script>
-
 </body>
 </html>

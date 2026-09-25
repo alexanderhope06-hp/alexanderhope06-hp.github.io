@@ -4998,3 +4998,181 @@ body.ad-free-active .storynest-sidebar-ad {
     outline-offset: 2px;
     border-radius: 4px;
 }
+
+
+
+
+
+
+
+
+/* =====================================================
+   HOME / LIBRARY SEARCH PILL
+   ===================================================== */
+
+.home-search-section {
+    padding: 40px 24px 0;
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.home-search {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(160, 120, 255, 0.45);
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.home-search:focus-within {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.18),
+                0 8px 32px rgba(124, 92, 255, 0.25);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.home-search-icon-btn {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a78bfa, #7c5cff);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 12px rgba(124, 92, 255, 0.35);
+}
+
+.home-search-icon-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(124, 92, 255, 0.5);
+}
+
+.home-search-icon-btn:active { transform: scale(0.96); }
+
+.home-search input[type="search"] {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary, #f5f3ff);
+    font-size: 16px;
+    padding: 12px 4px;
+    font-family: inherit;
+    min-width: 0;
+}
+
+.home-search input[type="search"]::placeholder {
+    color: rgba(245, 243, 255, 0.45);
+}
+
+.home-search input[type="search"]::-webkit-search-cancel-button,
+.home-search input[type="search"]::-webkit-search-decoration,
+.home-search input[type="search"]::-webkit-search-results-button,
+.home-search input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.home-search-mic,
+.home-search-clear {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: rgba(245, 243, 255, 0.55);
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-search-mic:hover {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.12);
+}
+
+.home-search-mic.listening {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+    animation: micPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(255, 107, 107, 0.45); }
+    50%      { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+}
+
+.home-search-clear {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    color: rgba(245, 243, 255, 0.6);
+}
+
+.home-search-clear:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+}
+
+.home-search-hint {
+    font-size: 13px;
+    color: rgba(245, 243, 255, 0.45);
+    text-align: center;
+    margin: 0;
+    transition: opacity 0.3s ease;
+}
+
+.home-search-hint.hidden { opacity: 0; }
+
+#homeSearchResults {
+    padding-top: 8px;
+    animation: searchResultsFade 0.35s ease;
+}
+
+@keyframes searchResultsFade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#homeSearchResults .view-all {
+    background: transparent;
+    border: none;
+    color: rgba(245, 243, 255, 0.55);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+#homeSearchResults .view-all:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+@media (max-width: 600px) {
+    .home-search-section { padding: 24px 16px 0; }
+    .home-search-icon-btn { width: 42px; height: 42px; font-size: 18px; }
+    .home-search input[type="search"] { font-size: 15px; }
+    .home-search-mic { width: 40px; height: 40px; font-size: 18px; }
+}
