@@ -17,6 +17,10 @@ html {
     -webkit-text-size-adjust: 100%;
 }
 
+html, body {
+    overflow-x: clip;   /* stronger than hidden — clips fixed children too */
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, Arial, Helvetica, sans-serif;
     background: #0d0d12;
@@ -5014,6 +5018,15 @@ body.ad-free-active .storynest-sidebar-ad {
    STORYNEST — REUSABLE HAMBURGER MENU
    ===================================================== */
 
+/* Prevent any fixed off-canvas element from widening the page */
+html, body {
+    overflow-x: clip;   /* falls back to hidden on old browsers */
+}
+
+/* =====================================================
+   HAMBURGER BUTTON
+   ===================================================== */
+
 .hamburger-btn {
     display: none;                 /* hidden on desktop */
     flex-direction: column;
@@ -5056,14 +5069,19 @@ body.ad-free-active .storynest-sidebar-ad {
 .hamburger-btn.open span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
 }
+
 .hamburger-btn.open span:nth-child(2) {
     opacity: 0;
 }
+
 .hamburger-btn.open span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* ---------- Mobile nav drawer ---------- */
+/* =====================================================
+   MOBILE NAV DRAWER
+   ===================================================== */
+
 .mobile-nav {
     position: fixed;
     top: 72px;                              /* sits just under the navbar */
@@ -5084,20 +5102,31 @@ body.ad-free-active .storynest-sidebar-ad {
     flex-direction: column;
     gap: 4px;
 
-    /* Hidden off-screen to the right */
-    transform: translateX(calc(100% + 20px));
+    /* =========================================
+       Hidden WITHOUT pushing the page wider.
+       No translateX off-screen — just fade +
+       scale in place at the top-right corner.
+       ========================================= */
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: transform 0.3s cubic-bezier(0.21, 1.02, 0.73, 1),
-                opacity 0.25s ease;
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top right;
+    transition: opacity 0.22s ease,
+                transform 0.22s ease,
+                visibility 0s linear 0.22s;
 
     z-index: 1050;
 }
 
 .mobile-nav.open {
-    transform: translateX(0);
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.22s ease,
+                transform 0.22s ease,
+                visibility 0s linear 0s;
 }
 
 .mobile-nav a {
@@ -5134,7 +5163,10 @@ body.ad-free-active .storynest-sidebar-ad {
     background: var(--accent-hover);
 }
 
-/* Backdrop */
+/* =====================================================
+   BACKDROP
+   ===================================================== */
+
 .mobile-nav-backdrop {
     position: fixed;
     inset: 0;
@@ -5150,7 +5182,11 @@ body.ad-free-active .storynest-sidebar-ad {
     pointer-events: auto;
 }
 
-/* ---------- Show hamburger only on mobile ---------- */
+/* =====================================================
+   RESPONSIVE VISIBILITY
+   ===================================================== */
+
+/* Show hamburger only on mobile, hide desktop nav-links */
 @media (max-width: 800px) {
     .hamburger-btn {
         display: flex;
