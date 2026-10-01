@@ -31,6 +31,32 @@
             <a href="login.html">
                 <button class="login-btn">Login</button>
             </a>
+<!-- Hamburger button (put inside .nav-actions) -->
+<button
+    class="hamburger-btn"
+    id="hamburgerBtn"
+    type="button"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="mobileNav"
+>
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- Mobile drawer -->
+<nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="index.html">Home</a>
+    <a href="index.html#trending">Trending</a>
+    <a href="index.html#wisdom">Wisdom</a>
+    <a href="index.html#genres">Genres</a>
+    <a href="index.html#new">New Releases</a>
+    <!-- Optional CTA -->
+    <a href="login.html" class="mobile-nav-login">Login</a>
+</nav>
+
+<div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
         </div>
 
 
@@ -404,6 +430,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/hamburger.js"></script>
 
     <!-- ================= AD BLOCK DETECTION ================= -->
     <script src="js/adblock-detect.js"></script>
