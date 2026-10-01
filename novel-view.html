@@ -192,7 +192,7 @@
             </button>
 
 
-            <!-- ================= THREE-DOTS MENU ================= -->
+            <!-- ================= THREE-DOTS MENU (GENRES) ================= -->
             <div class="novel-actions">
 
                 <button
@@ -211,43 +211,83 @@
                         Browse Genres
                     </div>
 
-                    <button class="genre-btn active" data-genre="all" type="button">
+                    <button
+                        class="genre-btn active"
+                        data-genre="all"
+                        type="button"
+                    >
                         ✨ All
                     </button>
 
-                    <button class="genre-btn" data-genre="Romance" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Romance"
+                        type="button"
+                    >
                         ❤️ Romance
                     </button>
 
-                    <button class="genre-btn" data-genre="Fantasy" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Fantasy"
+                        type="button"
+                    >
                         🧙 Fantasy
                     </button>
 
-                    <button class="genre-btn" data-genre="Thriller" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Thriller"
+                        type="button"
+                    >
                         🔪 Thriller
                     </button>
 
-                    <button class="genre-btn" data-genre="Mystery" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Mystery"
+                        type="button"
+                    >
                         👻 Mystery
                     </button>
 
-                    <button class="genre-btn" data-genre="Science Fiction" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Science Fiction"
+                        type="button"
+                    >
                         🚀 Sci-Fi
                     </button>
 
-                    <button class="genre-btn" data-genre="Comedy" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Comedy"
+                        type="button"
+                    >
                         😂 Comedy
                     </button>
 
-                    <button class="genre-btn" data-genre="Drama" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Drama"
+                        type="button"
+                    >
                         🎭 Drama
                     </button>
 
-                    <button class="genre-btn" data-genre="Historical" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Historical"
+                        type="button"
+                    >
                         🏛️ Historical
                     </button>
 
-                    <button class="genre-btn" data-genre="Adventure" type="button">
+                    <button
+                        class="genre-btn"
+                        data-genre="Adventure"
+                        type="button"
+                    >
                         ⚔️ Adventure
                     </button>
 
@@ -504,24 +544,22 @@
 
             if (!menuBtn || !dropdown) return;
 
-            // Toggle dropdown
+            // Toggle dropdown open/close
             menuBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 dropdown.classList.toggle('active');
             });
 
-            // Close dropdown when clicking outside
+            // Close when clicking outside
             document.addEventListener('click', function (e) {
                 if (!dropdown.contains(e.target) && e.target !== menuBtn) {
                     dropdown.classList.remove('active');
                 }
             });
 
-            // Close dropdown when a genre is picked
-            // (the .active class on the button is handled by novel-view.js)
+            // Close after picking a genre
             dropdown.querySelectorAll('.genre-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    // Let the existing filter logic run first, then close
                     setTimeout(function () {
                         dropdown.classList.remove('active');
                     }, 60);
