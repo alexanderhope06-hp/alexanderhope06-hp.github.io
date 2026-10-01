@@ -9,184 +9,533 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/style1.css">
     <link rel="icon" type="image/png" href="image/fav.png">
+
+    <style>
+        /* =====================================================
+           NOVEL VIEW — GENRE DROPDOWN MENU
+           ===================================================== */
+
+        .novel-actions {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .novel-menu-btn {
+            border: 0;
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.25s ease, transform 0.25s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .novel-menu-btn:hover {
+            background: rgba(155, 92, 255, 0.35);
+            transform: scale(1.05);
+        }
+
+        .novel-menu-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .novel-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 230px;
+            max-width: calc(100vw - 32px);
+            background: #17171f;
+            border: 1px solid #2a2a34;
+            border-radius: 14px;
+            padding: 8px;
+            display: none;
+            z-index: 500;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            max-height: 70vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .novel-dropdown.active {
+            display: block;
+            animation: novelDropdownFade 0.2s ease;
+        }
+
+        @keyframes novelDropdownFade {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .novel-dropdown-label {
+            padding: 8px 12px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #7a7a86;
+        }
+
+        .novel-dropdown .genre-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 11px 14px;
+            margin-bottom: 2px;
+            border-radius: 9px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #d0d0d8;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .novel-dropdown .genre-btn:hover {
+            background: rgba(155, 92, 255, 0.12);
+            color: #fff;
+        }
+
+        .novel-dropdown .genre-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 14px rgba(155, 92, 255, 0.3);
+        }
+
+        /* On mobile, dropdown shouldn't overflow */
+        @media (max-width: 480px) {
+            .novel-menu-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+
+            .novel-dropdown {
+                min-width: 200px;
+                right: -4px;
+            }
+
+            .novel-dropdown .genre-btn {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
     <!-- ================= NAVIGATION ================= -->
+
     <header class="navbar">
+
         <a href="index.html" class="logo">
-            <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+            <img
+                src="image/fav.png"
+                alt="StoryNest"
+                class="logo-icon"
+            >
+
             Story<span>Nest</span>
         </a>
 
+
         <nav class="nav-links">
-            <a href="index.html#home">Home</a>
-            <a href="index.html#trending">Trending</a>
-            <a href="index.html#wisdom">Wisdom</a>
-            <a href="index.html#genres">Genres</a>
-            <a href="index.html#new">New Releases</a>
+
+            <a href="index.html#home">
+                Home
+            </a>
+
+            <a href="index.html#trending">
+                Trending
+            </a>
+
+            <a href="index.html#wisdom">
+                Wisdom
+            </a>
+
+            <a href="index.html#genres">
+                Genres
+            </a>
+
+            <a href="index.html#new">
+                New Releases
+            </a>
+
         </nav>
 
-        <div class="nav-actions">
-            <a href="login.html">
-                <button class="login-btn" type="button">Login</button>
-            </a>
-        </div>
-    </header>
 
-    <!-- ================= TOP LEADERBOARD AD ================= -->
-    <div class="storynest-top-ad">
-        <div class="storynest-top-ad-inner">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '6e386924edca4892ed33ab2caa248000',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        <div class="nav-actions">
+
+            <button
+                class="search-btn"
+                id="searchBtn"
+                type="button"
+                aria-label="Search"
+            >
+                🔍
+            </button>
+
+
+            <!-- ================= THREE-DOTS MENU ================= -->
+            <div class="novel-actions">
+
+                <button
+                    class="novel-menu-btn"
+                    id="novelMenuBtn"
+                    type="button"
+                    aria-label="Menu"
+                    title="Menu"
+                >
+                    ⋮
+                </button>
+
+                <div class="novel-dropdown" id="novelDropdown">
+
+                    <div class="novel-dropdown-label">
+                        Browse Genres
+                    </div>
+
+                    <button class="genre-btn active" data-genre="all" type="button">
+                        ✨ All
+                    </button>
+
+                    <button class="genre-btn" data-genre="Romance" type="button">
+                        ❤️ Romance
+                    </button>
+
+                    <button class="genre-btn" data-genre="Fantasy" type="button">
+                        🧙 Fantasy
+                    </button>
+
+                    <button class="genre-btn" data-genre="Thriller" type="button">
+                        🔪 Thriller
+                    </button>
+
+                    <button class="genre-btn" data-genre="Mystery" type="button">
+                        👻 Mystery
+                    </button>
+
+                    <button class="genre-btn" data-genre="Science Fiction" type="button">
+                        🚀 Sci-Fi
+                    </button>
+
+                    <button class="genre-btn" data-genre="Comedy" type="button">
+                        😂 Comedy
+                    </button>
+
+                    <button class="genre-btn" data-genre="Drama" type="button">
+                        🎭 Drama
+                    </button>
+
+                    <button class="genre-btn" data-genre="Historical" type="button">
+                        🏛️ Historical
+                    </button>
+
+                    <button class="genre-btn" data-genre="Adventure" type="button">
+                        ⚔️ Adventure
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
+
+</header>
+
+<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
+<div class="storynest-top-ad">
+    <div class="storynest-top-ad-inner">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '6e386924edca4892ed33ab2caa248000',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+    </div>
+</div>
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <div
+        class="search-panel"
+        id="searchPanel"
+    >
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search novels by title, genre..."
+            autocomplete="off"
+        >
+
     </div>
 
-    <!-- ================= MAIN ================= -->
+
+    <!-- ================= MAIN CONTENT ================= -->
+
     <main>
-        <section class="section novels-page" id="novelsLibrary">
 
-            <!-- ================= LIBRARY SEARCH PILL ================= -->
-            <section class="home-search-section" id="librarySearchSection">
-                <form class="home-search" id="librarySearchForm" role="search">
-                    <button type="submit" class="home-search-icon-btn" aria-label="Search">
-                        <span class="search-glass">🔍</span>
-                    </button>
+        <section
+            class="section novels-page"
+            id="novelsLibrary"
+        >
 
-                    <input
-                        type="search"
-                        id="librarySearchInput"
-                        placeholder="Search stories, authors, genres..."
-                        autocomplete="off"
-                        spellcheck="false"
-                    >
-
-                    <button type="button" class="home-search-mic" id="librarySearchMic" aria-label="Voice search">
-                        🎤
-                    </button>
-
-                    <button type="button" class="home-search-clear" id="librarySearchClear" aria-label="Clear search" hidden>
-                        ✕
-                    </button>
-                </form>
-            </section>
 
             <!-- ================= PAGE HEADER ================= -->
+
             <div class="section-heading">
+
                 <div>
-                    <p class="section-label">STORYNEST LIBRARY</p>
-                    <h1>All Novels</h1>
-                    <p class="page-description">
-                        Discover every published novel available on StoryNest.
-                        Find your next adventure, mystery, romance, fantasy and more.
+
+                    <p class="section-label">
+                        STORYNEST LIBRARY
                     </p>
+
+                    <h1>
+                        All Novels
+                    </h1>
+
+                    <p class="page-description">
+                        Discover every published novel available
+                        on StoryNest. Find your next adventure,
+                        mystery, romance, fantasy and more.
+                    </p>
+
                 </div>
+
             </div>
 
-            <!-- ================= GENRE FILTERS ================= -->
-            <div class="novel-filters">
-                <button class="genre-btn active" data-genre="all" type="button">✨ All</button>
-                <button class="genre-btn" data-genre="Romance" type="button">❤️ Romance</button>
-                <button class="genre-btn" data-genre="Fantasy" type="button">🧙 Fantasy</button>
-                <button class="genre-btn" data-genre="Thriller" type="button">🔪 Thriller</button>
-                <button class="genre-btn" data-genre="Mystery" type="button">👻 Mystery</button>
-                <button class="genre-btn" data-genre="Science Fiction" type="button">🚀 Sci-Fi</button>
-                <button class="genre-btn" data-genre="Comedy" type="button">😂 Comedy</button>
-                <button class="genre-btn" data-genre="Drama" type="button">🎭 Drama</button>
-                <button class="genre-btn" data-genre="Historical" type="button">🏛️ Historical</button>
-                <button class="genre-btn" data-genre="Adventure" type="button">⚔️ Adventure</button>
-            </div>
 
-            <!-- ================= LIBRARY INFO ================= -->
+            <!-- ================= LIBRARY INFORMATION ================= -->
+
             <div class="novel-library-info">
-                <span id="novelCount">Loading novels...</span>
+
+                <span id="novelCount">
+                    Loading novels...
+                </span>
+
             </div>
+
 
             <!-- ================= NOVEL GRID ================= -->
-            <div class="novel-grid" id="allNovels">
+
+            <div
+                class="novel-grid"
+                id="allNovels"
+            >
+
                 <div class="loading-message">
-                    <p>Loading published novels...</p>
+
+                    <p>
+                        Loading published novels...
+                    </p>
+
                 </div>
+
             </div>
+
 
             <!-- ================= EMPTY STATE ================= -->
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <div class="empty-icon">📚</div>
-                <h2>No novels found</h2>
-                <p>There are no published novels in this category yet. Try another genre.</p>
+
+            <div
+                id="emptyState"
+                class="empty-state"
+                style="display: none;"
+            >
+
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <h2>
+                    No novels found
+                </h2>
+
+                <p>
+                    There are no published novels in this
+                    category yet. Try another genre.
+                </p>
+
             </div>
 
+
         </section>
+
     </main>
 
+
     <!-- ================= FOOTER ================= -->
+
     <footer>
-        <div class="footer-logo">📖 StoryNest</div>
-        <p>Discover. Read. Imagine.</p>
+
+        <div class="footer-logo">
+            📖 StoryNest
+        </div>
+
+        <p>
+            Discover. Read. Imagine.
+        </p>
+
 
         <div class="footer-links">
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
-            <a href="faq.html">FAQ</a>
-            <a href="guidelines.html">Guidelines</a>
-            <a href="sitemap.html">Sitemap</a>
+
+            <a href="about.html">
+                About
+            </a>
+
+            <a href="contact.html">
+                Contact
+            </a>
+
+            <a href="privacy.html">
+                Privacy
+            </a>
+
+            <a href="terms.html">
+                Terms
+            </a>
+
+            <a href="faq.html">
+                FAQ
+            </a>
+
+            <a href="guidelines.html">
+                Guidelines
+            </a>
+
+            <a href="sitemap.html">
+                Sitemap
+            </a>
+
         </div>
 
-        <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
+
+        <p class="copyright">
+            © 2026 StoryNest. All rights reserved.
+        </p>
+
     </footer>
 
-    <!-- ================= STICKY BOTTOM AD ================= -->
-    <div class="storynest-bottom-ad" id="storynestBottomAd">
-        <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
-        <div class="storynest-ad-content">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
-        </div>
+
+
+<!-- ================= STICKY BOTTOM AD BAR ================= -->
+<div class="storynest-bottom-ad" id="storynestBottomAd">
+    <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
+    <div class="storynest-ad-content">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
+</div>
 
-    <script>
-    (function () {
-        var adBar = document.getElementById('storynestBottomAd');
-        var closeBtn = document.getElementById('closeBottomAd');
-        if (!adBar || !closeBtn) return;
+<script>
+(function () {
+    var adBar = document.getElementById('storynestBottomAd');
+    var closeBtn = document.getElementById('closeBottomAd');
+    if (!adBar || !closeBtn) return;
 
-        if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-            adBar.classList.add('hidden');
-            document.body.classList.add('bottom-ad-hidden');
-            return;
-        }
+    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
+        adBar.classList.add('hidden');
+        document.body.classList.add('bottom-ad-hidden');
+        return;
+    }
 
-        closeBtn.addEventListener('click', function () {
-            adBar.classList.add('hidden');
-            document.body.classList.add('bottom-ad-hidden');
-            sessionStorage.setItem('storynest_ad_closed', '1');
-        });
-    })();
-    </script>
+    closeBtn.addEventListener('click', function () {
+        adBar.classList.add('hidden');
+        document.body.classList.add('bottom-ad-hidden');
+        sessionStorage.setItem('storynest_ad_closed', '1');
+    });
+})();
+</script>
+
+
+
+
+
+
 
     <!-- ================= SCRIPTS ================= -->
+
+    <!-- Supabase library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="js/supabase.js"></script>
+
     <script src="js/novel-view.js"></script>
+
+    <!-- ================= AD BLOCK DETECTION ================= -->
     <script src="js/adblock-detect.js"></script>
+
+
+    <!-- ================= GENRE MENU SCRIPT ================= -->
+    <script>
+        (function () {
+            var menuBtn = document.getElementById('novelMenuBtn');
+            var dropdown = document.getElementById('novelDropdown');
+
+            if (!menuBtn || !dropdown) return;
+
+            // Toggle dropdown
+            menuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!dropdown.contains(e.target) && e.target !== menuBtn) {
+                    dropdown.classList.remove('active');
+                }
+            });
+
+            // Close dropdown when a genre is picked
+            // (the .active class on the button is handled by novel-view.js)
+            dropdown.querySelectorAll('.genre-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    // Let the existing filter logic run first, then close
+                    setTimeout(function () {
+                        dropdown.classList.remove('active');
+                    }, 60);
+                });
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    dropdown.classList.remove('active');
+                }
+            });
+        })();
+    </script>
+
 </body>
 </html>
