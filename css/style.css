@@ -5066,36 +5066,49 @@ body.ad-free-active .storynest-sidebar-ad {
 /* ---------- Mobile nav drawer ---------- */
 .mobile-nav {
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(78vw, 320px);
+    top: 72px;                              /* sits just under the navbar */
+    right: 12px;
+    width: min(78vw, 300px);
+
+    /* Fit content — no fixed height, no inner scrolling */
+    height: auto;
+    max-height: calc(100vh - 96px);         /* safety only */
+
     background: #15151c;
-    border-left: 1px solid #26262f;
-    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.55);
-    padding: 80px 22px 30px;
+    border: 1px solid #26262f;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    transform: translateX(105%);
-    transition: transform 0.32s cubic-bezier(0.21, 1.02, 0.73, 1);
+    gap: 4px;
+
+    /* Hidden off-screen to the right */
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.21, 1.02, 0.73, 1),
+                opacity 0.25s ease;
+
     z-index: 1050;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .mobile-nav.open {
     transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .mobile-nav a {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 10px;
     color: #d0d0d8;
     font-size: 15px;
     font-weight: 500;
     text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;                    /* keep each item on one line */
 }
 
 .mobile-nav a:hover,
@@ -5110,7 +5123,7 @@ body.ad-free-active .storynest-sidebar-ad {
 }
 
 .mobile-nav .mobile-nav-login {
-    margin-top: auto;
+    margin-top: 6px;
     background: var(--accent);
     color: #fff !important;
     text-align: center;
@@ -5125,9 +5138,7 @@ body.ad-free-active .storynest-sidebar-ad {
 .mobile-nav-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.45);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -5139,27 +5150,35 @@ body.ad-free-active .storynest-sidebar-ad {
     pointer-events: auto;
 }
 
-/* Prevent body scroll when drawer is open */
-body.mobile-nav-open {
-    overflow: hidden;
-}
-
 /* ---------- Show hamburger only on mobile ---------- */
 @media (max-width: 800px) {
     .hamburger-btn {
         display: flex;
     }
 
-    /* Hide desktop nav-links when hamburger is in use */
     .navbar .nav-links {
         display: none;
     }
 }
 
-/* Make sure desktop never shows the mobile drawer pieces */
+/* Desktop: never show drawer pieces */
 @media (min-width: 801px) {
     .mobile-nav,
     .mobile-nav-backdrop {
         display: none !important;
+    }
+}
+
+/* Very small screens: shrink a bit */
+@media (max-width: 380px) {
+    .mobile-nav {
+        right: 8px;
+        width: calc(100vw - 16px);
+        max-width: 300px;
+    }
+
+    .mobile-nav a {
+        padding: 11px 12px;
+        font-size: 14px;
     }
 }
