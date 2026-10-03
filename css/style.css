@@ -8745,3 +8745,75 @@ body.ad-free-active .storynest-in-content-ad {
         font-size: 13px;
     }
 }
+
+
+/* ---------- Novel cover images ---------- */
+
+.novel-card .novel-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #eaeaea;
+}
+
+.novel-card .novel-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.novel-card:hover .novel-cover img {
+    transform: scale(1.05);
+}
+
+/* Single novel page — big cover */
+.large-cover {
+    overflow: hidden;
+    border-radius: 14px;
+    background: #eaeaea;
+}
+
+.large-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Author dashboard cover */
+.author-novel .author-cover {
+    width: 90px;
+    height: 135px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #eaeaea;
+    flex-shrink: 0;
+}
+
+.author-novel .author-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* New releases row cover */
+.new-novel .new-cover {
+    width: 90px;
+    height: 135px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #eaeaea;
+    flex-shrink: 0;
+}
+
+.new-novel .new-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

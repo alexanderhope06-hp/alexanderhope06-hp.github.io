@@ -241,23 +241,21 @@ function updateDashboardStatistics() {
 function displayNovels() {
     const novelList = document.getElementById('novelList');
     if (!novelList) return;
-    
-    // Filter novels
+
     let filteredNovels = authorNovels;
     if (novelFilter === 'published') {
         filteredNovels = authorNovels.filter(n => n.status === 'published');
     } else if (novelFilter === 'draft') {
         filteredNovels = authorNovels.filter(n => n.status !== 'published');
     }
-    
-    // No novels
+
     if (!filteredNovels || filteredNovels.length === 0) {
-        const message = novelFilter === 'all' 
+        const message = novelFilter === 'all'
             ? 'You haven\'t created any novels yet.'
-            : novelFilter === 'published' 
+            : novelFilter === 'published'
                 ? 'You haven\'t published any novels yet.'
                 : 'You don\'t have any drafts.';
-        
+
         novelList.innerHTML = `
             <div class="dashboard-empty">
                 <div>📖</div>
@@ -268,18 +266,26 @@ function displayNovels() {
         `;
         return;
     }
-    
+
     novelList.innerHTML = '';
-    
+
     filteredNovels.forEach(novel => {
         const item = document.createElement('article');
         item.className = 'author-novel';
-        
+
         const statusClass = novel.status === 'published' ? 'published' : 'draft';
         const statusText = novel.status === 'published' ? 'Published' : 'Draft';
-        
+        const cover = novel.cover_url || 'image/default-cover.png';
+
         item.innerHTML = `
-            <div class="author-cover">${escapeHTML(novel.title)}</div>
+            <div class="author-cover">
+                <img
+                    src="${escapeHTML(cover)}"
+                    alt="${escapeHTML(novel.title)}"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='image/default-cover.png';"
+                >
+            </div>
             <div class="author-novel-info">
                 <span class="status ${statusClass}">● ${statusText}</span>
                 <h2>${escapeHTML(novel.title)}</h2>
@@ -293,31 +299,26 @@ function displayNovels() {
                 <button class="danger-btn delete-novel" data-id="${novel.id}">Delete</button>
             </div>
         `;
-        
-        // Edit
+
         item.querySelector('.edit-novel').addEventListener('click', function() {
             window.location.href = `edit-novel.html?id=${encodeURIComponent(this.dataset.id)}`;
         });
-        
-        // Chapters
+
         item.querySelector('.manage-chapters').addEventListener('click', function() {
             window.location.href = `chapters.html?id=${encodeURIComponent(this.dataset.id)}`;
         });
-        
-        // Statistics
+
         item.querySelector('.novel-statistics').addEventListener('click', function() {
             window.location.href = `statistics.html?id=${encodeURIComponent(this.dataset.id)}`;
         });
-        
-        // Delete
+
         item.querySelector('.delete-novel').addEventListener('click', function() {
             deleteNovel(this.dataset.id);
         });
-        
+
         novelList.appendChild(item);
     });
 }
-
 /* =====================================================
    DELETE NOVEL
    ===================================================== */

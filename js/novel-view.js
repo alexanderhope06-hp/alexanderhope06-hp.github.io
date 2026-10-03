@@ -173,37 +173,23 @@ function displayNovels(novels) {
 
     novelsContainer.innerHTML = "";
 
-
     if (novelCount) {
-
         novelCount.textContent =
             `${novels.length} ${
-                novels.length === 1
-                    ? "novel"
-                    : "novels"
+                novels.length === 1 ? "novel" : "novels"
             } available`;
-
     }
-
 
     // =================================================
     // NO NOVELS
     // =================================================
 
     if (novels.length === 0) {
-
-        if (emptyState) {
-            emptyState.style.display = "block";
-        }
-
+        if (emptyState) emptyState.style.display = "block";
         return;
     }
 
-
-    if (emptyState) {
-        emptyState.style.display = "none";
-    }
-
+    if (emptyState) emptyState.style.display = "none";
 
     // =================================================
     // CREATE NOVEL CARDS
@@ -211,73 +197,36 @@ function displayNovels(novels) {
 
     novels.forEach(novel => {
 
-        const card =
-            document.createElement("a");
-
-
+        const card = document.createElement("a");
         card.className = "novel-card";
+        card.href = `novel.html?id=${encodeURIComponent(novel.id)}`;
 
-
-        card.href =
-            `novel.html?id=${encodeURIComponent(
-                novel.id
-            )}`;
-
-
-        const cover =
-            novel.cover_url ||
-            "image/fav.png";
-
+        const cover = novel.cover_url || "image/default-cover.png";
 
         card.innerHTML = `
-
             <div class="novel-cover">
-
                 <img
                     src="${escapeHTML(cover)}"
-                    alt="${escapeHTML(
-                        novel.title ||
-                        "StoryNest Novel"
-                    )}"
+                    alt="${escapeHTML(novel.title || "StoryNest Novel")}"
                     loading="lazy"
+                    onerror="this.onerror=null;this.src='image/default-cover.png';"
                 >
-
             </div>
-
 
             <div class="novel-info">
-
-                <h3>
-                    ${escapeHTML(
-                        novel.title ||
-                        "Untitled Novel"
-                    )}
-                </h3>
-
-
+                <h3>${escapeHTML(novel.title || "Untitled Novel")}</h3>
                 <p class="novel-author">
-                    StoryNest Author
+                    ${escapeHTML(novel.author_name || "StoryNest Author")}
                 </p>
-
-
                 <span class="novel-genre">
-                    ${escapeHTML(
-                        novel.genre ||
-                        "General"
-                    )}
+                    ${escapeHTML(novel.genre || "General")}
                 </span>
-
             </div>
-
         `;
 
-
         novelsContainer.appendChild(card);
-
     });
-
 }
-
 
 // =====================================================
 // GENRE FILTER

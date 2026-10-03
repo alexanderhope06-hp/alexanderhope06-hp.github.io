@@ -174,119 +174,75 @@ async function loadNovel() {
 
 function displayNovel() {
 
-    /*
-     * Browser title
-     */
-
-    document.title =
-        `${novel.title} — StoryNest`;
-
-
-    /*
-     * Main title
-     */
+    document.title = `${novel.title} — StoryNest`;
 
     if (novelTitle) {
-
-        novelTitle.textContent =
-            novel.title;
-
+        novelTitle.textContent = novel.title;
     }
 
+    /* ---------- COVER IMAGE ---------- */
 
-    /*
-     * Cover title
-     */
+    const coverContainer = document.getElementById("novelCover");
 
-    if (coverTitle) {
-
-        coverTitle.textContent =
-            novel.title;
-
+    if (coverContainer) {
+        if (novel.cover_url) {
+            const img = document.createElement("img");
+            img.src = novel.cover_url;
+            img.alt = novel.title || "Novel cover";
+            img.className = "large-cover-img";
+            img.onerror = () => {
+                // Fallback to the text placeholder
+                coverContainer.innerHTML = "";
+                const wrap = document.createElement("div");
+                const icon = document.createElement("span");
+                icon.textContent = "📖";
+                const h = document.createElement("h1");
+                h.textContent = novel.title || "Novel";
+                wrap.append(icon, h);
+                coverContainer.appendChild(wrap);
+            };
+            coverContainer.innerHTML = "";
+            coverContainer.appendChild(img);
+        } else {
+            // No cover — keep title visible in the placeholder
+            const coverTitleEl = document.getElementById("coverTitle");
+            if (coverTitleEl) coverTitleEl.textContent = novel.title;
+        }
     }
 
-
-    /*
-     * Genre
-     */
+    /* ---------- GENRE ---------- */
 
     if (novelGenre) {
-
-        novelGenre.textContent =
-            novel.genre ||
-            "STORY";
-
+        novelGenre.textContent = novel.genre || "STORY";
     }
 
-
-    /*
-     * Description
-     *
-     * Description appears only
-     * in "About This Novel".
-     */
+    /* ---------- DESCRIPTION ---------- */
 
     if (storyAbout) {
-
         storyAbout.textContent =
-            novel.description ||
-            "No description available.";
-
+            novel.description || "No description available.";
     }
 
-
-    /*
-     * Status
-     */
+    /* ---------- STATUS ---------- */
 
     if (novelStatus) {
-
-        novelStatus.textContent =
-            novel.status ||
-            "Published";
-
+        novelStatus.textContent = novel.status || "Published";
     }
 
-
-    /*
-     * Author
-     *
-     * Temporary until author
-     * profiles are connected.
-     */
+    /* ---------- AUTHOR ---------- */
 
     if (novelAuthor) {
-
-        novelAuthor.textContent =
-            "StoryNest Author";
-
+        novelAuthor.textContent = novel.author_name || "StoryNest Author";
     }
 
-
-    /*
-     * Start Reading
-     */
+    /* ---------- START READING ---------- */
 
     if (startReading) {
-
-        startReading.addEventListener(
-            "click",
-            () => {
-
-                window.location.href =
-                    `reader.html?id=${
-                        encodeURIComponent(
-                            novelId
-                        )
-                    }&chapter=1`;
-
-            }
-        );
-
+        startReading.addEventListener("click", () => {
+            window.location.href = `reader.html?id=${encodeURIComponent(novelId)}&chapter=1`;
+        });
     }
-
 }
-
 
 /* =====================================================
    LOAD CHAPTERS

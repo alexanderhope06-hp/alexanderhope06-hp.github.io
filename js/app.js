@@ -50,10 +50,18 @@ function displayTrending(novels) {
     novels.forEach(novel => {
         const card = document.createElement("article");
         card.className = "novel-card";
+
+        const cover = novel.cover_url || "image/default-cover.png";
+
         card.innerHTML = `
             <a href="novel.html?id=${encodeURIComponent(novel.id)}">
                 <div class="novel-cover">
-                    <h3>${escapeHTML(novel.title)}</h3>
+                    <img
+                        src="${escapeHTML(cover)}"
+                        alt="${escapeHTML(novel.title)}"
+                        loading="lazy"
+                        onerror="this.onerror=null;this.src='image/default-cover.png';"
+                    >
                 </div>
                 <div class="novel-info">
                     <h3>${escapeHTML(novel.title)}</h3>
@@ -78,8 +86,18 @@ function displayNewReleases(novels) {
     novels.forEach(novel => {
         const item = document.createElement("article");
         item.className = "new-novel";
+
+        const cover = novel.cover_url || "image/default-cover.png";
+
         item.innerHTML = `
-            <div class="new-cover">${escapeHTML(novel.title)}</div>
+            <div class="new-cover">
+                <img
+                    src="${escapeHTML(cover)}"
+                    alt="${escapeHTML(novel.title)}"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='image/default-cover.png';"
+                >
+            </div>
             <div class="new-info">
                 <h3>${escapeHTML(novel.title)}</h3>
                 <p>${escapeHTML(novel.author_name || 'Author')}</p>
@@ -95,7 +113,6 @@ function displayNewReleases(novels) {
         newContainer.appendChild(item);
     });
 }
-
 
 /* =====================================================
    EXPLORE BUTTON
