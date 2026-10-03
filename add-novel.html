@@ -52,20 +52,15 @@
         <div class="form-group">
             <label for="novelCover">Cover Image</label>
             <input type="file" id="novelCover" accept="image/*">
-            <small>Recommended: portrait book cover.</small>
+            <small>
+                Recommended: portrait book cover (e.g. 600×900).<br>
+                Best formats: <strong>WebP</strong> or <strong>JPEG</strong>.
+                Max upload 100&nbsp;KB (auto-compressed).
+                PNG only if you need transparency.
+            </small>
+            <img id="coverPreview" alt="Cover preview"
+                 style="display:none;margin-top:12px;max-width:160px;border-radius:8px;">
         </div>
-
-<div class="form-group">
-    <label for="novelCover">Cover Image</label>
-    <input type="file" id="novelCover" accept="image/*">
-    <small>
-        Recommended: portrait book cover (e.g. 600×900). 
-        Best formats: <strong>WebP</strong> or <strong>JPEG</strong>.
-        Max upload 200&nbsp;KB (auto-compressed). PNG only if you need transparency.
-    </small>
-    <img id="coverPreview" alt="Cover preview"
-         style="display:none;margin-top:12px;max-width:160px;border-radius:8px;">
-</div>
 
         <div class="form-buttons">
             <button type="button" class="secondary-btn">Save Draft</button>
