@@ -1,9 +1,11 @@
 /* =====================================================
-   STORYNEST — LIFE & WISDOM
-   Matches style.css (dark theme, accent #9b5cff)
+   STORYNEST — PAGE-SPECIFIC STYLES
+   Life & Wisdom, Wisdom Studio
    ===================================================== */
 
-/* ================= WISDOM PAGE ================= */
+/* =====================================================
+   LIFE & WISDOM — LISTING PAGE
+   ===================================================== */
 
 .wisdom-page {
     max-width: 1200px;
@@ -21,9 +23,7 @@
     margin: 0 auto;
 }
 
-.wisdom-hero .section-label {
-    margin-bottom: 14px;
-}
+.wisdom-hero .section-label { margin-bottom: 14px; }
 
 .wisdom-hero h1 {
     font-size: clamp(38px, 6vw, 68px);
@@ -34,9 +34,7 @@
     margin-bottom: 22px;
 }
 
-.wisdom-hero h1 span {
-    color: var(--accent-light);
-}
+.wisdom-hero h1 span { color: var(--accent-light); }
 
 .wisdom-hero p {
     font-size: 17px;
@@ -84,9 +82,7 @@
     box-shadow: 0 6px 20px rgba(155, 92, 255, 0.3);
 }
 
-.wisdom-filter.active:hover {
-    transform: translateY(-3px);
-}
+.wisdom-filter.active:hover { transform: translateY(-3px); }
 
 /* ---------- POSTS GRID ---------- */
 
@@ -214,8 +210,6 @@
     gap: 10px;
 }
 
-/* ---------- POST HEADER ---------- */
-
 .post-header {
     text-align: center;
     padding-bottom: 35px;
@@ -223,9 +217,7 @@
     border-bottom: 1px solid var(--border-subtle);
 }
 
-.post-header .post-category {
-    margin-bottom: 22px;
-}
+.post-header .post-category { margin-bottom: 22px; }
 
 .post-header h1 {
     font-size: clamp(30px, 5vw, 46px);
@@ -244,17 +236,13 @@
     color: var(--text-dim);
 }
 
-/* ---------- POST BODY ---------- */
-
 .post-body {
     font-size: 17px;
     line-height: 1.85;
     color: var(--text-secondary);
 }
 
-.post-body p {
-    margin-bottom: 24px;
-}
+.post-body p { margin-bottom: 24px; }
 
 .post-body p:first-of-type::first-letter {
     float: left;
@@ -289,8 +277,6 @@
     color: var(--accent);
     opacity: 0.3;
 }
-
-/* ---------- SHARE SECTION ---------- */
 
 .share-section {
     margin-top: 60px;
@@ -343,18 +329,14 @@
     border-color: #1877f2;
 }
 
-.facebook-btn:hover {
-    background: #0e63d6;
-}
+.facebook-btn:hover { background: #0e63d6; }
 
 .whatsapp-btn {
     background: #25d366;
     border-color: #25d366;
 }
 
-.whatsapp-btn:hover {
-    background: #1eb355;
-}
+.whatsapp-btn:hover { background: #1eb355; }
 
 .copy-btn {
     background: var(--accent);
@@ -367,8 +349,6 @@
     border-color: var(--accent-hover);
     box-shadow: 0 10px 28px rgba(155, 92, 255, 0.5);
 }
-
-/* ---------- MORE WISDOM ---------- */
 
 .more-wisdom {
     margin-top: 50px;
@@ -407,8 +387,6 @@
     transform: translateY(-2px);
     box-shadow: 0 12px 30px rgba(155, 92, 255, 0.45);
 }
-
-/* ---------- NOT FOUND ---------- */
 
 .not-found {
     text-align: center;
@@ -450,179 +428,8 @@
 }
 
 /* =====================================================
-   RESPONSIVE — TABLET (max 900px)
+   WISDOM STUDIO
    ===================================================== */
-
-@media (max-width: 900px) {
-    .wisdom-posts {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-}
-
-/* =====================================================
-   RESPONSIVE — MOBILE (max 800px)
-   ===================================================== */
-
-@media (max-width: 800px) {
-    .wisdom-page {
-        padding: 40px 5% 80px;
-    }
-
-    .wisdom-hero {
-        padding: 20px 0 35px;
-    }
-
-    .wisdom-hero h1 {
-        font-size: 38px;
-        margin-bottom: 18px;
-    }
-
-    .wisdom-hero p {
-        font-size: 15px;
-    }
-
-    .wisdom-categories {
-        gap: 8px;
-        padding-bottom: 30px;
-    }
-
-    .wisdom-filter {
-        padding: 9px 16px;
-        font-size: 13px;
-    }
-
-    .wisdom-posts {
-        grid-template-columns: 1fr;
-        gap: 18px;
-    }
-
-    .wisdom-post {
-        padding: 22px 22px 20px;
-    }
-
-    .wisdom-post h2 {
-        font-size: 18px;
-    }
-
-    .post-page {
-        padding: 30px 5% 70px;
-    }
-
-    .back-link {
-        margin-bottom: 30px;
-    }
-
-    .post-header {
-        padding-bottom: 28px;
-        margin-bottom: 32px;
-    }
-
-    .post-header h1 {
-        font-size: 28px;
-    }
-
-    .post-body {
-        font-size: 16px;
-        line-height: 1.8;
-    }
-
-    .post-body .highlight {
-        padding: 22px 24px;
-        font-size: 16px;
-        margin: 30px 0;
-    }
-
-    .share-section {
-        padding: 30px 22px;
-        margin-top: 45px;
-    }
-
-    .share-btn {
-        flex: 1;
-        min-width: 120px;
-    }
-}
-
-/* =====================================================
-   RESPONSIVE — SMALL MOBILE (max 480px)
-   ===================================================== */
-
-@media (max-width: 480px) {
-    .wisdom-hero h1 {
-        font-size: 32px;
-    }
-
-    .wisdom-hero p {
-        font-size: 14px;
-    }
-
-    .wisdom-filter {
-        padding: 8px 14px;
-        font-size: 12px;
-    }
-
-    .wisdom-post {
-        padding: 20px 18px 18px;
-    }
-
-    .wisdom-post h2 {
-        font-size: 17px;
-    }
-
-    .post-header h1 {
-        font-size: 24px;
-    }
-
-    .post-body {
-        font-size: 15.5px;
-    }
-
-    .post-body p:first-of-type::first-letter {
-        font-size: 3rem;
-    }
-
-    .post-body .highlight {
-        padding: 20px 20px;
-        font-size: 15px;
-    }
-
-    .share-buttons {
-        flex-direction: column;
-    }
-
-    .share-btn {
-        width: 100%;
-    }
-
-    .more-wisdom h2 {
-        font-size: 20px;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   STORYNEST — WISDOM STUDIO
-   Matches style.css (dark theme, accent #9b5cff)
-   ===================================================== */
-
-/* ================= PAGE LAYOUT ================= */
 
 .studio-container {
     max-width: 1100px;
@@ -653,8 +460,6 @@
     line-height: 1.7;
 }
 
-/* Logout button — positioned top-right on desktop */
-
 .studio-header .logout-btn {
     position: absolute;
     top: 0;
@@ -677,8 +482,6 @@
     transform: translateY(-2px);
 }
 
-/* ================= CARDS ================= */
-
 .studio-card {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
@@ -689,9 +492,7 @@
     transition: border-color var(--transition);
 }
 
-.studio-card:hover {
-    border-color: #2a1f3a;
-}
+.studio-card:hover { border-color: #2a1f3a; }
 
 .studio-card h2 {
     font-size: 22px;
@@ -703,48 +504,7 @@
     letter-spacing: -0.01em;
 }
 
-/* ================= FORM ================= */
-
-.studio-card .form-group {
-    margin-bottom: 22px;
-}
-
-.studio-card .form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: 13px;
-    color: #d0d0d8;
-    margin-bottom: 9px;
-    letter-spacing: 0.2px;
-}
-
-.studio-card .form-group input,
-.studio-card .form-group select,
-.studio-card .form-group textarea {
-    width: 100%;
-    padding: 13px 16px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    background: var(--bg-input);
-    color: #f0f0f5;
-    font-size: 15px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-}
-
-.studio-card .form-group input::placeholder,
-.studio-card .form-group textarea::placeholder {
-    color: var(--text-faint);
-}
-
-.studio-card .form-group input:focus,
-.studio-card .form-group select:focus,
-.studio-card .form-group textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(155, 92, 255, 0.15);
-}
+/* Studio reuses .form-group from base, only tweaks the textarea/select look */
 
 .studio-card .form-group textarea {
     min-height: 220px;
@@ -764,8 +524,6 @@
     background-size: 16px;
     padding-right: 42px;
 }
-
-/* ================= BUTTON ROW ================= */
 
 .button-row {
     display: flex;
@@ -825,8 +583,6 @@
     transform: translateY(-2px);
 }
 
-/* ================= MESSAGE ================= */
-
 .message {
     display: none;
     margin-top: 22px;
@@ -856,6 +612,15 @@
 .post-list {
     display: grid;
     gap: 14px;
+}
+
+.post-list > .post-empty {
+    padding: 50px 20px;
+    text-align: center;
+    border: 1px dashed #333;
+    border-radius: var(--radius-lg);
+    color: var(--text-muted);
+    font-size: 14px;
 }
 
 .post-item {
@@ -894,8 +659,6 @@
     margin-bottom: 16px;
 }
 
-/* ================= STATUS BADGES ================= */
-
 .status {
     display: inline-block;
     padding: 4px 11px;
@@ -916,8 +679,6 @@
     background: rgba(231, 173, 79, 0.15);
     color: var(--warning);
 }
-
-/* ================= POST ACTIONS ================= */
 
 .post-actions {
     display: flex;
@@ -976,111 +737,81 @@
     transform: translateY(-2px);
 }
 
-/* ================= EMPTY / LOADING STATE ================= */
-
-.post-list:empty::before,
-.post-list > p {
-    display: block;
-    padding: 50px 20px;
-    text-align: center;
-    border: 1px dashed #333;
-    border-radius: var(--radius-lg);
-    color: var(--text-muted);
-    font-size: 14px;
-}
-
 /* =====================================================
    RESPONSIVE
    ===================================================== */
 
+@media (max-width: 900px) {
+    .wisdom-posts {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
 @media (max-width: 800px) {
-    .studio-container {
-        margin: 0 auto;
-        padding: 40px 5% 80px;
-    }
+    .wisdom-page { padding: 40px 5% 80px; }
+    .wisdom-hero { padding: 20px 0 35px; }
+    .wisdom-hero h1 { font-size: 38px; margin-bottom: 18px; }
+    .wisdom-hero p { font-size: 15px; }
+    .wisdom-categories { gap: 8px; padding-bottom: 30px; }
+    .wisdom-filter { padding: 9px 16px; font-size: 13px; }
+    .wisdom-posts { grid-template-columns: 1fr; gap: 18px; }
+    .wisdom-post { padding: 22px 22px 20px; }
+    .wisdom-post h2 { font-size: 18px; }
 
-    .studio-header {
-        padding-bottom: 24px;
-        margin-bottom: 32px;
+    .post-page { padding: 30px 5% 70px; }
+    .back-link { margin-bottom: 30px; }
+    .post-header { padding-bottom: 28px; margin-bottom: 32px; }
+    .post-header h1 { font-size: 28px; }
+    .post-body { font-size: 16px; line-height: 1.8; }
+    .post-body .highlight {
+        padding: 22px 24px;
+        font-size: 16px;
+        margin: 30px 0;
     }
+    .share-section { padding: 30px 22px; margin-top: 45px; }
+    .share-btn { flex: 1; min-width: 120px; }
 
-    .studio-header h1 {
-        font-size: 30px;
-    }
-
+    .studio-container { padding: 40px 5% 80px; }
+    .studio-header { padding-bottom: 24px; margin-bottom: 32px; }
+    .studio-header h1 { font-size: 30px; }
     .studio-header .logout-btn {
         position: static;
         margin-top: 18px;
         display: inline-flex;
     }
-
     .studio-card {
         padding: 26px 22px;
         border-radius: var(--radius-lg);
         margin-bottom: 20px;
     }
-
-    .studio-card h2 {
-        font-size: 19px;
-        margin-bottom: 22px;
-    }
-
-    .button-row {
-        flex-direction: column;
-    }
-
-    .studio-btn {
-        width: 100%;
-    }
-
-    .post-item {
-        padding: 18px 20px;
-    }
-
-    .post-actions button {
-        flex: 1;
-        min-width: 90px;
-        text-align: center;
-    }
+    .studio-card h2 { font-size: 19px; margin-bottom: 22px; }
+    .button-row { flex-direction: column; }
+    .studio-btn { width: 100%; }
+    .post-item { padding: 18px 20px; }
+    .post-actions button { flex: 1; min-width: 90px; text-align: center; }
 }
 
 @media (max-width: 480px) {
-    .studio-header h1 {
-        font-size: 26px;
-    }
+    .wisdom-hero h1 { font-size: 32px; }
+    .wisdom-hero p { font-size: 14px; }
+    .wisdom-filter { padding: 8px 14px; font-size: 12px; }
+    .wisdom-post { padding: 20px 18px 18px; }
+    .wisdom-post h2 { font-size: 17px; }
 
-    .studio-header p {
-        font-size: 14px;
-    }
+    .post-header h1 { font-size: 24px; }
+    .post-body { font-size: 15.5px; }
+    .post-body p:first-of-type::first-letter { font-size: 3rem; }
+    .post-body .highlight { padding: 20px 20px; font-size: 15px; }
+    .share-buttons { flex-direction: column; }
+    .share-btn { width: 100%; }
+    .more-wisdom h2 { font-size: 20px; }
 
-    .studio-card {
-        padding: 22px 18px;
-    }
-
-    .studio-card h2 {
-        font-size: 17px;
-    }
-
-    .studio-card .form-group input,
-    .studio-card .form-group select,
-    .studio-card .form-group textarea {
-        font-size: 14px;
-        padding: 12px 14px;
-    }
-
-    .post-item h3 {
-        font-size: 16px;
-    }
-
-    .post-meta {
-        font-size: 12px;
-    }
-
-    .post-actions {
-        flex-direction: column;
-    }
-
-    .post-actions button {
-        width: 100%;
-    }
+    .studio-header h1 { font-size: 26px; }
+    .studio-header p { font-size: 14px; }
+    .studio-card { padding: 22px 18px; }
+    .studio-card h2 { font-size: 17px; }
+    .post-item h3 { font-size: 16px; }
+    .post-meta { font-size: 12px; }
+    .post-actions { flex-direction: column; }
+    .post-actions button { width: 100%; }
 }

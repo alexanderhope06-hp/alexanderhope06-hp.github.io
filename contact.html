@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,145 +7,128 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="image/fav.png">
 </head>
-
 <body>
 
-    <header class="navbar">
-<a href="index.html" class="logo">
+<header class="navbar">
+    <a href="index.html" class="logo">
         <img src="image/fav.png" alt="StoryNest" class="logo-icon">
-         Story<span>Nest</span>
-</a>
-        <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="index.html#trending">Trending</a>
-            <a href="index.html#genres">Genres</a>
-            <a href="about.html">About</a>
-        </nav>
-        <div class="nav-actions">
-            <a href="login.html">
-                <button class="login-btn">Login</button>
-            </a>
-        </div>
-
+        Story<span>Nest</span>
+    </a>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#trending">Trending</a>
+        <a href="index.html#genres">Genres</a>
+        <a href="about.html">About</a>
+    </nav>
+    <div class="nav-actions">
+        <a href="login.html" class="login-btn">Login</a>
+    </div>
 </header>
 
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
 <div class="storynest-top-ad">
     <div class="storynest-top-ad-inner">
         <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
+            atOptions = { 'key': '6e386924edca4892ed33ab2caa248000', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        <script src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
     </div>
 </div>
 
+<main class="page-container">
+    <div class="page-header">
+        <p class="section-label">GET IN TOUCH</p>
+        <h1>Contact StoryNest</h1>
+        <p class="page-subtitle">Have questions, feedback, or suggestions? We'd love to hear from you.</p>
+    </div>
 
-    </header>
+    <div class="page-content">
+        <div class="contact-grid">
+            <div class="contact-form-container">
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="contactName">Your Name</label>
+                        <input type="text" id="contactName" placeholder="Enter your name" required>
+                    </div>
 
-    <main class="page-container">
-        <div class="page-header">
-            <p class="section-label">GET IN TOUCH</p>
-            <h1>Contact StoryNest</h1>
-            <p class="page-subtitle">Have questions, feedback, or suggestions? We'd love to hear from you.</p>
-        </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Email Address</label>
+                        <input type="email" id="contactEmail" placeholder="you@example.com" required>
+                    </div>
 
-        <div class="page-content">
-            <div class="contact-grid">
-                <div class="contact-form-container">
-                    <form id="contactForm" class="contact-form">
-                        <div class="form-group">
-                            <label for="contactName">Your Name</label>
-                            <input type="text" id="contactName" placeholder="Enter your name" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="contactSubject">Subject</label>
+                        <select id="contactSubject" required>
+                            <option value="">Select a subject</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback & Suggestions</option>
+                            <option value="report">Report an Issue</option>
+                            <option value="partnership">Partnership Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="contactEmail">Email Address</label>
-                            <input type="email" id="contactEmail" placeholder="you@example.com" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="contactMessage">Message</label>
+                        <textarea id="contactMessage" rows="6" placeholder="Tell us how we can help..." required></textarea>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="contactSubject">Subject</label>
-                            <select id="contactSubject" required>
-                                <option value="">Select a subject</option>
-                                <option value="support">Technical Support</option>
-                                <option value="feedback">Feedback & Suggestions</option>
-                                <option value="report">Report an Issue</option>
-                                <option value="partnership">Partnership Inquiry</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
+                    <button type="submit" class="primary-btn" id="sendMessageBtn">Send Message →</button>
+                </form>
 
-                        <div class="form-group">
-                            <label for="contactMessage">Message</label>
-                            <textarea id="contactMessage" rows="6" placeholder="Tell us how we can help..." required></textarea>
-                        </div>
+                <div id="contactSuccess" style="display:none; text-align:center; padding:40px;">
+                    <div style="font-size:3rem; margin-bottom:16px;">✅</div>
+                    <h3>Message Sent!</h3>
+                    <p>Thank you for reaching out. We'll get back to you soon.</p>
+                    <button onclick="resetContactForm()" class="secondary-btn" style="margin-top:16px;">Send Another Message</button>
+                </div>
+            </div>
 
-                        <button type="submit" class="primary-btn" id="sendMessageBtn">
-                            Send Message →
-                        </button>
-                    </form>
-                    <div id="contactSuccess" style="display:none; text-align:center; padding:40px;">
-                        <div style="font-size:3rem; margin-bottom:16px;">✅</div>
-                        <h3>Message Sent!</h3>
-                        <p>Thank you for reaching out. We'll get back to you soon.</p>
-                        <button onclick="resetContactForm()" class="secondary-btn" style="margin-top:16px;">
-                            Send Another Message
-                        </button>
+            <div class="contact-info">
+                <h3>Other Ways to Reach Us</h3>
+
+                <div class="contact-method">
+                    <div class="contact-method-icon">📧</div>
+                    <div>
+                        <strong>Email</strong>
+                        <p>support@storynest.com</p>
                     </div>
                 </div>
 
-                <div class="contact-info">
-                    <h3>Other Ways to Reach Us</h3>
-                    
-                    <div class="contact-method">
-                        <div class="contact-method-icon">📧</div>
-                        <div>
-                            <strong>Email</strong>
-                            <p>support@storynest.com</p>
-                        </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">🐦</div>
+                    <div>
+                        <strong>Twitter</strong>
+                        <p>@StoryNest</p>
                     </div>
+                </div>
 
-                    <div class="contact-method">
-                        <div class="contact-method-icon">🐦</div>
-                        <div>
-                            <strong>Twitter</strong>
-                            <p>@StoryNest</p>
-                        </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">📱</div>
+                    <div>
+                        <strong>Instagram</strong>
+                        <p>@StoryNest</p>
                     </div>
+                </div>
 
-                    <div class="contact-method">
-                        <div class="contact-method-icon">📱</div>
-                        <div>
-                            <strong>Instagram</strong>
-                            <p>@StoryNest</p>
-                        </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">📝</div>
+                    <div>
+                        <strong>Response Time</strong>
+                        <p>Usually within 24-48 hours</p>
                     </div>
+                </div>
 
-                    <div class="contact-method">
-                        <div class="contact-method-icon">📝</div>
-                        <div>
-                            <strong>Response Time</strong>
-                            <p>Usually within 24-48 hours</p>
-                        </div>
-                    </div>
-
-                    <div class="contact-hours">
-                        <h4>Support Hours</h4>
-                        <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
-                        <p>Weekend: Limited support</p>
-                    </div>
+                <div class="contact-hours">
+                    <h4>Support Hours</h4>
+                    <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                    <p>Weekend: Limited support</p>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <footer>
+<footer>
     <div class="footer-logo">📖 StoryNest</div>
     <p>Discover. Read. Imagine.</p>
     <div class="footer-links">
@@ -160,73 +142,18 @@
     <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-    <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('contactName').value.trim();
-            const email = document.getElementById('contactEmail').value.trim();
-            const subject = document.getElementById('contactSubject').value;
-            const message = document.getElementById('contactMessage').value.trim();
-
-            if (!name || !email || !subject || !message) {
-                alert('Please fill in all fields.');
-                return;
-            }
-
-            // Show success (in production, this would send to Supabase or email)
-            document.getElementById('contactForm').style.display = 'none';
-            document.getElementById('contactSuccess').style.display = 'block';
-        });
-
-        function resetContactForm() {
-            document.getElementById('contactForm').reset();
-            document.getElementById('contactForm').style.display = 'block';
-            document.getElementById('contactSuccess').style.display = 'none';
-        }
-    </script>
-
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
         <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key': 'ff80d71ae4bd0291f749548e7f51685e', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
 </div>
 
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
-
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
-
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-<!-- ================= AD BLOCK DETECTION ================= -->
+<script src="js/ads.js"></script>
+<script src="js/contact.js"></script>
 <script src="js/adblock-detect.js"></script>
-
-
 </body>
 </html>

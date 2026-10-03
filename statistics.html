@@ -1,294 +1,100 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics — StoryNest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+</head>
+<body class="author-page">
 
-	<head>
-
-		<meta charset="UTF-8">
-
-			<meta
-				name="viewport"
-				content="width=device-width, initial-scale=1.0"
-    >
-
-				<title>Statistics — StoryNest</title>
-
-				<link
-					rel="stylesheet"
-					href="css/style.css"
-    >
-<link rel="icon" type="image/png" href="image/fav.png">
-
-				</head>
-
-
-	<body class="author-page">
-
-
-		<header class="navbar">
-
-	<a href="index.html" class="logo">
-            <img src="image/fav.png" alt="StoryNest" class="logo-icon">
-             Story<span>Nest</span>
-       </a>
-
-
-			<a
-				href="author.html"
-				class="login-btn"
-    >
-				← Dashboard
-			</a>
-
+<header class="navbar">
+    <a href="index.html" class="logo">
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+        Story<span>Nest</span>
+    </a>
+    <a href="author.html" class="login-btn">← Dashboard</a>
 </header>
 
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
 <div class="storynest-top-ad">
     <div class="storynest-top-ad-inner">
         <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
+            atOptions = { 'key': '6e386924edca4892ed33ab2caa248000', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        <script src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
     </div>
 </div>
 
-
-
-
-		</header>
-
-
-		<main class="author-dashboard">
-
-
-			<!-- HEADER -->
-
-			<section class="dashboard-header">
-
-				<div>
-
-					<p class="section-label">
-						AUTHOR STUDIO
-					</p>
-
-					<h1 id="statisticsTitle">
-						Novel Statistics
-					</h1>
-
-					<p id="statisticsDescription">
-						View the performance of your story.
-					</p>
-
-				</div>
-
-			</section>
-
-
-
-			<!-- STATISTICS -->
-
-			<section class="author-stats">
-
-
-				<div class="author-stat">
-
-					<span>
-						Readers
-					</span>
-
-					<strong id="totalReaders">
-						0
-					</strong>
-
-				</div>
-
-
-				<div class="author-stat">
-
-					<span>
-						Chapters
-					</span>
-
-					<strong id="totalChapters">
-						0
-					</strong>
-
-				</div>
-
-
-				<div class="author-stat">
-
-					<span>
-						Rating
-					</span>
-
-					<strong id="novelRating">
-						—
-					</strong>
-
-				</div>
-
-
-				<div class="author-stat">
-
-					<span>
-						Status
-					</span>
-
-					<strong id="novelStatus">
-						—
-					</strong>
-
-				</div>
-
-
-			</section>
-
-
-
-			<!-- NOVEL INFORMATION -->
-
-			<section class="dashboard-section">
-
-
-				<div class="section-heading">
-
-					<div>
-
-						<p class="section-label">
-							NOVEL
-						</p>
-
-						<h2>
-							Story Information
-						</h2>
-
-					</div>
-
-				</div>
-
-
-				<div class="author-novel">
-
-
-					<div
-						class="author-cover"
-						id="statisticsCover"
-            >
-						📖
-					</div>
-
-
-					<div class="author-novel-info">
-
-
-						<span
-							class="status"
-							id="statusLabel"
-                >
-							● Loading
-						</span>
-
-
-						<h2 id="novelTitle">
-							Loading...
-						</h2>
-
-
-						<p id="novelGenre">
-							Loading...
-						</p>
-
-
-						<p
-							class="muted"
-							id="publishedDate"
-                >
-							Published: —
-						</p>
-
-
-					</div>
-
-
-				</div>
-
-			</section>
-
-
-
-			<!-- CHAPTER INFORMATION -->
-
-			<section class="dashboard-section">
-
-
-				<div class="section-heading">
-
-					<div>
-
-						<p class="section-label">
-							CONTENT
-						</p>
-
-						<h2>
-							Chapters
-						</h2>
-
-					</div>
-
-				</div>
-
-
-				<div id="statisticsChapters">
-
-					<p>
-						Loading chapters...
-					</p>
-
-				</div>
-
-
-			</section>
-
-
-
-			<!-- FUTURE ANALYTICS -->
-
-			<section class="publish-box">
-
-
-				<div>
-
-					<h2>
-						Reader Analytics
-					</h2>
-
-
-					<p>
-						Detailed reader activity, reading
-						time, views and earnings will appear
-						here once reader tracking is enabled.
-					</p>
-
-				</div>
-
-
-				<span>
-					Coming Soon
-				</span>
-
-			</section>
-
-
-		</main>
-
-
-		<footer>
+<main class="author-dashboard">
+    <section class="dashboard-header">
+        <div>
+            <p class="section-label">AUTHOR STUDIO</p>
+            <h1 id="statisticsTitle">Novel Statistics</h1>
+            <p id="statisticsDescription">View the performance of your story.</p>
+        </div>
+    </section>
+
+    <section class="author-stats">
+        <div class="author-stat">
+            <span>Readers</span>
+            <strong id="totalReaders">0</strong>
+        </div>
+        <div class="author-stat">
+            <span>Chapters</span>
+            <strong id="totalChapters">0</strong>
+        </div>
+        <div class="author-stat">
+            <span>Rating</span>
+            <strong id="novelRating">—</strong>
+        </div>
+        <div class="author-stat">
+            <span>Status</span>
+            <strong id="novelStatus">—</strong>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">NOVEL</p>
+                <h2>Story Information</h2>
+            </div>
+        </div>
+
+        <div class="author-novel">
+            <div class="author-cover" id="statisticsCover">📖</div>
+            <div class="author-novel-info">
+                <span class="status" id="statusLabel">● Loading</span>
+                <h2 id="novelTitle">Loading...</h2>
+                <p id="novelGenre">Loading...</p>
+                <p class="muted" id="publishedDate">Published: —</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">CONTENT</p>
+                <h2>Chapters</h2>
+            </div>
+        </div>
+        <div id="statisticsChapters">
+            <p>Loading chapters...</p>
+        </div>
+    </section>
+
+    <section class="publish-box">
+        <div>
+            <h2>Reader Analytics</h2>
+            <p>Detailed reader activity, reading time, views and earnings will appear here once reader tracking is enabled.</p>
+        </div>
+        <span>Coming Soon</span>
+    </section>
+</main>
+
+<footer>
     <div class="footer-logo">📖 StoryNest</div>
     <p>Discover. Read. Imagine.</p>
     <div class="footer-links">
@@ -303,56 +109,20 @@
     <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-
-
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-		<script src="js/supabase.js"></script>
-
-		<script src="js/statistics.js"></script>
-
-
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
         <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key': 'ff80d71ae4bd0291f749548e7f51685e', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
 </div>
 
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
-
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
-
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-<!-- ================= AD BLOCK DETECTION ================= -->
+<script src="js/ads.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/statistics.js"></script>
 <script src="js/adblock-detect.js"></script>
-
-	</body>
-
+</body>
 </html>

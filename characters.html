@@ -1,223 +1,87 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters — StoryNest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+</head>
+<body>
 
-	<head>
-
-		<meta charset="UTF-8">
-
-			<meta name="viewport"
-				  content="width=device-width, initial-scale=1.0">
-
-				<title>Characters — StoryNest</title>
-
-				<link rel="stylesheet"
-					  href="css/style.css">
-<link rel="icon" type="image/png" href="image/fav.png">
-				</head>
-
-	<body>
-
-		<header class="navbar">
-<a href="index.html" class="logo">
-	<img src="image/fav.png" alt="StoryNest" class="logo-icon">
+<header class="navbar">
+    <a href="index.html" class="logo">
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
         Story<span>Nest</span>
-</a>
-
-			<a href="author.html"
-			   class="login-btn">
-
-				← Dashboard
-
-			</a>
-
-
+    </a>
+    <a href="author.html" class="login-btn">← Dashboard</a>
 </header>
 
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
 <div class="storynest-top-ad">
     <div class="storynest-top-ad-inner">
         <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
+            atOptions = { 'key': '6e386924edca4892ed33ab2caa248000', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        <script src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
     </div>
 </div>
 
-
-		</header>
-
-
-		<main class="add-novel-container">
-
-			<!-- HEADER -->
-
-			<div class="add-novel-header">
-
-				<p class="section-label">
-					AUTHOR STUDIO
-				</p>
-
-				<h1 id="novelTitle">
-					Characters
-				</h1>
-
-				<p>
-					Create and manage the characters in your story.
-				</p>
-
-			</div>
-
-
-			<!-- ADD CHARACTER -->
-
-			<section class="chapter-editor">
-
-				<div class="chapter-editor-top">
-
-					<h2>
-						Add Character
-					</h2>
-
-				</div>
-
-
-				<div class="form-group">
-
-					<label for="characterName">
-						Character Name
-					</label>
-
-					<input
-						type="text"
-						id="characterName"
-						placeholder="Example: Amara Williams"
-            >
-
-					</div>
-
-
-				<div class="form-group">
-
-					<label for="characterRole">
-						Role
-					</label>
-
-					<select id="characterRole">
-
-						<option value="">
-							Select character role
-						</option>
-
-						<option value="Protagonist">
-							Protagonist
-						</option>
-
-						<option value="Antagonist">
-							Antagonist
-						</option>
-
-						<option value="Supporting Character">
-							Supporting Character
-						</option>
-
-						<option value="Love Interest">
-							Love Interest
-						</option>
-
-						<option value="Other">
-							Other
-						</option>
-
-					</select>
-
-				</div>
-
-
-				<div class="form-group">
-
-					<label for="characterDescription">
-						Description
-					</label>
-
-					<textarea
-						id="characterDescription"
-						rows="7"
-						placeholder="Describe this character..."
-            ></textarea>
-
-				</div>
-
-
-				<div class="chapter-editor-buttons">
-
-					<button
-						class="secondary-btn"
-						id="clearCharacter">
-
-						Clear
-
-					</button>
-
-
-					<button
-						class="primary-btn"
-						id="saveCharacter">
-
-						+ Add Character
-
-					</button>
-
-				</div>
-
-			</section>
-
-
-			<!-- CHARACTER LIST -->
-
-			<section class="saved-chapters">
-
-				<div class="section-heading">
-
-					<div>
-
-						<p class="section-label">
-							YOUR STORY
-						</p>
-
-						<h2>
-							Characters
-						</h2>
-
-					</div>
-
-				</div>
-
-
-				<div id="characterList">
-
-					<div class="chapter-empty">
-
-						<div>👤</div>
-
-						<p>
-							No characters yet.
-						</p>
-
-					</div>
-
-				</div>
-
-			</section>
-
-		</main>
-
-
+<main class="add-novel-container">
+    <div class="add-novel-header">
+        <p class="section-label">AUTHOR STUDIO</p>
+        <h1 id="novelTitle">Characters</h1>
+        <p>Create and manage the characters in your story.</p>
+    </div>
+
+    <section class="chapter-editor">
+        <div class="chapter-editor-top">
+            <h2>Add Character</h2>
+        </div>
+
+        <div class="form-group">
+            <label for="characterName">Character Name</label>
+            <input type="text" id="characterName" placeholder="Example: Amara Williams">
+        </div>
+
+        <div class="form-group">
+            <label for="characterRole">Role</label>
+            <select id="characterRole">
+                <option value="">Select character role</option>
+                <option value="Protagonist">Protagonist</option>
+                <option value="Antagonist">Antagonist</option>
+                <option value="Supporting Character">Supporting Character</option>
+                <option value="Love Interest">Love Interest</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="characterDescription">Description</label>
+            <textarea id="characterDescription" rows="7" placeholder="Describe this character..."></textarea>
+        </div>
+
+        <div class="chapter-editor-buttons">
+            <button class="secondary-btn" id="clearCharacter">Clear</button>
+            <button class="primary-btn" id="saveCharacter">+ Add Character</button>
+        </div>
+    </section>
+
+    <section class="saved-chapters">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">YOUR STORY</p>
+                <h2>Characters</h2>
+            </div>
+        </div>
+
+        <div id="characterList">
+            <div class="chapter-empty">
+                <div>👤</div>
+                <p>No characters yet.</p>
+            </div>
+        </div>
+    </section>
+</main>
 
 <footer>
     <div class="footer-logo">📖 StoryNest</div>
@@ -234,55 +98,20 @@
     <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-		<script src="js/supabase.js"></script>
-
-		<script src="js/characters.js"></script>
-
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
         <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key': 'ff80d71ae4bd0291f749548e7f51685e', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
 </div>
 
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
-
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
-
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-
-<!-- ================= AD BLOCK DETECTION ================= -->
+<script src="js/ads.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/characters.js"></script>
 <script src="js/adblock-detect.js"></script>
-
-	</body>
-
+</body>
 </html>

@@ -11,32 +11,20 @@
 
 <header class="navbar">
     <a href="index.html" class="logo">
-            <img src="image/fav.png" alt="StoryNest" class="logo-icon">
-             Story<span>Nest</span>
-       </a>
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+        Story<span>Nest</span>
+    </a>
     <a href="author.html" class="login-btn">← Dashboard</a>
-
 </header>
 
-<!-- ================= TOP LEADERBOARD AD (728x90) ================= -->
 <div class="storynest-top-ad">
     <div class="storynest-top-ad-inner">
         <script type="text/javascript">
-            atOptions = {
-                'key' : '6e386924edca4892ed33ab2caa248000',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-            };
+            atOptions = { 'key': '6e386924edca4892ed33ab2caa248000', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
+        <script src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
     </div>
 </div>
-
-
-
-</header>
 
 <main class="add-novel-container">
     <div class="add-novel-header">
@@ -44,23 +32,23 @@
         <h1>Edit Your Profile</h1>
         <p>Update your author information and bio.</p>
     </div>
-    
+
     <form id="profileForm" class="novel-form">
         <div class="form-group">
-            <label>Display Name</label>
+            <label for="profileDisplayName">Display Name</label>
             <input type="text" id="profileDisplayName" placeholder="Your author name">
         </div>
-        
+
         <div class="form-group">
-            <label>Bio</label>
+            <label for="profileBio">Bio</label>
             <textarea id="profileBio" rows="6" placeholder="Tell readers about yourself..."></textarea>
         </div>
-        
+
         <div class="form-group">
-            <label>Email</label>
+            <label for="profileEmail">Email</label>
             <input type="email" id="profileEmail" disabled>
         </div>
-        
+
         <div class="form-buttons">
             <a href="author.html" class="secondary-btn">Cancel</a>
             <button type="submit" class="primary-btn" id="saveProfile">Save Profile</button>
@@ -83,51 +71,21 @@
     <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/profile.js"></script>
-
-<!-- ================= STICKY BOTTOM AD BAR ================= -->
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
         <script type="text/javascript">
-            atOptions = {
-                'key' : 'ff80d71ae4bd0291f749548e7f51685e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key': 'ff80d71ae4bd0291f749548e7f51685e', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
         </script>
-        <script type="text/javascript" src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
+        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
 </div>
 
-<script>
-(function () {
-    var adBar = document.getElementById('storynestBottomAd');
-    var closeBtn = document.getElementById('closeBottomAd');
-    if (!adBar || !closeBtn) return;
-
-    if (sessionStorage.getItem('storynest_ad_closed') === '1') {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        return;
-    }
-
-    closeBtn.addEventListener('click', function () {
-        adBar.classList.add('hidden');
-        document.body.classList.add('bottom-ad-hidden');
-        sessionStorage.setItem('storynest_ad_closed', '1');
-    });
-})();
-</script>
-
-<!-- ================= AD BLOCK DETECTION ================= -->
+<script src="js/ads.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
 <script src="js/adblock-detect.js"></script>
-
 </body>
 </html>

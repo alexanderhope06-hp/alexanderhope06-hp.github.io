@@ -9,16 +9,11 @@
 </head>
 <body class="author-page">
 
-<!-- =====================================================
-     NAVBAR
-===================================================== -->
-
 <header class="navbar">
     <a href="index.html" class="logo">
-            <img src="image/fav.png" alt="StoryNest" class="logo-icon">
-             Story<span>Nest</span>
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+        Story<span>Nest</span>
     </a>
-
 
     <nav class="nav-links">
         <a href="index.html">Home</a>
@@ -33,21 +28,11 @@
     </div>
 </header>
 
-<!-- =====================================================
-     SEARCH
-===================================================== -->
-
 <div class="search-panel" id="searchPanel">
     <input type="text" placeholder="Search StoryNest...">
 </div>
 
-<!-- =====================================================
-     AUTHOR DASHBOARD
-===================================================== -->
-
 <main class="author-dashboard">
-
-    <!-- DASHBOARD HEADER -->
     <section class="dashboard-header">
         <div>
             <p class="section-label">AUTHOR STUDIO</p>
@@ -57,7 +42,6 @@
         <a href="add-novel.html" class="primary-btn">+ Add New Novel</a>
     </section>
 
-    <!-- AUTHOR PROFILE -->
     <section class="author-profile-card">
         <div class="author-avatar" id="authorAvatar">A</div>
         <div class="author-profile-info">
@@ -68,7 +52,6 @@
         <a href="profile.html" class="secondary-btn">Edit Profile</a>
     </section>
 
-    <!-- DASHBOARD NAVIGATION -->
     <nav class="author-dashboard-nav">
         <a href="#overview" class="dashboard-nav-link active">🏠 <span>Overview</span></a>
         <a href="#novels" class="dashboard-nav-link">📚 <span>Novels</span></a>
@@ -78,7 +61,6 @@
         <a href="#settings" class="dashboard-nav-link">⚙️ <span>Settings</span></a>
     </nav>
 
-    <!-- OVERVIEW -->
     <section id="overview" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -123,7 +105,6 @@
         </div>
     </section>
 
-    <!-- PERFORMANCE -->
     <section id="statistics" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -141,7 +122,6 @@
         </div>
     </section>
 
-    <!-- PUBLISHING ACTIVITY -->
     <section class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -169,7 +149,6 @@
         <p class="dashboard-note">Keep publishing consistently to build your audience on StoryNest.</p>
     </section>
 
-    <!-- TOP NOVELS -->
     <section class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -186,7 +165,6 @@
         </div>
     </section>
 
-    <!-- NOVELS -->
     <section id="novels" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -195,14 +173,13 @@
             </div>
             <a href="add-novel.html" class="view-all">+ New Novel</a>
         </div>
-        
-        <!-- Novel Filters -->
+
         <div class="novel-filters">
             <button class="novel-filter active" data-filter="all">All</button>
             <button class="novel-filter" data-filter="published">Published</button>
             <button class="novel-filter" data-filter="draft">Drafts</button>
         </div>
-        
+
         <div id="novelList" class="author-novel-list">
             <div class="dashboard-empty">
                 <div>📖</div>
@@ -211,7 +188,6 @@
         </div>
     </section>
 
-    <!-- EARNINGS -->
     <section id="earnings" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -219,50 +195,34 @@
                 <h2>Earnings</h2>
             </div>
         </div>
+
+        <div class="earnings-grid">
+            <div class="earnings-card">
+                <span>Total Revenue</span>
+                <strong id="totalRevenue">$0.00</strong>
+                <small>All time earnings</small>
+            </div>
+            <div class="earnings-card">
+                <span>This Month</span>
+                <strong id="monthlyRevenue">$0.00</strong>
+                <small>Current month</small>
+            </div>
+            <div class="earnings-card">
+                <span>Available Balance</span>
+                <strong id="availableBalance">$0.00</strong>
+                <small>Ready to withdraw</small>
+            </div>
+        </div>
+
         <div class="coming-soon-card">
             <div class="coming-soon-icon">💰</div>
             <div>
                 <h3>Author Earnings</h3>
-
-
-<!-- Earnings section with real data -->
-<section id="earnings" class="dashboard-section">
-    
-    <div class="earnings-grid"><br />
-        <div class="earnings-card">
-            <span>Total Revenue</span>
-            <strong id="totalRevenue">$0.00</strong>
-            <small>All time earnings</small>
-        </div>
-        
-        <div class="earnings-card">
-            <span>This Month</span>
-            <strong id="monthlyRevenue">$0.00</strong>
-            <small>Current month</small>
-        </div>
-        
-        <div class="earnings-card">
-            <span>Available Balance</span>
-            <strong id="availableBalance">$0.00</strong>
-            <small>Ready to withdraw</small>
-        </div>
-    </div>
-    
-    <div style="margin-top: 20px; text-align: center; padding: 20px; background: var(--bg-card); border-radius: 8px;">
-        <p style="color: var(--text-secondary);">
-            📊 Earnings will start tracking once ad revenue is activated.
-            <br>
-            <small>This feature is coming soon!</small>
-        </p>
-    </div>
-</section>
-
-
+                <p>Earnings will start tracking once ad revenue is activated. This feature is coming soon.</p>
             </div>
         </div>
     </section>
 
-    <!-- WITHDRAW -->
     <section id="withdraw" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -279,14 +239,6 @@
         </div>
     </section>
 
-
-
-
-    
-
-
-
-    <!-- SETTINGS -->
     <section id="settings" class="dashboard-section">
         <div class="section-heading">
             <div>
@@ -318,17 +270,14 @@
             </button>
         </div>
     </section>
-
 </main>
 
-<!-- FOOTER -->
 <footer>
     <div class="footer-logo">📖 StoryNest</div>
     <p>Discover. Read. Imagine.</p>
-    <p class="copyright">© 2026 StoryNest.</p>
+    <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/auth.js"></script>

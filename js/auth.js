@@ -1,26 +1,28 @@
 /* =====================================================
-   STORYNEST - AUTHENTICATION
+   STORYNEST — AUTHENTICATION
    ===================================================== */
 
-const AUTH_STORAGE_KEY = 'sb-frtvsuxvhvnjrrffyeot-auth-token';
+// Must match your Supabase project ref: smvkexbzgobzpvndmdgh
+const AUTH_STORAGE_KEY = 'sb-smvkexbzgobzpvndmdgh-auth-token';
+
 
 /* =====================================================
    HELPERS
    ===================================================== */
 
 async function getCurrentSession() {
+    // 1. Try localStorage first (fast path)
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     if (stored) {
         try {
             const session = JSON.parse(stored);
-            if (session && session.user) {
-                return session;
-            }
-        } catch (e) {
+            if (session && session.user) return session;
+        } catch (_) {
             localStorage.removeItem(AUTH_STORAGE_KEY);
         }
     }
 
+    // 2. Fall back to Supabase
     const { data } = await supabaseClient.auth.getSession();
     if (data?.session) {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
@@ -56,15 +58,14 @@ function showToast(message, type = 'success') {
 
     container.appendChild(toast);
 
-    toast.querySelector('.toast-close').addEventListener('click', () => {
-        toast.remove();
-    });
+    toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
 
     setTimeout(() => {
         toast.classList.add('toast-fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
+
 
 /* =====================================================
    ELEMENTS
@@ -73,6 +74,7 @@ function showToast(message, type = 'success') {
 const signupForm = document.getElementById('signupForm');
 const loginForm = document.getElementById('loginForm');
 const authMessage = document.getElementById('authMessage');
+
 
 /* =====================================================
    MESSAGE
@@ -84,12 +86,13 @@ function showMessage(message, error = false) {
     authMessage.style.color = error ? '#ff6b6b' : '#58d68d';
 }
 
+
 /* =====================================================
    SIGN UP
    ===================================================== */
 
 if (signupForm) {
-    signupForm.addEventListener('submit', async function(event) {
+    signupForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const displayName = document.getElementById('displayName').value.trim();
@@ -113,13 +116,9 @@ if (signupForm) {
 
         try {
             const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        display_name: displayName
-                    }
-                }
+                email,
+                password,
+                options: { data: { display_name: displayName } }
             });
 
             if (error) {
@@ -130,11 +129,10 @@ if (signupForm) {
                 return;
             }
 
-            if (data && data.session && data.user) {
+            if (data?.session && data?.user) {
                 localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
                 showMessage('Account created! Opening Author Studio...');
-                await new Promise(resolve => setTimeout(resolve, 300));
-                window.location.replace('author.html');
+                setTimeout(() => window.location.replace('author.html'), 300);
                 return;
             }
 
@@ -142,8 +140,8 @@ if (signupForm) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Create Account';
 
-        } catch (error) {
-            console.error('SIGNUP ERROR:', error);
+        } catch (err) {
+            console.error('SIGNUP ERROR:', err);
             showMessage('An unexpected error occurred.', true);
             submitBtn.disabled = false;
             submitBtn.textContent = 'Create Account';
@@ -151,12 +149,13 @@ if (signupForm) {
     });
 }
 
+
 /* =====================================================
    LOGIN
    ===================================================== */
 
 if (loginForm) {
-    loginForm.addEventListener('submit', async function(event) {
+    loginForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const email = document.getElementById('loginEmail').value.trim();
@@ -174,8 +173,8 @@ if (loginForm) {
 
         try {
             const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
+                email,
+                password
             });
 
             if (error) {
@@ -186,8 +185,7 @@ if (loginForm) {
                 return;
             }
 
-            if (!data || !data.session || !data.user) {
-                console.error('LOGIN SESSION MISSING:', data);
+            if (!data?.session || !data?.user) {
                 showMessage('Login succeeded, but no session was created.', true);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
@@ -195,7 +193,6 @@ if (loginForm) {
             }
 
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
-            console.log('LOGIN SUCCESS:', data.user.email);
 
             const params = new URLSearchParams(window.location.search);
             const redirect = params.get('redirect');
@@ -206,13 +203,10 @@ if (loginForm) {
             }
 
             showMessage('Login successful! Redirecting...');
+            setTimeout(() => window.location.replace(destination), 300);
 
-            setTimeout(() => {
-                window.location.replace(destination);
-            }, 300);
-
-        } catch (error) {
-            console.error('LOGIN ERROR:', error);
+        } catch (err) {
+            console.error('LOGIN ERROR:', err);
             showMessage('An unexpected error occurred.', true);
             submitBtn.disabled = false;
             submitBtn.textContent = 'Login';
@@ -220,9 +214,9 @@ if (loginForm) {
     });
 }
 
+
 /* =====================================================
    PASSWORD VISIBILITY TOGGLE
-   Works on any page that has .password-toggle buttons.
    ===================================================== */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -240,14 +234,11 @@ document.addEventListener('DOMContentLoaded', function () {
             input.type = isHidden ? 'text' : 'password';
 
             this.textContent = isHidden ? '🙈' : '👁️';
-            this.setAttribute(
-                'aria-label',
-                isHidden ? 'Hide password' : 'Show password'
-            );
+            this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
 
             const pos = input.value.length;
             input.focus();
-            try { input.setSelectionRange(pos, pos); } catch (e) {}
+            try { input.setSelectionRange(pos, pos); } catch (_) {}
         });
     });
 });

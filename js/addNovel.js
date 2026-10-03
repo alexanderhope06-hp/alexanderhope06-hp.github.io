@@ -86,7 +86,7 @@ async function createNovel(event) {
      * Save the novel ID and redirect to characters page
      */
     localStorage.setItem("editingNovelId", novel.id);
-    window.location.href = "characters.html";
+    window.location.href = "characters.html?id=" + encodeURIComponent(novel.id);
 }
 
 /*
