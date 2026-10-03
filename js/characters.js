@@ -45,18 +45,10 @@ let currentUser = null;
  */
 
 if (!novelId) {
-
-    alert(
-        "No novel selected."
-    );
-
-    window.location.href =
-        "author.html";
-
+    // No ?id= in the URL — show the novel picker
+    showNovelPicker();
 } else {
-
     initializeCharacters();
-
 }
 
 
@@ -636,6 +628,74 @@ function clearCharacterForm() {
     saveCharacter.textContent =
         "+ Add Character";
 
+}
+
+/* =====================================================
+   NOVEL PICKER (when no ?id= is given)
+   ===================================================== */
+
+async function showNovelPicker() {
+
+    const { data: { user } } =
+        await supabaseClient.auth.getUser();
+
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Hide the editor form while the picker is showing
+    const editor = document.querySelector(".chapter-editor");
+    if (editor) editor.style.display = "none";
+
+    // Load the author's novels
+    const { data: novels, error } = await supabaseClient
+        .from("novels")
+        .select("id, title, status")
+        .eq("author_id", user.id)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        characterList.innerHTML = `<p>Could not load your novels.</p>`;
+        return;
+    }
+
+    if (!novels || novels.length === 0) {
+        characterList.innerHTML = `
+            <div class="chapter-empty">
+                <div>📖</div>
+                <p>You haven't created any novels yet.</p>
+                <a href="add-novel.html" class="primary-btn" style="margin-top:16px; display:inline-block;">
+                    + Create Your First Novel
+                </a>
+            </div>
+        `;
+        novelTitle.textContent = "Pick a Novel";
+        return;
+    }
+
+    novelTitle.textContent = "Pick a Novel";
+
+    characterList.innerHTML = "";
+    novels.forEach(n => {
+        const item = document.createElement("a");
+        item.href = `characters.html?id=${encodeURIComponent(n.id)}`;
+        item.className = "editor-chapter";
+        item.style.textDecoration = "none";
+        item.style.color = "inherit";
+        item.style.cursor = "pointer";
+
+        item.innerHTML = `
+            <div class="editor-chapter-number">📖</div>
+            <div class="editor-chapter-info">
+                <strong>${escapeHTML(n.title)}</strong>
+                <span>${n.status === "published" ? "Published" : "Draft"}</span>
+            </div>
+            <div><span style="font-size:20px; color:var(--accent-light);">→</span></div>
+        `;
+
+        characterList.appendChild(item);
+    });
 }
 
 

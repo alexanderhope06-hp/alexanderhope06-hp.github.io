@@ -111,84 +111,62 @@ if (!novelId) {
 
 async function loadNovel() {
 
-    /*
-     * Load published novel
-     */
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
+    // Try published first (works for anyone)
+    let { data, error } = await supabaseClient
         .from("novels")
-
         .select("*")
+        .eq("id", novelId)
+        .eq("status", "published")
+        .maybeSingle();
 
-        .eq(
-            "id",
-            novelId
-        )
+    // If not found and user is signed in, allow them to see their own draft
+    if (!data) {
+        const { data: { user } } = await supabaseClient.auth.getUser();
 
-        .eq(
-            "status",
-            "published"
-        )
+        if (user) {
+            const { data: ownDraft, error: ownError } = await supabaseClient
+                .from("novels")
+                .select("*")
+                .eq("id", novelId)
+                .eq("author_id", user.id)
+                .maybeSingle();
 
-        .single();
+            if (ownDraft) {
+                data = ownDraft;
+                error = null;
 
-
-    /*
-     * Handle error
-     */
-
-    if (error || !data) {
-
-        console.error(
-            "Novel error:",
-            error
-        );
-
-
-        showError(
-            "This novel could not be found."
-        );
-
-
-        return;
-
+                // Show a small "Draft preview" badge
+                const badge = document.createElement("div");
+                badge.textContent = "📝 Draft preview — not visible to readers";
+                badge.style.cssText = `
+                    background: rgba(231, 173, 79, 0.15);
+                    color: #e7ad4f;
+                    border: 1px solid rgba(231, 173, 79, 0.35);
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin: 0 auto 20px;
+                    max-width: 400px;
+                    text-align: center;
+                `;
+                const main = document.querySelector("main");
+                if (main) main.insertBefore(badge, main.firstChild);
+            }
+        }
     }
 
+    if (error || !data) {
+        console.error("Novel error:", error);
+        showError("This novel could not be found.");
+        return;
+    }
 
-    /*
-     * Store novel
-     */
-
-    novel =
-        data;
-
-
-    /*
-     * Display novel
-     */
-
+    novel = data;
     displayNovel();
-
-
-    /*
-     * Load chapters
-     */
-
     loadChapters();
-
-
-    /*
-     * Load characters
-     */
-
     loadCharacters();
-
 }
-
 
 /* =====================================================
    DISPLAY NOVEL
