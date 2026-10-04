@@ -4680,27 +4680,22 @@ body.ad-free-active .reader-skyscraper {
 
 
 /* =====================================================
-   NATIVE BANNER AD (in-content) — aligns with .section
+   NATIVE BANNER AD
    ===================================================== */
+
+.storynest-native-ad-section {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
 
 .storynest-native-ad {
     position: relative;
     width: 100%;
-    max-width: 1400px;
-    margin: 40px auto;
-    padding: 16px 20px 20px;
+    padding: 20px 24px 24px;
     background: var(--bg-card);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
     box-sizing: border-box;
-}
-
-@media (min-width: 900px) {
-    .storynest-native-ad {
-        width: calc(100% - 16%);
-        margin-left: auto;
-        margin-right: auto;
-    }
 }
 
 .storynest-native-ad-label {
@@ -4709,14 +4704,14 @@ body.ad-free-active .reader-skyscraper {
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .storynest-native-ad #container-27a5267f73be7cc4dd0f9a0c6c0697bf {
     width: 100%;
-    min-height: 120px;
+    min-height: 140px;
 }
 
-body.ad-free-active .storynest-native-ad {
+body.ad-free-active .storynest-native-ad-section {
     display: none !important;
-}
+s}
