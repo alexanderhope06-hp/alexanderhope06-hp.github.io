@@ -55,6 +55,20 @@
     </div>
 </main>
 
+<!-- 160x600 Skyscraper — floating on the right, desktop only -->
+<aside class="reader-skyscraper" id="readerSkyscraper" aria-label="Advertisement">
+    <script type="text/javascript">
+        atOptions = {
+            'key' : '7215dda459528e5a1b3fc407e017f036',
+            'format' : 'iframe',
+            'height' : 600,
+            'width' : 160,
+            'params' : {}
+        };
+    </script>
+    <script src="https://unprofessionalginger.com/7215dda459528e5a1b3fc407e017f036/invoke.js"></script>
+</aside>
+
 <div class="storynest-bottom-ad" id="storynestBottomAd">
     <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
     <div class="storynest-ad-content">
@@ -64,6 +78,44 @@
         <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
     </div>
 </div>
+
+
+<script>
+    /*
+     * Show the floating right-side ad only after the user
+     * has scrolled past 600px. Prevents an ad-on-arrival.
+     */
+    (function () {
+        'use strict';
+
+        var ad = document.getElementById('readerSkyscraper');
+        if (!ad) return;
+
+        var mq = window.matchMedia('(min-width: 1400px)');
+        if (!mq.matches) return;
+
+        var revealed = false;
+        var REVEAL_AT = 600;
+
+        function checkScroll() {
+            if (revealed) return;
+
+            var y = window.scrollY
+                 || window.pageYOffset
+                 || document.documentElement.scrollTop
+                 || 0;
+
+            if (y >= REVEAL_AT) {
+                ad.classList.add('revealed');
+                revealed = true;
+                window.removeEventListener('scroll', checkScroll);
+            }
+        }
+
+        window.addEventListener('scroll', checkScroll, { passive: true });
+        checkScroll();
+    })();
+</script>
 
 <script src="js/ads.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

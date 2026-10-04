@@ -4616,3 +4616,107 @@ body.ad-free-active .storynest-in-content-ad {
                 padding: 10px 12px;
             }
         }
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   READER — FLOATING SKYSCRAPER AD (160x600)
+   Positioned fixed to the left edge of the viewport.
+   Never touches the reader text layout.
+   ===================================================== */
+
+.reader-skyscraper {
+    display: none;                      /* hidden by default (mobile/tablet) */
+}
+
+@media (min-width: 1400px) {
+    .reader-skyscraper {
+        display: block;
+        position: fixed;
+        top: 88px;                      /* clears the fixed reader header */
+        left: 24px;                    /* stuck to the right edge */
+        width: 160px;
+        height: 600px;
+        overflow: hidden;
+        z-index: 900;                   /* below header (1000) and progress bar (999) */
+
+        /* Hidden until scroll reveals it */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-6px);
+        transition: opacity 0.5s ease,
+                    transform 0.5s ease,
+                    visibility 0s linear 0.5s;
+    }
+
+    .reader-skyscraper.revealed {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        transition: opacity 0.5s ease,
+                    transform 0.5s ease,
+                    visibility 0s linear 0s;
+    }
+
+    .reader-skyscraper iframe {
+        display: block;
+        width: 160px;
+        height: 600px;
+        border: 0;
+    }
+}
+
+/* Ad-free mode hides it */
+body.ad-free-active .reader-skyscraper {
+    display: none !important;
+}
+
+
+/* =====================================================
+   NATIVE BANNER AD (in-content) — aligns with .section
+   ===================================================== */
+
+.storynest-native-ad {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 16px 20px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-sizing: border-box;
+}
+
+@media (min-width: 900px) {
+    .storynest-native-ad {
+        width: calc(100% - 16%);
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.storynest-native-ad-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+}
+
+.storynest-native-ad #container-27a5267f73be7cc4dd0f9a0c6c0697bf {
+    width: 100%;
+    min-height: 120px;
+}
+
+body.ad-free-active .storynest-native-ad {
+    display: none !important;
+}
