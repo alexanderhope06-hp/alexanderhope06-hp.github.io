@@ -4257,7 +4257,7 @@ body.ad-free-active .storynest-in-content-ad {
 }
 
 /* =====================================================
-   LIFE & WISDOM SECTION
+   LIFE & WISDOM SECTION — FIXED FOR MOBILE
    ===================================================== */
 
 .wisdom-section {
@@ -4305,12 +4305,14 @@ body.ad-free-active .storynest-in-content-ad {
     transform: translateX(4px);
 }
 
+/* ---- Grid: 3 cols desktop → 2 tablet → 1 mobile ---- */
 .wisdom-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
+/* ---- Card ---- */
 .wisdom-card {
     position: relative;
     display: flex;
@@ -4323,6 +4325,7 @@ body.ad-free-active .storynest-in-content-ad {
     text-decoration: none;
     color: inherit;
     overflow: hidden;
+    min-width: 0;                    /* prevents overflow inside grid */
     transition: transform 0.35s ease,
                 border-color 0.35s ease,
                 box-shadow 0.35s ease,
@@ -4373,6 +4376,7 @@ body.ad-free-active .storynest-in-content-ad {
     opacity: 1;
 }
 
+/* ---- Icon ---- */
 .wisdom-icon {
     flex-shrink: 0;
     width: 52px;
@@ -4396,9 +4400,10 @@ body.ad-free-active .storynest-in-content-ad {
     border-color: rgba(155, 92, 255, 0.35);
 }
 
+/* ---- Content ---- */
 .wisdom-content {
     flex: 1;
-    min-width: 0;
+    min-width: 0;                    /* allows text to wrap properly */
 }
 
 .wisdom-content h3 {
@@ -4409,6 +4414,7 @@ body.ad-free-active .storynest-in-content-ad {
     margin-bottom: 6px;
     letter-spacing: -0.01em;
     transition: color var(--transition);
+    word-break: break-word;
 }
 
 .wisdom-card:hover .wisdom-content h3 {
@@ -4420,6 +4426,78 @@ body.ad-free-active .storynest-in-content-ad {
     line-height: 1.65;
     color: var(--text-muted);
     margin: 0;
+    word-break: break-word;
+}
+
+/* =====================================================
+   WISDOM RESPONSIVE FIXES
+   ===================================================== */
+
+/* Tablet: 2 columns */
+@media (max-width: 1024px) {
+    .wisdom-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+/* Mobile: 1 column, stacked card */
+@media (max-width: 800px) {
+    .wisdom-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .wisdom-card {
+        padding: 18px 18px;
+        gap: 14px;
+        align-items: center;         /* vertically center icon + text */
+    }
+
+    .wisdom-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+        border-radius: 10px;
+    }
+
+    .wisdom-content h3 {
+        font-size: 15.5px;
+        margin-bottom: 4px;
+    }
+
+    .wisdom-content p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+
+/* Small mobile: even tighter */
+@media (max-width: 480px) {
+    .wisdom-grid {
+        gap: 12px;
+    }
+
+    .wisdom-card {
+        padding: 16px 14px;
+        gap: 12px;
+        border-radius: 12px;
+    }
+
+    .wisdom-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .wisdom-content h3 {
+        font-size: 14.5px;
+    }
+
+    .wisdom-content p {
+        font-size: 12.5px;
+        line-height: 1.55;
+    }
 }
 
 
