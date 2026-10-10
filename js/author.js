@@ -450,13 +450,22 @@ async function deleteNovel(novelId) {
 
 /* ---------- Top novels ---------- */
 
+/* ---------- Top novels ---------- */
+
 function displayTopNovels() {
     const topNovels = document.getElementById('topNovels');
     if (!topNovels) return;
 
     const published = authorNovels
         .filter(n => n.status === 'published')
-        .sort((a, b) => (b.reader_count || 0) - (a.reader_count || 0));
+        .sort((a, b) => {
+            // Rating first
+            if (b.average_rating !== a.average_rating) {
+                return b.average_rating - a.average_rating;
+            }
+            // Tiebreaker: more readers wins
+            return (b.reader_count || 0) - (a.reader_count || 0);
+        });
 
     if (!published.length) {
         topNovels.innerHTML = `

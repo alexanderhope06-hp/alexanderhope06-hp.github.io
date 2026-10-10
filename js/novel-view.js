@@ -34,134 +34,86 @@ loadNovels();
 // =====================================================
 
 async function loadNovels() {
-
-    console.log("StoryNest: Loading published novels...");
-
-
-    if (!novelsContainer) {
-
-        console.error(
-            "StoryNest: #allNovels was not found."
-        );
-
-        return;
-    }
-
+    if (!novelsContainer) return;
 
     novelsContainer.innerHTML = `
-        <div class="loading-message">
-            Loading published novels...
-        </div>
+        <div class="loading-message">Loading published novels...</div>
     `;
 
-
     try {
-
-        const {
-            data: novelData,
-            error: novelError
-        } = await supabaseClient
-
-            .from("novels")
-
-            .select("*")
-
-            .eq("status", "published")
-
-            .order("created_at", {
-                ascending: false
-            });
-
-
-        // =================================================
-        // ERROR
-        // =================================================
+        const { data: novelData, error: novelError } = await supabaseClient
+            .from('novels')
+            .select('*')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false });
 
         if (novelError) {
-
-            console.error(
-                "StoryNest Novel Error:",
-                novelError
-            );
-
-
+            console.error('StoryNest Novel Error:', novelError);
             novelsContainer.innerHTML = `
                 <div class="loading-message">
-
-                    <p>
-                        Unable to load novels.
-                    </p>
-
-                    <small>
-                        ${escapeHTML(
-                            novelError.message ||
-                            "Unknown Supabase error"
-                        )}
-                    </small>
-
+                    <p>Unable to load novels.</p>
+                    <small>${escapeHTML(novelError.message || 'Unknown Supabase error')}</small>
                 </div>
             `;
-
-
-            if (novelCount) {
-                novelCount.textContent =
-                    "Unable to load novels";
-            }
-
-
+            if (novelCount) novelCount.textContent = 'Unable to load novels';
             return;
         }
 
-
-        // =================================================
-        // SAVE DATA
-        // =================================================
-
         allNovels = novelData || [];
 
+        // ---- Enrich with ratings + readers ----
+        if (allNovels.length > 0) {
+            const ids = allNovels.map(n => n.id);
 
-        console.log(
-            "StoryNest: Published novels:",
-            allNovels
-        );
+            const [ratingsRes, readersRes] = await Promise.all([
+                supabaseClient
+                    .from('novel_ratings_summary')
+                    .select('*')
+                    .in('novel_id', ids),
+                supabaseClient
+                    .from('novel_readers_summary')
+                    .select('*')
+                    .in('novel_id', ids),
+            ]);
 
+            const ratingMap = {};
+            (ratingsRes.data || []).forEach(r => { ratingMap[r.novel_id] = r; });
+
+            const readerMap = {};
+            (readersRes.data || []).forEach(r => { readerMap[r.novel_id] = r; });
+
+            allNovels.forEach(n => {
+                const rating = ratingMap[n.id];
+                const readers = readerMap[n.id];
+
+                n.average_rating = rating?.average_rating
+                    ? parseFloat(rating.average_rating)
+                    : 0;
+                n.rating_count = rating?.rating_count || 0;
+                n.reader_count = readers?.reader_count || 0;
+            });
+
+            // ---- Sort: rating desc, then readers desc ----
+            allNovels.sort((a, b) => {
+                if (b.average_rating !== a.average_rating) {
+                    return b.average_rating - a.average_rating;
+                }
+                return b.reader_count - a.reader_count;
+            });
+        }
 
         displayNovels(allNovels);
 
-
     } catch (error) {
-
-        console.error(
-            "StoryNest: Unexpected error:",
-            error
-        );
-
-
+        console.error('StoryNest: Unexpected error:', error);
         novelsContainer.innerHTML = `
             <div class="loading-message">
-
-                <p>
-                    Something went wrong.
-                </p>
-
-                <small>
-                    ${escapeHTML(
-                        error.message ||
-                        "Unknown error"
-                    )}
-                </small>
-
+                <p>Something went wrong.</p>
+                <small>${escapeHTML(error.message || 'Unknown error')}</small>
             </div>
         `;
-
-
-        if (novelCount) {
-            novelCount.textContent =
-                "Unable to load novels";
-        }
-
+        if (novelCount) novelCount.textContent = 'Unable to load novels';
     }
-
 }
 
 
@@ -220,9 +172,17 @@ function displayNovels(novels) {
                 </p>
                 <span class="novel-genre">
                     ${escapeHTML(novel.genre || "General")}
-                </span>
-            </div>
-        `;
+
+                    ${novel.rating_count > 0
+                        ? `<p class="novel-rating-compact">
+                                <span class="stars">${renderStars(novel.average_rating)}</span>
+                                <span>${novel.average_rating.toFixed(1)}</span>
+                               <span class="count">(${novel.rating_count})</span>
+                           </p>`
+                        : `<p class="novel-rating-compact"><span class="count">No ratings yet</span></p>`}
+                                   </span>
+                               </div>
+                            `;
 
         novelsContainer.appendChild(card);
     });
@@ -419,4 +379,19 @@ function escapeHTML(value) {
 
     return div.innerHTML;
 
+}
+
+
+
+
+
+
+
+function renderStars(average, max = 5) {
+    const rounded = Math.round(average * 2) / 2;
+    let stars = '';
+    for (let i = 1; i <= max; i++) {
+        stars += (i <= rounded) ? '★' : '☆';
+    }
+    return stars;
 }

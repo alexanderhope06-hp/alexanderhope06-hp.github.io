@@ -23,6 +23,10 @@
        LOAD PUBLISHED NOVELS
     ================================================= */
 
+/* =================================================
+   LOAD PUBLISHED NOVELS
+================================================= */
+
 async function loadPublishedNovels() {
     const { data: novels, error } = await supabaseClient
         .from('novels')
@@ -39,77 +43,105 @@ async function loadPublishedNovels() {
 
     allNovels = novels || [];
 
-    // Fetch rating summaries for the loaded novels
-    if (allNovels.length > 0) {
-        const ids = allNovels.map(n => n.id);
-        const { data: summaries } = await supabaseClient
-            .from('novel_ratings_summary')
-            .select('*')
-            .in('novel_id', ids);
-
-        const map = {};
-        (summaries || []).forEach(s => { map[s.novel_id] = s; });
-
-        allNovels.forEach(n => {
-            const s = map[n.id];
-            n.average_rating = s?.average_rating ? parseFloat(s.average_rating) : 0;
-            n.rating_count = s?.rating_count || 0;
-        });
-    }
-
     if (allNovels.length === 0) {
         showEmptyMessage(trendingContainer, 'No published novels yet. Check back soon!');
         showEmptyMessage(newContainer, 'No new releases yet.');
         return;
     }
 
-    displayTrending(allNovels.slice(0, 4));
+    // ---- Fetch ratings AND reader counts in parallel ----
+    const ids = allNovels.map(n => n.id);
+
+    const [ratingsRes, readersRes] = await Promise.all([
+        supabaseClient
+            .from('novel_ratings_summary')
+            .select('*')
+            .in('novel_id', ids),
+        supabaseClient
+            .from('novel_readers_summary')
+            .select('*')
+            .in('novel_id', ids),
+    ]);
+
+    const ratingMap = {};
+    (ratingsRes.data || []).forEach(r => { ratingMap[r.novel_id] = r; });
+
+    const readerMap = {};
+    (readersRes.data || []).forEach(r => { readerMap[r.novel_id] = r; });
+
+    allNovels.forEach(n => {
+        const rating = ratingMap[n.id];
+        const readers = readerMap[n.id];
+
+        n.average_rating = rating?.average_rating
+            ? parseFloat(rating.average_rating)
+            : 0;
+        n.rating_count = rating?.rating_count || 0;
+        n.reader_count = readers?.reader_count || 0;
+    });
+
+    // ---- Trending: sort by rating desc, then readers desc ----
+    const trending = [...allNovels].sort((a, b) => {
+        if (b.average_rating !== a.average_rating) {
+            return b.average_rating - a.average_rating;
+        }
+        return b.reader_count - a.reader_count;
+    });
+
+    displayTrending(trending.slice(0, 4));
+
+    // ---- New Releases: keep respecting the genre filter ----
     renderNewReleases();
 }
 
 
-    /* =================================================
-       TRENDING
-       (unchanged, always top 4)
-    ================================================= */
+/* =================================================
+   TRENDING
+================================================= */
 
-    function displayTrending(novels) {
-        if (!trendingContainer) return;
-        trendingContainer.innerHTML = '';
+function displayTrending(novels) {
+    if (!trendingContainer) return;
+    trendingContainer.innerHTML = '';
 
-        novels.forEach(novel => {
-            const card = document.createElement('article');
-            card.className = 'novel-card';
+    novels.forEach(novel => {
+        const card = document.createElement('article');
+        card.className = 'novel-card';
 
-            const cover = novel.cover_url || 'image/default-cover.png';
+        const cover = novel.cover_url || 'image/default-cover.png';
 
-            card.innerHTML = `
-                <a href="novel.html?id=${encodeURIComponent(novel.id)}">
-                    <div class="novel-cover">
-                        <img
-                            src="${escapeHTML(cover)}"
-                            alt="${escapeHTML(novel.title)}"
-                            loading="lazy"
-                            onerror="this.onerror=null;this.src='image/default-cover.png';"
-                        >
-                    </div>
-                    <div class="novel-info">
-                        <h3>${escapeHTML(novel.title)}</h3>
-                        <p class="author">${escapeHTML(novel.author_name || 'Author')}</p>
-<p class="novel-rating-compact">
-    ${novel.rating_count > 0
-        ? `<span class="stars">${renderStars(novel.average_rating)}</span>
-           <span>${novel.average_rating.toFixed(1)}</span>
-           <span class="count">(${novel.rating_count})</span>`
-        : '<span class="count">No ratings yet</span>'}
-</p>
-                    </div>
-                </a>
-            `;
-            trendingContainer.appendChild(card);
-        });
-    }
+        const ratingHTML = novel.rating_count > 0
+            ? `<p class="novel-rating-compact">
+                   <span class="stars">${renderStars(novel.average_rating)}</span>
+                   <span>${novel.average_rating.toFixed(1)}</span>
+                   <span class="count">(${novel.rating_count})</span>
+               </p>`
+            : `<p class="novel-rating-compact"><span class="count">No ratings yet</span></p>`;
 
+        const readersHTML = novel.reader_count > 0
+            ? `<p class="readers-count">👥 ${novel.reader_count.toLocaleString()} readers</p>`
+            : '';
+
+        card.innerHTML = `
+            <a href="novel.html?id=${encodeURIComponent(novel.id)}">
+                <div class="novel-cover">
+                    <img
+                        src="${escapeHTML(cover)}"
+                        alt="${escapeHTML(novel.title)}"
+                        loading="lazy"
+                        onerror="this.onerror=null;this.src='image/default-cover.png';"
+                    >
+                </div>
+                <div class="novel-info">
+                    <h3>${escapeHTML(novel.title)}</h3>
+                    <p class="author">${escapeHTML(novel.author_name || 'Author')}</p>
+                    ${ratingHTML}
+                    ${readersHTML}
+                </div>
+            </a>
+        `;
+        trendingContainer.appendChild(card);
+    });
+}
 
     /* =================================================
        NEW RELEASES — respects the active genre filter
@@ -254,5 +286,17 @@ function renderStars(average, max = 5) {
     const rounded = Math.round(average * 2) / 2;
     let stars = '';
     for (let i = 1; i <= max; i++) stars += (i <= rounded) ? '★' : '☆';
+    return stars;
+}
+
+
+
+
+function renderStars(average, max = 5) {
+    const rounded = Math.round(average * 2) / 2;
+    let stars = '';
+    for (let i = 1; i <= max; i++) {
+        stars += (i <= rounded) ? '★' : '☆';
+    }
     return stars;
 }

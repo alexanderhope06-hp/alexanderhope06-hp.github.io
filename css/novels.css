@@ -658,3 +658,12 @@
     .star-btn { font-size: 28px; }
     .rating-stars { font-size: 18px; }
 }
+
+
+
+
+.novel-info .readers-count {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
