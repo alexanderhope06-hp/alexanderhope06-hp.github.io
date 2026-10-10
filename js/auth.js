@@ -1,17 +1,17 @@
 /* =====================================================
-   STORYNEST — AUTHENTICATION
+   STORYNEST — AUTH HELPERS
+   Shared utilities. Form handling lives in login.js / signup.js
    ===================================================== */
 
-// Must match your Supabase project ref: smvkexbzgobzpvndmdgh
+// Must match your Supabase project ref
 const AUTH_STORAGE_KEY = 'sb-smvkexbzgobzpvndmdgh-auth-token';
 
 
 /* =====================================================
-   HELPERS
+   SESSION HELPERS
    ===================================================== */
 
 async function getCurrentSession() {
-    // 1. Try localStorage first (fast path)
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     if (stored) {
         try {
@@ -22,7 +22,6 @@ async function getCurrentSession() {
         }
     }
 
-    // 2. Fall back to Supabase
     const { data } = await supabaseClient.auth.getSession();
     if (data?.session) {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
@@ -31,15 +30,102 @@ async function getCurrentSession() {
     return null;
 }
 
+
 function redirectToLogin(destination) {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage =
+        window.location.pathname.split('/').pop() || 'index.html';
     const redirect = destination || currentPage;
-    window.location.replace(`login.html?redirect=${encodeURIComponent(redirect)}`);
+
+    window.location.replace(
+        `login.html?redirect=${encodeURIComponent(redirect)}`
+    );
 }
 
+
 function redirectAfterAuth(destination) {
-    window.location.replace(destination || 'author.html');
+    window.location.replace(destination || 'index.html');
 }
+
+
+/**
+ * Returns 'reader', 'author', or null.
+ */
+function getUserRole(user) {
+    if (!user) return null;
+    return user.user_metadata?.role || null;
+}
+
+
+/* =====================================================
+   ROLE GUARD — use on author-only pages
+   Returns the user if they're allowed, or null after
+   redirecting / upgrading. Call at the top of any
+   author-only script.
+   ===================================================== */
+
+async function requireAuthor(options = {}) {
+    const session = await getCurrentSession();
+
+    // No session — send to login
+    if (!session?.user) {
+        const redirect =
+            options.redirect ||
+            window.location.pathname.split('/').pop() ||
+            'index.html';
+
+        window.location.replace(
+            `login.html?redirect=${encodeURIComponent(redirect)}`
+        );
+        return null;
+    }
+
+    const user = session.user;
+    const role = user.user_metadata?.role;
+
+    // Already an author — let them through
+    if (role === 'author') return user;
+
+    // Reader — offer to upgrade
+    const upgrade = confirm(
+        options.message ||
+        'This area is for authors.\n\n' +
+        'Become an author to write, publish and earn from your stories.\n\n' +
+        'Continue?'
+    );
+
+    if (upgrade) {
+        try {
+            await supabaseClient.auth.updateUser({
+                data: { ...user.user_metadata, role: 'author' }
+            });
+
+            const { data } = await supabaseClient.auth.refreshSession();
+
+            if (data?.session) {
+                localStorage.setItem(
+                    AUTH_STORAGE_KEY,
+                    JSON.stringify(data.session)
+                );
+            }
+
+            window.location.reload();
+        } catch (err) {
+            console.error('Role upgrade failed:', err);
+            alert('Could not upgrade your account. Please try again.');
+            window.location.replace('index.html');
+        }
+        return null;
+    }
+
+    // Declined — send home
+    window.location.replace('index.html');
+    return null;
+}
+
+
+/* =====================================================
+   TOASTS
+   ===================================================== */
 
 function showToast(message, type = 'success') {
     let container = document.querySelector('.toast-container');
@@ -58,7 +144,8 @@ function showToast(message, type = 'success') {
 
     container.appendChild(toast);
 
-    toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
+    toast.querySelector('.toast-close')
+        .addEventListener('click', () => toast.remove());
 
     setTimeout(() => {
         toast.classList.add('toast-fade-out');
@@ -68,173 +155,25 @@ function showToast(message, type = 'success') {
 
 
 /* =====================================================
-   ELEMENTS
-   ===================================================== */
-
-const signupForm = document.getElementById('signupForm');
-const loginForm = document.getElementById('loginForm');
-const authMessage = document.getElementById('authMessage');
-
-
-/* =====================================================
-   MESSAGE
-   ===================================================== */
-
-function showMessage(message, error = false) {
-    if (!authMessage) return;
-    authMessage.textContent = message;
-    authMessage.style.color = error ? '#ff6b6b' : '#58d68d';
-}
-
-
-/* =====================================================
-   SIGN UP
-   ===================================================== */
-
-if (signupForm) {
-    signupForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const displayName = document.getElementById('displayName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
-        const password = document.getElementById('signupPassword').value;
-        const submitBtn = signupForm.querySelector('button[type="submit"]');
-
-        if (!displayName || !email || !password) {
-            showMessage('Please complete all fields.', true);
-            return;
-        }
-
-        if (password.length < 6) {
-            showMessage('Password must be at least 6 characters.', true);
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Creating account...';
-        showMessage('Creating account...');
-
-        try {
-            const { data, error } = await supabaseClient.auth.signUp({
-                email,
-                password,
-                options: { data: { display_name: displayName } }
-            });
-
-            if (error) {
-                console.error('SIGNUP ERROR:', error);
-                showMessage(error.message, true);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
-                return;
-            }
-
-            if (data?.session && data?.user) {
-                localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
-                showMessage('Account created! Opening Author Studio...');
-                setTimeout(() => window.location.replace('author.html'), 300);
-                return;
-            }
-
-            showMessage('Account created! Please check your email to confirm your account.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create Account';
-
-        } catch (err) {
-            console.error('SIGNUP ERROR:', err);
-            showMessage('An unexpected error occurred.', true);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create Account';
-        }
-    });
-}
-
-
-/* =====================================================
-   LOGIN
-   ===================================================== */
-
-if (loginForm) {
-    loginForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const submitBtn = loginForm.querySelector('button[type="submit"]');
-
-        if (!email || !password) {
-            showMessage('Please enter your email and password.', true);
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Logging in...';
-        showMessage('Logging in...');
-
-        try {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (error) {
-                console.error('LOGIN ERROR:', error);
-                showMessage(error.message, true);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
-                return;
-            }
-
-            if (!data?.session || !data?.user) {
-                showMessage('Login succeeded, but no session was created.', true);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
-                return;
-            }
-
-            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
-
-            const params = new URLSearchParams(window.location.search);
-            const redirect = params.get('redirect');
-
-            let destination = 'author.html';
-            if (redirect && !redirect.includes('://') && !redirect.startsWith('//')) {
-                destination = redirect;
-            }
-
-            showMessage('Login successful! Redirecting...');
-            setTimeout(() => window.location.replace(destination), 300);
-
-        } catch (err) {
-            console.error('LOGIN ERROR:', err);
-            showMessage('An unexpected error occurred.', true);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Login';
-        }
-    });
-}
-
-
-/* =====================================================
    PASSWORD VISIBILITY TOGGLE
    ===================================================== */
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.password-toggle').forEach(function (btn) {
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.password-toggle').forEach(btn => {
         btn.addEventListener('click', function (event) {
             event.preventDefault();
 
-            const targetId = this.dataset.target;
-            if (!targetId) return;
-
-            const input = document.getElementById(targetId);
+            const input = document.getElementById(this.dataset.target);
             if (!input) return;
 
-            const isHidden = input.type === 'password';
-            input.type = isHidden ? 'text' : 'password';
+            const hidden = input.type === 'password';
+            input.type = hidden ? 'text' : 'password';
 
-            this.textContent = isHidden ? '🙈' : '👁️';
-            this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            this.textContent = hidden ? '🙈' : '👁️';
+            this.setAttribute(
+                'aria-label',
+                hidden ? 'Hide password' : 'Show password'
+            );
 
             const pos = input.value.length;
             input.focus();

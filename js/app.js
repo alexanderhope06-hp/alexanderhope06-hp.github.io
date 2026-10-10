@@ -23,34 +23,49 @@
        LOAD PUBLISHED NOVELS
     ================================================= */
 
-    async function loadPublishedNovels() {
-        const { data: novels, error } = await supabaseClient
-            .from('novels')
-            .select('*')
-            .eq('status', 'published')
-            .order('created_at', { ascending: false });
+async function loadPublishedNovels() {
+    const { data: novels, error } = await supabaseClient
+        .from('novels')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('Could not load novels:', error);
-            showErrorMessage(trendingContainer, 'Could not load novels.');
-            showErrorMessage(newContainer, 'Could not load novels.');
-            return;
-        }
-
-        allNovels = novels || [];
-
-        if (allNovels.length === 0) {
-            showEmptyMessage(trendingContainer, 'No published novels yet. Check back soon!');
-            showEmptyMessage(newContainer, 'No new releases yet.');
-            return;
-        }
-
-        // Trending: always the 4 newest, unaffected by genre filter
-        displayTrending(allNovels.slice(0, 4));
-
-        // New releases: respect the current genre filter
-        renderNewReleases();
+    if (error) {
+        console.error('Could not load novels:', error);
+        showErrorMessage(trendingContainer, 'Could not load novels.');
+        showErrorMessage(newContainer, 'Could not load novels.');
+        return;
     }
+
+    allNovels = novels || [];
+
+    // Fetch rating summaries for the loaded novels
+    if (allNovels.length > 0) {
+        const ids = allNovels.map(n => n.id);
+        const { data: summaries } = await supabaseClient
+            .from('novel_ratings_summary')
+            .select('*')
+            .in('novel_id', ids);
+
+        const map = {};
+        (summaries || []).forEach(s => { map[s.novel_id] = s; });
+
+        allNovels.forEach(n => {
+            const s = map[n.id];
+            n.average_rating = s?.average_rating ? parseFloat(s.average_rating) : 0;
+            n.rating_count = s?.rating_count || 0;
+        });
+    }
+
+    if (allNovels.length === 0) {
+        showEmptyMessage(trendingContainer, 'No published novels yet. Check back soon!');
+        showEmptyMessage(newContainer, 'No new releases yet.');
+        return;
+    }
+
+    displayTrending(allNovels.slice(0, 4));
+    renderNewReleases();
+}
 
 
     /* =================================================
@@ -81,7 +96,13 @@
                     <div class="novel-info">
                         <h3>${escapeHTML(novel.title)}</h3>
                         <p class="author">${escapeHTML(novel.author_name || 'Author')}</p>
-                        <p class="rating">📚 ${escapeHTML(novel.genre || 'Story')}</p>
+<p class="novel-rating-compact">
+    ${novel.rating_count > 0
+        ? `<span class="stars">${renderStars(novel.average_rating)}</span>
+           <span>${novel.average_rating.toFixed(1)}</span>
+           <span class="count">(${novel.rating_count})</span>`
+        : '<span class="count">No ratings yet</span>'}
+</p>
                     </div>
                 </a>
             `;
@@ -228,3 +249,10 @@
     loadPublishedNovels();
 
 })();
+
+function renderStars(average, max = 5) {
+    const rounded = Math.round(average * 2) / 2;
+    let stars = '';
+    for (let i = 1; i <= max; i++) stars += (i <= rounded) ? '★' : '☆';
+    return stars;
+}

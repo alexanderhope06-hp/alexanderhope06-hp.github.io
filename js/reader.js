@@ -137,33 +137,25 @@ async function loadNovel() {
    ===================================================== */
 
 function displayChapter() {
-
     const chapter = chapters[chapterNumber - 1];
-
     if (!chapter) return;
 
-
-    chapterHeader.textContent =
-        `Chapter ${chapter.chapter_number}`;
-
-    document.title =
-        `${chapter.title || "Chapter " + chapter.chapter_number} — ${novel.title}`;
-
+    chapterHeader.textContent = `Chapter ${chapter.chapter_number}`;
+    document.title = `${chapter.title || "Chapter " + chapter.chapter_number} — ${novel.title}`;
 
     unlockScrolling();
-
     renderChapter(chapter);
 
-    // Track impression for revenue attribution
     if (novel && novel.id && novel.author_id && chapter.id) {
         trackChapterImpression(novel.id, chapter.id, novel.author_id);
     }
 
-    updateURL();
+    // Record this read once (feeds reader count)
+    recordNovelReadOnce(novel.id);
 
+    updateURL();
     restorePosition();
 }
-
 
 /* =====================================================
    RENDER CHAPTER
@@ -811,5 +803,24 @@ async function trackChapterImpression(novelId, chapterId, authorId) {
             });
     } catch (err) {
         console.warn('Impression tracking failed:', err);
+    }
+}
+
+
+/* =====================================================
+   RECORD NOVEL READ
+   Feeds novel_readers_summary. Runs once per page load.
+   ===================================================== */
+
+async function recordNovelReadOnce(novelId) {
+    if (!novelId) return;
+    if (typeof recordNovelRead !== 'function') return;
+    if (recordNovelReadOnce._done) return;
+    recordNovelReadOnce._done = true;
+
+    try {
+        await recordNovelRead(novelId);
+    } catch (err) {
+        console.warn('recordNovelRead failed:', err);
     }
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,7 +24,6 @@
         <a href="index.html#genres">Genres</a>
     </nav>
     <div class="nav-actions">
-        <button class="search-btn">🔍</button>
         <a href="login.html" class="login-btn">Login</a>
     </div>
 </header>
@@ -44,8 +43,23 @@
             <p class="author-large">By <strong id="novelAuthor">Author</strong></p>
 
             <div class="rating-large">
-                ⭐ <span id="novelRating">No rating yet</span>
-                <span id="novelReaders"></span>
+                <div class="rating-display">
+                    <span class="rating-stars" id="ratingStars">☆☆☆☆☆</span>
+                    <span id="novelRating">No rating yet</span>
+                    <span id="novelReaders"></span>
+                </div>
+
+                <div class="user-rating" id="userRatingWidget">
+                    <p class="user-rating-label" id="userRatingLabel">Rate this novel:</p>
+                    <div class="star-picker" id="starPicker" role="radiogroup" aria-label="Rate this novel">
+                        <button type="button" class="star-btn" data-value="1" aria-label="1 star">★</button>
+                        <button type="button" class="star-btn" data-value="2" aria-label="2 stars">★</button>
+                        <button type="button" class="star-btn" data-value="3" aria-label="3 stars">★</button>
+                        <button type="button" class="star-btn" data-value="4" aria-label="4 stars">★</button>
+                        <button type="button" class="star-btn" data-value="5" aria-label="5 stars">★</button>
+                    </div>
+                    <p class="user-rating-hint" id="userRatingHint"></p>
+                </div>
             </div>
 
             <div class="novel-actions-buttons">
@@ -71,17 +85,14 @@
         <p class="story-about" id="storyAbout">Loading...</p>
     </section>
 
-
-<!-- NATIVE BANNER AD — matches section padding for alignment -->
-<section class="section storynest-native-ad-section">
-    <div class="storynest-native-ad">
-        <div class="storynest-native-ad-label">Sponsored</div>
-        <script async="async" data-cfasync="false"
-                src="https://unprofessionalginger.com/27a5267f73be7cc4dd0f9a0c6c0697bf/invoke.js"></script>
-        <div id="container-27a5267f73be7cc4dd0f9a0c6c0697bf"></div>
-    </div>
-</section>
-
+    <section class="section storynest-native-ad-section">
+        <div class="storynest-native-ad">
+            <div class="storynest-native-ad-label">Sponsored</div>
+            <script async="async" data-cfasync="false"
+                    src="https://unprofessionalginger.com/27a5267f73be7cc4dd0f9a0c6c0697bf/invoke.js"></script>
+            <div id="container-27a5267f73be7cc4dd0f9a0c6c0697bf"></div>
+        </div>
+    </section>
 
     <section class="section">
         <div class="section-heading">
@@ -112,6 +123,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/ratings.js"></script>
 <script src="js/novel.js"></script>
 </body>
 </html>

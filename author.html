@@ -91,22 +91,22 @@
                     <small>Across your novels</small>
                 </div>
             </div>
-            <div class="author-stat">
-                <div class="stat-icon">👥</div>
-                <div>
-                    <span>Total Readers</span>
-                    <strong>—</strong>
-                    <small>Reader analytics coming soon</small>
-                </div>
-            </div>
-            <div class="author-stat">
-                <div class="stat-icon">⭐</div>
-                <div>
-                    <span>Average Rating</span>
-                    <strong>—</strong>
-                    <small>Ratings coming soon</small>
-                </div>
-            </div>
+<div class="author-stat">
+    <div class="stat-icon">👥</div>
+    <div>
+        <span>Total Readers</span>
+        <strong id="totalReadersStat">0</strong>
+        <small>Unique readers</small>
+    </div>
+</div>
+<div class="author-stat">
+    <div class="stat-icon">⭐</div>
+    <div>
+        <span>Average Rating</span>
+        <strong id="averageRatingStat">—</strong>
+        <small>Across all novels</small>
+    </div>
+</div>
         </div>
     </section>
 
@@ -286,6 +286,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
 <script src="js/author.js"></script>
 </body>
 </html>

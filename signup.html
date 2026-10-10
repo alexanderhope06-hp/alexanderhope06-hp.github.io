@@ -1,100 +1,113 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account — StoryNest</title>
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/auth.css">
-<link rel="stylesheet" href="css/ads.css">
-<link rel="icon" type="image/png" href="image/fav.png">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
 </head>
-<body>
+<body class="auth-page">
 
 <header class="navbar">
     <a href="index.html" class="logo">
         <img src="image/fav.png" alt="StoryNest" class="logo-icon">
         Story<span>Nest</span>
     </a>
-    <a href="login.html" class="login-btn">Login</a>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#trending">Trending</a>
+        <a href="index.html#genres">Genres</a>
+    </nav>
+    <div class="nav-actions">
+        <a href="login.html" class="login-btn">Login</a>
+    </div>
 </header>
 
-<div class="storynest-top-ad">
-    <div class="storynest-top-ad-inner">
-        <script type="text/javascript">
-            atOptions = { 'key': '6e386924edca4892ed33ab2caa248000', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
-        </script>
-        <script src="https://unprofessionalginger.com/6e386924edca4892ed33ab2caa248000/invoke.js"></script>
-    </div>
-</div>
+<main class="auth-wrapper">
+    <div class="auth-card auth-card-wide">
 
-<main class="auth-container">
-    <div class="auth-card">
-        <p class="section-label">JOIN STORYNEST</p>
-        <h1>Create your account</h1>
-        <p class="auth-subtitle">Start sharing your stories with readers.</p>
+        <div class="auth-header">
+            <p class="section-label">JOIN STORYNEST</p>
+            <h1>Create your account</h1>
+            <p class="auth-subtitle">
+                Choose how you want to use StoryNest. You can switch later.
+            </p>
+        </div>
 
-        <form id="signupForm">
+        <div class="role-picker" id="rolePicker">
+            <button type="button" class="role-card" data-role="reader">
+                <div class="role-icon">📖</div>
+                <h3>As Reader</h3>
+                <p>Read novels, rate stories, save your reading list, and earn rewards.</p>
+                <span class="role-badge">Free forever</span>
+            </button>
+
+            <button type="button" class="role-card" data-role="author">
+                <div class="role-icon">✍️</div>
+                <h3>As Author</h3>
+                <p>Everything a reader gets, plus the Author Studio to publish your own novels.</p>
+                <span class="role-badge role-badge-author">Publish stories</span>
+            </button>
+        </div>
+
+        <form id="signupForm" class="auth-form" hidden>
+            <div class="role-selected" id="roleSelected"></div>
+
             <div class="form-group">
                 <label for="displayName">Display Name</label>
-                <input type="text" id="displayName" placeholder="Your author name" required>
+                <input type="text" id="displayName"
+                       placeholder="e.g. Jane Doe"
+                       autocomplete="name" required>
             </div>
 
             <div class="form-group">
                 <label for="signupEmail">Email</label>
-                <input type="email" id="signupEmail" placeholder="you@example.com" required>
+                <input type="email" id="signupEmail"
+                       placeholder="you@example.com"
+                       autocomplete="email" required>
             </div>
 
             <div class="form-group">
                 <label for="signupPassword">Password</label>
-                <div class="password-field">
-                    <input type="password" id="signupPassword" placeholder="At least 6 characters" minlength="6" required>
-                    <button type="button" class="password-toggle" data-target="signupPassword" aria-label="Show password">👁️</button>
+                <div class="password-wrap">
+                    <input type="password" id="signupPassword"
+                           placeholder="At least 6 characters"
+                           autocomplete="new-password"
+                           minlength="6" required>
+                    <button type="button" class="password-toggle"
+                            data-target="signupPassword"
+                            aria-label="Show password">👁️</button>
                 </div>
             </div>
 
-            <button type="submit" class="primary-btn auth-submit">Create Account</button>
+            <button type="submit" class="primary-btn auth-submit">
+                Create Account
+            </button>
+
+            <p class="auth-message" id="authMessage"></p>
+
+            <p class="auth-switch">
+                Already have an account?
+                <a href="login.html">Login</a>
+            </p>
         </form>
 
-        <p id="authMessage" class="auth-message"></p>
-
-        <p class="auth-switch">
-            Already have an account? <a href="login.html">Login</a>
-        </p>
     </div>
 </main>
 
 <footer>
     <div class="footer-logo">📖 StoryNest</div>
     <p>Discover. Read. Imagine.</p>
-    <div class="footer-links">
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="faq.html">FAQ</a>
-        <a href="guidelines.html">Guidelines</a>
-        <a href="sitemap.html">Sitemap</a>
-    </div>
     <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
 </footer>
 
-<div class="storynest-bottom-ad" id="storynestBottomAd">
-    <button class="close-ad" id="closeBottomAd" aria-label="Close advertisement">✕</button>
-    <div class="storynest-ad-content">
-        <script type="text/javascript">
-            atOptions = { 'key': 'ff80d71ae4bd0291f749548e7f51685e', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
-        </script>
-        <script src="https://www.highrevenueformat.com/ff80d71ae4bd0291f749548e7f51685e/invoke.js"></script>
-    </div>
-</div>
-
-<script src="js/ads.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/adblock-detect.js"></script>
+<script src="js/signup.js"></script>
 </body>
 </html>

@@ -2,36 +2,38 @@
    STORYNEST — EDIT NOVEL
    ===================================================== */
 
-(function () {
-    'use strict';
+/* ---------- ROLE GUARD ---------- */
+(async function guard() {
+    const user = await requireAuthor({ redirect: 'edit-novel.html' });
+    if (!user) return;
 
-    const params  = new URLSearchParams(window.location.search);
+    initEditNovel(user);
+})();
+
+
+function initEditNovel(currentUser) {
+    const params = new URLSearchParams(window.location.search);
     const novelId = params.get('id');
 
-    const editForm          = document.getElementById('editNovelForm');
-    const titleInput        = document.getElementById('novelTitle');
-    const descriptionInput  = document.getElementById('novelDescription');
-    const genreInput        = document.getElementById('novelGenre');
-    const statusInput       = document.getElementById('novelStatus');
-    const coverInput        = document.getElementById('novelCover');
-    const coverPreview      = document.getElementById('coverPreview');
-    const coverHint         = document.getElementById('coverHint');
-    const saveButton        = document.getElementById('saveNovel');
-    const manageChapters    = document.getElementById('manageChapters');
-    const manageCharacters  = document.getElementById('manageCharacters');
+    const editForm = document.getElementById('editNovelForm');
+    const titleInput = document.getElementById('novelTitle');
+    const descriptionInput = document.getElementById('novelDescription');
+    const genreInput = document.getElementById('novelGenre');
+    const statusInput = document.getElementById('novelStatus');
+    const coverInput = document.getElementById('novelCover');
+    const coverPreview = document.getElementById('coverPreview');
+    const coverHint = document.getElementById('coverHint');
+    const saveButton = document.getElementById('saveNovel');
+    const manageChapters = document.getElementById('manageChapters');
+    const manageCharacters = document.getElementById('manageCharacters');
 
-    // Track state
-    let currentUser     = null;
-    let currentNovel    = null;
-    let newCoverFile    = null;   // set when the user picks a new file
-    let removeCover     = false;  // set when the user clicks "Remove cover"
-
+    let currentNovel = null;
+    let newCoverFile = null;
+    let removeCover = false;
 
     /* =================================================
        IMAGE COMPRESSION
-       (same limits as addNovel.js)
-    ================================================= */
-
+       ================================================= */
     const MAX_UPLOAD_BYTES = 100 * 1024;
     const TARGET_BYTES     = 70 * 1024;
     const MAX_DIMENSION    = 900;
@@ -43,14 +45,14 @@
 
         const dataUrl = await new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload  = () => resolve(reader.result);
+            reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject(new Error('Could not read the file.'));
             reader.readAsDataURL(file);
         });
 
         const img = await new Promise((resolve, reject) => {
             const image = new Image();
-            image.onload  = () => resolve(image);
+            image.onload = () => resolve(image);
             image.onerror = () => reject(new Error('Invalid or corrupt image.'));
             image.src = dataUrl;
         });
@@ -58,14 +60,14 @@
         let { width, height } = img;
         if (width > height && width > MAX_DIMENSION) {
             height = Math.round((height * MAX_DIMENSION) / width);
-            width  = MAX_DIMENSION;
+            width = MAX_DIMENSION;
         } else if (height > MAX_DIMENSION) {
-            width  = Math.round((width * MAX_DIMENSION) / height);
+            width = Math.round((width * MAX_DIMENSION) / height);
             height = MAX_DIMENSION;
         }
 
         const canvas = document.createElement('canvas');
-        canvas.width  = width;
+        canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
@@ -80,16 +82,14 @@
 
         if (blob.size > MAX_UPLOAD_BYTES) {
             const scale = Math.sqrt(MAX_UPLOAD_BYTES / blob.size) * 0.9;
-            canvas.width  = Math.max(1, Math.round(width * scale));
+            canvas.width = Math.max(1, Math.round(width * scale));
             canvas.height = Math.max(1, Math.round(height * scale));
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             blob = await canvasToBlob(canvas, 'image/webp', 0.7);
         }
 
         if (blob.size > MAX_UPLOAD_BYTES) {
-            throw new Error(
-                'Image is too large even after compression. Try a simpler image.'
-            );
+            throw new Error('Image is too large even after compression. Try a simpler image.');
         }
 
         return new File([blob], `cover-${Date.now()}.webp`, { type: 'image/webp' });
@@ -105,11 +105,9 @@
         });
     }
 
-
     /* =================================================
        UPLOAD / DELETE
-    ================================================= */
-
+       ================================================= */
     async function uploadCover(userId, file) {
         const path = `${userId}/${Date.now()}-${file.name}`;
 
@@ -134,8 +132,6 @@
         return data.publicUrl;
     }
 
-    // Best-effort delete of an old cover file when it's replaced.
-    // The path is derived from the public URL. Fails silently.
     async function deleteOldCover(publicUrl) {
         if (!publicUrl) return;
         try {
@@ -150,11 +146,9 @@
         }
     }
 
-
     /* =================================================
        COVER INPUT PREVIEW
-    ================================================= */
-
+       ================================================= */
     function showCoverPreview(src) {
         if (!coverPreview) return;
         if (src) {
@@ -171,9 +165,8 @@
             const file = coverInput.files?.[0];
 
             if (!file) {
-                // User cancelled — revert to existing cover
                 newCoverFile = null;
-                removeCover  = false;
+                removeCover = false;
                 coverHint.style.display = 'none';
                 showCoverPreview(currentNovel?.cover_url || null);
                 return;
@@ -182,7 +175,7 @@
             try {
                 const compressed = await compressImage(file);
                 newCoverFile = compressed;
-                removeCover  = false;
+                removeCover = false;
 
                 coverPreview.src = URL.createObjectURL(compressed);
                 coverPreview.style.display = 'block';
@@ -200,11 +193,9 @@
         });
     }
 
-
     /* =================================================
        LOAD NOVEL
-    ================================================= */
-
+       ================================================= */
     if (!novelId) {
         showToast('No novel selected.', 'error');
         setTimeout(() => window.location.href = 'author.html', 1500);
@@ -214,21 +205,11 @@
     loadNovel();
 
     async function loadNovel() {
-        const { data: { user }, error: userError } =
-            await supabaseClient.auth.getUser();
-
-        if (userError || !user) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        currentUser = user;
-
         const { data: novel, error } = await supabaseClient
             .from('novels')
             .select('*')
             .eq('id', novelId)
-            .eq('author_id', user.id)
+            .eq('author_id', currentUser.id)
             .single();
 
         if (error || !novel) {
@@ -240,31 +221,29 @@
 
         currentNovel = novel;
 
-        titleInput.value       = novel.title       || '';
+        titleInput.value = novel.title || '';
         descriptionInput.value = novel.description || '';
-        genreInput.value       = novel.genre       || '';
-        statusInput.value      = novel.status      || 'draft';
+        genreInput.value = novel.genre || '';
+        statusInput.value = novel.status || 'draft';
 
         if (novel.cover_url) showCoverPreview(novel.cover_url);
 
         document.title = `Edit ${novel.title} — StoryNest`;
     }
 
-
     /* =================================================
        SAVE
-    ================================================= */
-
+       ================================================= */
     editForm.addEventListener('submit', saveNovelChanges);
 
     async function saveNovelChanges(event) {
         event.preventDefault();
 
-        if (!currentUser || !currentNovel) return;
+        if (!currentNovel) return;
 
-        const title       = titleInput.value.trim();
+        const title = titleInput.value.trim();
         const description = descriptionInput.value.trim();
-        const genre       = genreInput.value;
+        const genre = genreInput.value;
 
         if (!title || !description || !genre) {
             showToast('Please complete all fields.', 'error');
@@ -275,14 +254,12 @@
         saveButton.textContent = 'Saving...';
 
         try {
-            // 1. Upload new cover if the user picked one
             let coverUrl = currentNovel.cover_url || null;
 
             if (newCoverFile) {
                 saveButton.textContent = 'Uploading cover...';
                 coverUrl = await uploadCover(currentUser.id, newCoverFile);
 
-                // Best-effort cleanup of the previous file
                 if (currentNovel.cover_url) {
                     deleteOldCover(currentNovel.cover_url);
                 }
@@ -293,7 +270,6 @@
                 coverUrl = null;
             }
 
-            // 2. Update the novel row
             saveButton.textContent = 'Saving...';
             const { data, error } = await supabaseClient
                 .from('novels')
@@ -317,11 +293,9 @@
         }
     }
 
-
     /* =================================================
        NAVIGATION BUTTONS
-    ================================================= */
-
+       ================================================= */
     if (manageChapters) {
         manageChapters.addEventListener('click', () => {
             window.location.href =
@@ -335,5 +309,4 @@
                 `characters.html?id=${encodeURIComponent(novelId)}`;
         });
     }
-
-})();
+}

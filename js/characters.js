@@ -1,716 +1,422 @@
 /* =====================================================
-   STORYNEST - CHARACTER MANAGER
+   STORYNEST - CHAPTER EDITOR
    ===================================================== */
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+/* ---------- ROLE GUARD ---------- */
+(async function guard() {
+    const user = await requireAuthor({ redirect: 'chapters.html' });
+    if (!user) return;
 
-const novelId =
-    params.get("id");
-
-
-/* =====================================================
-   ELEMENTS
-   ===================================================== */
-
-const novelTitle =
-    document.getElementById("novelTitle");
-
-const characterName =
-    document.getElementById("characterName");
-
-const characterRole =
-    document.getElementById("characterRole");
-
-const characterDescription =
-    document.getElementById("characterDescription");
-
-const saveCharacter =
-    document.getElementById("saveCharacter");
-
-const clearCharacter =
-    document.getElementById("clearCharacter");
-
-const characterList =
-    document.getElementById("characterList");
+    initChapterEditor(user);
+})();
 
 
-let currentUser = null;
+function initChapterEditor(currentUser) {
+    const params = new URLSearchParams(window.location.search);
+    const novelId = params.get('id');
 
+    const novelTitleDisplay = document.getElementById('novelTitleDisplay');
+    const novelGenreDisplay = document.getElementById('novelGenreDisplay');
+    const chapterTitle = document.getElementById('chapterTitle');
+    const chapterContent = document.getElementById('chapterContent');
+    const chapterList = document.getElementById('chapterList');
+    const chapterCount = document.getElementById('chapterCount');
+    const saveChapterButton = document.getElementById('saveChapter');
+    const clearChapterButton = document.getElementById('clearChapter');
+    const publishNovelButton = document.getElementById('publishNovel');
 
-/*
- * ID is required
- */
+    let novel = null;
+    let editingChapterId = null;
 
-if (!novelId) {
-    // No ?id= in the URL — show the novel picker
-    showNovelPicker();
-} else {
-    initializeCharacters();
-}
-
-
-/* =====================================================
-   INITIALIZE
-   ===================================================== */
-
-async function initializeCharacters() {
-
-    const {
-        data: {
-            user
-        },
-        error
-    } =
-        await supabaseClient
-            .auth
-            .getUser();
-
-
-    if (error || !user) {
-
-        window.location.href =
-            "login.html";
-
+    /* ---------- CHECK NOVEL ---------- */
+    if (!novelId) {
+        showToast('No novel selected. Please choose a novel first.', 'error');
+        setTimeout(() => window.location.href = 'author.html', 1500);
         return;
-
     }
 
+    initializeChapterEditor();
 
-    currentUser =
-        user;
-
-
-    /*
-     * Make sure this novel belongs
-     * to the logged-in author.
-     */
-
-    const {
-        data: novel,
-        error: novelError
-    } =
-        await supabaseClient
-            .from("novels")
-            .select("id, title")
-            .eq("id", novelId)
-            .eq("author_id", user.id)
+    /* ---------- INITIALIZE ---------- */
+    async function initializeChapterEditor() {
+        const { data, error } = await supabaseClient
+            .from('novels')
+            .select('*')
+            .eq('id', novelId)
+            .eq('author_id', currentUser.id)
             .single();
 
-
-    if (novelError || !novel) {
-
-        console.error(
-            novelError
-        );
-
-        alert(
-            "Novel not found."
-        );
-
-        window.location.href =
-            "author.html";
-
-        return;
-
-    }
-
-
-    novelTitle.textContent =
-        `${novel.title} — Characters`;
-
-
-    await loadCharacters();
-
-}
-
-
-/* =====================================================
-   LOAD CHARACTERS
-   ===================================================== */
-
-async function loadCharacters() {
-
-    const {
-        data: characters,
-        error
-    } =
-        await supabaseClient
-            .from("characters")
-            .select("*")
-            .eq("novel_id", novelId)
-            .order("created_at", {
-                ascending: true
-            });
-
-
-    if (error) {
-
-        console.error(
-            "Could not load characters:",
-            error
-        );
-
-        characterList.innerHTML = `
-            <p>
-                Could not load characters.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    displayCharacters(
-        characters || []
-    );
-
-}
-
-
-/* =====================================================
-   DISPLAY CHARACTERS
-   ===================================================== */
-
-function displayCharacters(characters) {
-
-    if (characters.length === 0) {
-
-        characterList.innerHTML = `
-
-            <div class="chapter-empty">
-
-                <div>👤</div>
-
-                <p>
-                    No characters yet.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    characterList.innerHTML =
-        "";
-
-
-    characters.forEach(
-        character => {
-
-            const item =
-                document.createElement("div");
-
-
-            item.className =
-                "editor-chapter";
-
-
-            item.innerHTML = `
-
-                <div class="editor-chapter-number">
-                    👤
-                </div>
-
-
-                <div class="editor-chapter-info">
-
-                    <strong>
-                        ${escapeHTML(
-                            character.name
-                        )}
-                    </strong>
-
-                    <span>
-                        ${escapeHTML(
-                            character.role ||
-                            "Character"
-                        )}
-                    </span>
-
-                    <span>
-                        ${escapeHTML(
-                            character.description ||
-                            ""
-                        )}
-                    </span>
-
-                </div>
-
-
-                <div>
-
-                    <button
-                        type="button"
-                        class="secondary-btn edit-character"
-                        data-id="${character.id}">
-
-                        Edit
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="delete-chapter delete-character"
-                        data-id="${character.id}">
-
-                        Delete
-
-                    </button>
-
-                </div>
-
-            `;
-
-
-            characterList.appendChild(
-                item
-            );
-
+        if (error || !data) {
+            console.error('Could not load novel:', error);
+            showToast('Novel not found or you do not have permission.', 'error');
+            setTimeout(() => window.location.href = 'author.html', 1500);
+            return;
         }
-    );
 
+        novel = data;
 
-    attachCharacterActions(
-        characters
-    );
+        novelTitleDisplay.textContent = novel.title;
+        novelGenreDisplay.textContent = `${novel.genre || 'Story'} • ${novel.status || 'draft'}`;
+        document.title = `Chapters — ${novel.title} — StoryNest`;
 
-}
-
-
-/* =====================================================
-   SINGLE SAVE BUTTON
-   ADD + EDIT
-   ===================================================== */
-
-saveCharacter.addEventListener(
-    "click",
-    saveCharacterData
-);
-
-
-async function saveCharacterData() {
-
-    const editingId =
-        saveCharacter.dataset.editingId;
-
-
-    const name =
-        characterName.value.trim();
-
-
-    const role =
-        characterRole.value;
-
-
-    const description =
-        characterDescription.value.trim();
-
-
-    /*
-     * Validation
-     */
-
-    if (!name) {
-
-        alert(
-            "Please enter the character name."
-        );
-
-        return;
-
+        await loadChapters();
     }
 
+    /* ---------- LOAD CHAPTERS ---------- */
+    async function loadChapters() {
+        const { data: chapters, error } = await supabaseClient
+            .from('chapters')
+            .select('*')
+            .eq('novel_id', novelId)
+            .order('chapter_number', { ascending: true });
 
-    /*
-     * Loading
-     */
+        if (error) {
+            console.error('Could not load chapters:', error);
+            chapterList.innerHTML = `
+                <div class="chapter-empty">
+                    <div>⚠️</div>
+                    <p>Could not load chapters.</p>
+                </div>
+            `;
+            return;
+        }
 
-    saveCharacter.disabled =
-        true;
+        updateChapterCount(chapters.length);
 
-    saveCharacter.textContent =
-        "Saving...";
+        if (!chapters || chapters.length === 0) {
+            chapterList.innerHTML = `
+                <div class="chapter-empty">
+                    <div>📖</div>
+                    <p>No chapters yet. Add your first chapter above.</p>
+                </div>
+            `;
+            return;
+        }
 
-
-    let error;
-
-
-    /* =================================================
-       EDIT EXISTING CHARACTER
-       ================================================= */
-
-    if (editingId) {
-
-        const result =
-            await supabaseClient
-                .from("characters")
-                .update({
-
-                    name:
-                        name,
-
-                    role:
-                        role || null,
-
-                    description:
-                        description || null
-
-                })
-                .eq(
-                    "id",
-                    editingId
-                )
-                .eq(
-                    "novel_id",
-                    novelId
-                );
-
-
-        error =
-            result.error;
-
-
+        chapterList.innerHTML = '';
+        chapters.forEach(chapter => displayChapter(chapter));
     }
 
-
-    /* =================================================
-       CREATE NEW CHARACTER
-       ================================================= */
-
-    else {
-
-        const result =
-            await supabaseClient
-                .from("characters")
-                .insert({
-
-                    novel_id:
-                        novelId,
-
-                    name:
-                        name,
-
-                    role:
-                        role || null,
-
-                    description:
-                        description || null
-
-                });
-
-
-        error =
-            result.error;
-
-    }
-
-
-    /*
-     * Handle error
-     */
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-        alert(
-            "Could not save character:\n\n" +
-            error.message
-        );
-
-        saveCharacter.disabled =
-            false;
-
-        saveCharacter.textContent =
-            editingId
-                ? "Save Changes"
-                : "+ Add Character";
-
-        return;
-
-    }
-
-
-    /*
-     * Success
-     */
-
-    clearCharacterForm();
-
-    await loadCharacters();
-
-
-    saveCharacter.disabled =
-        false;
-
-    saveCharacter.textContent =
-        "+ Add Character";
-
-}
-
-
-/* =====================================================
-   EDIT / DELETE BUTTONS
-   ===================================================== */
-
-function attachCharacterActions(characters) {
-
-    /*
-     * EDIT
-     */
-
-    document
-        .querySelectorAll(
-            ".edit-character"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const character =
-                            characters.find(
-                                item =>
-                                    item.id ===
-                                    button.dataset.id
-                            );
-
-
-                        if (!character) {
-                            return;
-                        }
-
-
-                        characterName.value =
-                            character.name || "";
-
-
-                        characterRole.value =
-                            character.role || "";
-
-
-                        characterDescription.value =
-                            character.description || "";
-
-
-                        /*
-                         * Store the ID of the
-                         * character being edited.
-                         */
-
-                        saveCharacter.dataset.editingId =
-                            character.id;
-
-
-                        saveCharacter.textContent =
-                            "Save Changes";
-
-
-                        window.scrollTo({
-                            top: 0,
-                            behavior: "smooth"
-                        });
-
-                    }
-                );
-
-            }
-        );
-
-
-    /*
-     * DELETE
-     */
-
-    document
-        .querySelectorAll(
-            ".delete-character"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    async () => {
-
-                        const confirmed =
-                            confirm(
-                                "Delete this character?"
-                            );
-
-
-                        if (!confirmed) {
-                            return;
-                        }
-
-
-                        const {
-                            error
-                        } =
-                            await supabaseClient
-                                .from("characters")
-                                .delete()
-                                .eq(
-                                    "id",
-                                    button.dataset.id
-                                )
-                                .eq(
-                                    "novel_id",
-                                    novelId
-                                );
-
-
-                        if (error) {
-
-                            console.error(
-                                error
-                            );
-
-                            alert(
-                                "Could not delete character:\n\n" +
-                                error.message
-                            );
-
-                            return;
-
-                        }
-
-
-                        await loadCharacters();
-
-                    }
-                );
-
-            }
-        );
-
-}
-
-
-/* =====================================================
-   CLEAR
-   ===================================================== */
-
-clearCharacter.addEventListener(
-    "click",
-    clearCharacterForm
-);
-
-
-function clearCharacterForm() {
-
-    characterName.value =
-        "";
-
-    characterRole.value =
-        "";
-
-    characterDescription.value =
-        "";
-
-
-    delete saveCharacter.dataset.editingId;
-
-
-    saveCharacter.textContent =
-        "+ Add Character";
-
-}
-
-/* =====================================================
-   NOVEL PICKER (when no ?id= is given)
-   ===================================================== */
-
-async function showNovelPicker() {
-
-    const { data: { user } } =
-        await supabaseClient.auth.getUser();
-
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Hide the editor form while the picker is showing
-    const editor = document.querySelector(".chapter-editor");
-    if (editor) editor.style.display = "none";
-
-    // Load the author's novels
-    const { data: novels, error } = await supabaseClient
-        .from("novels")
-        .select("id, title, status")
-        .eq("author_id", user.id)
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        characterList.innerHTML = `<p>Could not load your novels.</p>`;
-        return;
-    }
-
-    if (!novels || novels.length === 0) {
-        characterList.innerHTML = `
-            <div class="chapter-empty">
-                <div>📖</div>
-                <p>You haven't created any novels yet.</p>
-                <a href="add-novel.html" class="primary-btn" style="margin-top:16px; display:inline-block;">
-                    + Create Your First Novel
-                </a>
-            </div>
-        `;
-        novelTitle.textContent = "Pick a Novel";
-        return;
-    }
-
-    novelTitle.textContent = "Pick a Novel";
-
-    characterList.innerHTML = "";
-    novels.forEach(n => {
-        const item = document.createElement("a");
-        item.href = `characters.html?id=${encodeURIComponent(n.id)}`;
-        item.className = "editor-chapter";
-        item.style.textDecoration = "none";
-        item.style.color = "inherit";
-        item.style.cursor = "pointer";
+    /* ---------- DISPLAY CHAPTER ---------- */
+    function displayChapter(chapter) {
+        const item = document.createElement('div');
+        item.className = 'editor-chapter';
+
+        const isPublished = chapter.status === 'published';
 
         item.innerHTML = `
-            <div class="editor-chapter-number">📖</div>
-            <div class="editor-chapter-info">
-                <strong>${escapeHTML(n.title)}</strong>
-                <span>${n.status === "published" ? "Published" : "Draft"}</span>
+            <div class="editor-chapter-number">
+                ${chapter.chapter_number}
             </div>
-            <div><span style="font-size:20px; color:var(--accent-light);">→</span></div>
+
+            <div class="editor-chapter-info">
+                <strong>${escapeHTML(chapter.title)}</strong>
+
+                <span>
+                    ${escapeHTML(chapter.content || '').length} characters
+                </span>
+
+                <span class="chapter-status ${isPublished ? 'published' : 'draft'}">
+                    ${isPublished ? 'Published' : 'Draft'}
+                </span>
+            </div>
+
+            <div class="editor-chapter-actions">
+
+                <button
+                    class="secondary-btn edit-chapter"
+                    data-id="${chapter.id}">
+                    Edit
+                </button>
+
+                <button
+                    class="delete-chapter"
+                    data-id="${chapter.id}">
+                    Delete
+                </button>
+
+                ${
+                    !isPublished
+                        ? `
+                            <button
+                                class="primary-btn publish-chapter"
+                                data-id="${chapter.id}">
+                                🚀 Publish Chapter
+                            </button>
+                        `
+                        : ''
+                }
+
+            </div>
         `;
 
-        characterList.appendChild(item);
-    });
-}
+        item.querySelector('.edit-chapter')
+            .addEventListener('click', () => editChapter(chapter));
 
+        item.querySelector('.delete-chapter')
+            .addEventListener('click', () => deleteChapter(chapter.id));
 
-/* =====================================================
-   HTML SAFETY
-   ===================================================== */
+        const publishButton = item.querySelector('.publish-chapter');
 
-function escapeHTML(value) {
+        if (publishButton) {
+            publishButton.addEventListener('click', () => {
+                publishChapter(chapter.id);
+            });
+        }
 
-    const div =
-        document.createElement("div");
+        chapterList.appendChild(item);
+    }
 
-    div.textContent =
-        value ?? "";
+    /* ---------- PUBLISH INDIVIDUAL CHAPTER ---------- */
+    async function publishChapter(chapterId) {
+        const confirmed = confirm(
+            'Publish this chapter?\n\n' +
+            'Readers will be able to read this chapter once the novel is published.'
+        );
 
-    return div.innerHTML;
+        if (!confirmed) return;
 
+        const publishButton = document.querySelector(
+            `.publish-chapter[data-id="${chapterId}"]`
+        );
+
+        if (publishButton) {
+            publishButton.disabled = true;
+            publishButton.textContent = 'Publishing...';
+        }
+
+        const { data, error } = await supabaseClient
+            .from('chapters')
+            .update({
+                status: 'published',
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', chapterId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Could not publish chapter:', error);
+            showToast('Could not publish chapter: ' + error.message, 'error');
+            if (publishButton) {
+                publishButton.disabled = false;
+                publishButton.textContent = '🚀 Publish Chapter';
+            }
+            return;
+        }
+
+        console.log('Published chapter:', data);
+        showToast('Chapter published successfully!');
+        await loadChapters();
+    }
+
+    /* ---------- SAVE CHAPTER ---------- */
+    saveChapterButton.addEventListener('click', saveChapter);
+
+    async function saveChapter() {
+        const title = chapterTitle.value.trim();
+        const content = chapterContent.value.trim();
+
+        if (!title || !content) {
+            showToast('Please enter a chapter title and content.', 'error');
+            return;
+        }
+
+        saveChapterButton.disabled = true;
+        saveChapterButton.textContent = editingChapterId ? 'Updating...' : 'Adding...';
+
+        // UPDATE
+        if (editingChapterId) {
+            const { error } = await supabaseClient
+                .from('chapters')
+                .update({ title, content })
+                .eq('id', editingChapterId);
+
+            if (error) {
+                console.error('Could not update chapter:', error);
+                showToast('Could not update chapter: ' + error.message, 'error');
+                resetSaveButton();
+                return;
+            }
+
+            showToast('Chapter updated successfully!');
+            editingChapterId = null;
+            clearEditor();
+            resetSaveButton();
+            await loadChapters();
+            return;
+        }
+
+        // INSERT NEW
+        const { data: existingChapters, error: chaptersError } = await supabaseClient
+            .from('chapters')
+            .select('chapter_number')
+            .eq('novel_id', novelId);
+
+        if (chaptersError) {
+            console.error(chaptersError);
+            showToast('Could not determine chapter number.', 'error');
+            resetSaveButton();
+            return;
+        }
+
+        let nextNumber = 1;
+        if (existingChapters && existingChapters.length > 0) {
+            const numbers = existingChapters.map(ch => Number(ch.chapter_number));
+            nextNumber = Math.max(...numbers) + 1;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('chapters')
+            .insert({
+                novel_id: novelId,
+                chapter_number: nextNumber,
+                title: title,
+                content: content,
+                status: 'draft'
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Could not create chapter:', error);
+            showToast('Could not create chapter: ' + error.message, 'error');
+            resetSaveButton();
+            return;
+        }
+
+        console.log('Chapter created:', data);
+        showToast(`Chapter ${nextNumber} added successfully!`);
+        clearEditor();
+        resetSaveButton();
+        await loadChapters();
+    }
+
+    /* ---------- EDIT CHAPTER ---------- */
+    function editChapter(chapter) {
+        editingChapterId = chapter.id;
+        chapterTitle.value = chapter.title;
+        chapterContent.value = chapter.content;
+        saveChapterButton.textContent = 'Update Chapter';
+
+        chapterTitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        chapterTitle.focus();
+    }
+
+    /* ---------- DELETE CHAPTER ---------- */
+    async function deleteChapter(chapterId) {
+        const confirmed = confirm('Delete this chapter?\n\nThis action cannot be undone.');
+        if (!confirmed) return;
+
+        const { error } = await supabaseClient
+            .from('chapters')
+            .delete()
+            .eq('id', chapterId);
+
+        if (error) {
+            console.error('Could not delete chapter:', error);
+            showToast('Could not delete chapter: ' + error.message, 'error');
+            return;
+        }
+
+        await renumberChapters();
+        showToast('Chapter deleted successfully.');
+        await loadChapters();
+    }
+
+    /* ---------- RENUMBER CHAPTERS ---------- */
+    async function renumberChapters() {
+        const { data: chapters, error } = await supabaseClient
+            .from('chapters')
+            .select('id')
+            .eq('novel_id', novelId)
+            .order('chapter_number', { ascending: true });
+
+        if (error) {
+            console.error('Could not load chapters for renumbering:', error);
+            return;
+        }
+
+        for (let i = 0; i < chapters.length; i++) {
+            await supabaseClient
+                .from('chapters')
+                .update({ chapter_number: i + 1 })
+                .eq('id', chapters[i].id);
+        }
+    }
+
+    /* ---------- CLEAR EDITOR ---------- */
+    clearChapterButton.addEventListener('click', clearEditor);
+
+    function clearEditor() {
+        chapterTitle.value = '';
+        chapterContent.value = '';
+        editingChapterId = null;
+        resetSaveButton();
+    }
+
+    /* ---------- RESET BUTTON ---------- */
+    function resetSaveButton() {
+        saveChapterButton.disabled = false;
+        saveChapterButton.textContent = '＋ Add Chapter';
+    }
+
+    /* ---------- CHAPTER COUNT ---------- */
+    function updateChapterCount(count) {
+        chapterCount.textContent = `${count} ${count === 1 ? 'chapter' : 'chapters'}`;
+    }
+
+    /* ---------- PUBLISH NOVEL ---------- */
+    publishNovelButton.addEventListener('click', publishNovel);
+
+    async function publishNovel() {
+        const { data: chapters, error: chaptersError } = await supabaseClient
+            .from('chapters')
+            .select('id')
+            .eq('novel_id', novelId);
+
+        if (chaptersError) {
+            console.error(chaptersError);
+            showToast('Could not check chapters.', 'error');
+            return;
+        }
+
+        if (!chapters || chapters.length === 0) {
+            showToast('Add at least one chapter before publishing.', 'error');
+            return;
+        }
+
+        const confirmed = confirm(`Publish "${novel.title}"?\n\nReaders will be able to see this novel.`);
+        if (!confirmed) return;
+
+        publishNovelButton.disabled = true;
+        publishNovelButton.textContent = 'Publishing...';
+
+        const { data, error } = await supabaseClient
+            .from('novels')
+            .update({ status: 'published' })
+            .eq('id', novelId)
+            .eq('author_id', currentUser.id)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Could not publish novel:', error);
+            showToast('Could not publish novel: ' + error.message, 'error');
+            publishNovelButton.disabled = false;
+            publishNovelButton.textContent = '🚀 Publish Novel';
+            return;
+        }
+
+        console.log('Published novel:', data);
+        showToast(`"${novel.title}" has been published!`);
+        setTimeout(() => window.location.href = 'author.html', 1000);
+    }
+
+    /* ---------- HTML SAFETY ---------- */
+    function escapeHTML(value) {
+        const div = document.createElement('div');
+        div.textContent = value ?? '';
+        return div.innerHTML;
+    }
 }
