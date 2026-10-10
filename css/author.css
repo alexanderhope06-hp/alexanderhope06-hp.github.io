@@ -548,3 +548,221 @@
     .author-actions button { width: 100%; text-align: center; }
     .dashboard-nav-link { padding: 8px 12px; font-size: 16px; }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* ================= READER GROWTH CHART ================= */
+
+.reader-growth {
+    padding: 30px 28px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+}
+
+.reader-growth-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.growth-stat {
+    flex: 1;
+    min-width: 120px;
+}
+
+.growth-stat span {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.growth-stat strong {
+    display: block;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.growth-stat strong.positive { color: #4ade80; }
+.growth-stat strong.negative { color: #f87171; }
+
+.growth-stat small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-faint);
+}
+
+/* ---------- Chart ---------- */
+
+.growth-chart {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    align-items: end;
+    height: 180px;
+    padding-bottom: 30px;
+    position: relative;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.growth-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    position: relative;
+}
+
+.growth-bar {
+    width: 100%;
+    max-width: 56px;
+    background: linear-gradient(180deg, var(--accent-light), var(--accent));
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    transition: all 0.4s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.growth-bar:hover {
+    filter: brightness(1.15);
+}
+
+.growth-bar-value {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.growth-bar-wrap:hover .growth-bar-value,
+.growth-bar-value.always {
+    opacity: 1;
+}
+
+.growth-bar-label {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ---------- Empty state ---------- */
+
+.growth-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.growth-empty-icon {
+    font-size: 44px;
+    margin-bottom: 12px;
+}
+
+.growth-empty h3 {
+    color: #fff;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.growth-empty p {
+    font-size: 13.5px;
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+/* ---------- Top growing novels list ---------- */
+
+.growth-top-list {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-default);
+}
+
+.growth-top-list h4 {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.growth-top-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.growth-top-item:last-child { border-bottom: none; }
+
+.growth-top-rank {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(155, 92, 255, 0.15);
+    color: var(--accent-light);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.growth-top-title {
+    flex: 1;
+    font-size: 14px;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.growth-top-count {
+    font-size: 13px;
+    color: #4ade80;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+    .reader-growth { padding: 20px 18px; }
+    .growth-chart { height: 140px; gap: 6px; }
+    .growth-bar { max-width: 34px; }
+    .growth-stat strong { font-size: 22px; }
+}

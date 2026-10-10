@@ -136,6 +136,8 @@ async function loadAuthorNovels() {
         await loadChapterStatistics();
         await loadNovelRatings();
         await loadNovelReaderCounts();
+        await loadNovelReaderCounts();
+        await loadReaderGrowth();
 
         displayNovels();
         displayTopNovels();
@@ -298,6 +300,206 @@ function updateTotalReaders() {
 }
 
 
+/* =====================================================
+   READER GROWTH (last 6 months)
+   ===================================================== */
+
+async function loadReaderGrowth() {
+    const container = document.getElementById('readerGrowthContainer');
+    if (!container) return;
+
+    if (!authorNovels.length) {
+        renderGrowthEmpty(container, 'No novels yet.');
+        return;
+    }
+
+    const novelIds = authorNovels.map(n => n.id);
+
+    // Fetch monthly reader counts for all author's novels
+    const { data: rows, error } = await supabaseClient
+        .from('novel_monthly_readers')
+        .select('novel_id, first_read_month, new_readers')
+        .in('novel_id', novelIds);
+
+    if (error) {
+        console.warn('Reader growth fetch failed:', error);
+        renderGrowthEmpty(container, 'Could not load reader growth.');
+        return;
+    }
+
+    // Build the last 6 months window
+    const months = getLastSixMonths();
+
+    // Aggregate: month → total new readers
+    const monthlyTotals = {};
+    months.forEach(m => { monthlyTotals[m.key] = 0; });
+
+    // Track per-novel totals for the "top growing novels" list
+    const perNovel = {};
+
+    (rows || []).forEach(row => {
+        const monthKey = row.first_read_month.slice(0, 7); // "2026-01"
+
+        if (monthlyTotals[monthKey] !== undefined) {
+            monthlyTotals[monthKey] += row.new_readers;
+        }
+
+        perNovel[row.novel_id] =
+            (perNovel[row.novel_id] || 0) + row.new_readers;
+    });
+
+    // Top growing novels (last 6 months)
+    const topNovels = Object.entries(perNovel)
+        .map(([id, count]) => {
+            const novel = authorNovels.find(n => n.id === id);
+            return {
+                title: novel?.title || 'Untitled',
+                count,
+            };
+        })
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+
+    renderGrowthChart(container, months, monthlyTotals, topNovels);
+}
+
+
+/* ---------- Build the 6-month window ---------- */
+
+function getLastSixMonths() {
+    const out = [];
+    const now = new Date();
+
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const year = d.getFullYear();
+        const month = d.getMonth();
+        const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const label = d.toLocaleString('en-US', { month: 'short' });
+
+        out.push({ key, label, year, month });
+    }
+    return out;
+}
+
+
+/* ---------- Render the chart ---------- */
+
+function renderGrowthChart(container, months, monthlyTotals, topNovels) {
+    const values = months.map(m => monthlyTotals[m.key] || 0);
+    const maxValue = Math.max(...values, 1);
+
+    const thisMonth = values[values.length - 1] || 0;
+    const lastMonth = values[values.length - 2] || 0;
+    const totalSixMonths = values.reduce((a, b) => a + b, 0);
+
+    // Change vs last month
+    let changeText = '—';
+    let changeClass = '';
+    if (lastMonth === 0 && thisMonth > 0) {
+        changeText = 'New this month';
+        changeClass = 'positive';
+    } else if (lastMonth > 0) {
+        const diff = thisMonth - lastMonth;
+        const pct = Math.round((diff / lastMonth) * 100);
+        if (pct > 0) {
+            changeText = `+${pct}%`;
+            changeClass = 'positive';
+        } else if (pct < 0) {
+            changeText = `${pct}%`;
+            changeClass = 'negative';
+        } else {
+            changeText = 'No change';
+        }
+    }
+
+    const barsHTML = months.map((m, i) => {
+        const value = values[i];
+        const heightPercent = maxValue > 0
+            ? Math.max(4, (value / maxValue) * 100)
+            : 4;
+
+        // Show the value label always if it's non-zero, or on hover
+        const labelClass = value > 0 ? 'growth-bar-value always' : 'growth-bar-value';
+
+        return `
+            <div class="growth-bar-wrap">
+                <div class="growth-bar" style="height: ${heightPercent}%;">
+                    <span class="${labelClass}">${value}</span>
+                </div>
+                <span class="growth-bar-label">${m.label}</span>
+            </div>
+        `;
+    }).join('');
+
+    const topHTML = topNovels.length
+        ? `
+            <div class="growth-top-list">
+                <h4>Top Growing Novels</h4>
+                ${topNovels.map((n, i) => `
+                    <div class="growth-top-item">
+                        <div class="growth-top-rank">#${i + 1}</div>
+                        <div class="growth-top-title">${escapeHTML(n.title)}</div>
+                        <div class="growth-top-count">+${n.count}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    // Nothing tracked at all?
+    if (totalSixMonths === 0) {
+        container.innerHTML = `
+            <div class="growth-empty">
+                <div class="growth-empty-icon">📈</div>
+                <h3>No reader data yet</h3>
+                <p>Once readers start opening your novels, their monthly growth will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="reader-growth-summary">
+            <div class="growth-stat">
+                <span>This Month</span>
+                <strong>${thisMonth.toLocaleString()}</strong>
+                <small>new readers</small>
+            </div>
+            <div class="growth-stat">
+                <span>vs Last Month</span>
+                <strong class="${changeClass}">${changeText}</strong>
+                <small>${lastMonth.toLocaleString()} last month</small>
+            </div>
+            <div class="growth-stat">
+                <span>Last 6 Months</span>
+                <strong>${totalSixMonths.toLocaleString()}</strong>
+                <small>total new readers</small>
+            </div>
+        </div>
+
+        <div class="growth-chart">
+            ${barsHTML}
+        </div>
+
+        ${topHTML}
+    `;
+}
+
+
+/* ---------- Empty state helper ---------- */
+
+function renderGrowthEmpty(container, message) {
+    container.innerHTML = `
+        <div class="growth-empty">
+            <div class="growth-empty-icon">📈</div>
+            <h3>No reader data yet</h3>
+            <p>${escapeHTML(message)}</p>
+        </div>
+    `;
+}
+
+
 /* ---------- Counters ---------- */
 
 function updateChapterCounters(total) {
@@ -448,7 +650,6 @@ async function deleteNovel(novelId) {
 }
 
 
-/* ---------- Top novels ---------- */
 
 /* ---------- Top novels ---------- */
 
