@@ -1,0 +1,219 @@
+/* =====================================================
+   STORYNEST — AUTHOR STUDIO FORMS
+   Add/edit novel, chapter editor, characters editor
+   ===================================================== */
+
+/* ================= ADD/EDIT NOVEL ================= */
+.add-novel-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 70px 6%;
+}
+
+.add-novel-header { margin-bottom: 40px; }
+
+.add-novel-header h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 8px;
+}
+
+.add-novel-header p { color: var(--text-muted); }
+
+.novel-form {
+    padding: 30px 35px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+/* ================= CHAPTER EDITOR ================= */
+.chapter-editor-container {
+    max-width: 950px;
+    margin: auto;
+    padding: 70px 6%;
+}
+
+.chapter-editor-header { margin-bottom: 40px; }
+
+.chapter-editor-header h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 5px;
+    word-break: break-word;
+}
+
+.chapter-editor-header p:not(.section-label) { color: var(--text-muted); }
+
+.chapter-editor {
+    padding: 30px 35px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    margin-bottom: 60px;
+}
+
+.chapter-editor-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 16px;
+}
+
+.chapter-editor-top span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.chapter-editor textarea {
+    min-height: 350px;
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.8;
+}
+
+.chapter-editor-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.editor-chapter {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    transition: all var(--transition);
+}
+
+.editor-chapter:hover { border-color: #493263; }
+
+.editor-chapter-number {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+}
+
+.editor-chapter-info { flex: 1; min-width: 0; }
+
+.editor-chapter-info strong {
+    display: block;
+    word-break: break-word;
+}
+
+.editor-chapter-info span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 3px;
+    word-break: break-word;
+}
+
+.editor-chapter-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.editor-chapter-actions .secondary-btn,
+.editor-chapter-actions .delete-chapter {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+}
+
+.delete-chapter {
+    border: 1px solid #553333;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-weight: 500;
+    padding: 7px 14px;
+    font-size: 12px;
+}
+
+.delete-chapter:hover {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: #e74c3c;
+}
+
+.chapter-empty {
+    padding: 50px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    border: 1px dashed #333;
+    border-radius: var(--radius-md);
+}
+
+.chapter-empty div {
+    font-size: 35px;
+    margin-bottom: 8px;
+}
+
+.publish-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    padding: 30px 35px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #211330, #17171f);
+    border: 1px solid #593779;
+    flex-wrap: wrap;
+}
+
+.publish-box h2 { margin-bottom: 5px; }
+
+.publish-box p {
+    color: var(--text-secondary);
+    max-width: 550px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 800px) {
+    .chapter-editor-container { padding: 50px 5%; }
+    .chapter-editor-header h1 { font-size: 32px; }
+    .chapter-editor { padding: 20px; }
+    .chapter-editor-buttons { flex-direction: column; }
+    .chapter-editor-buttons button { width: 100%; }
+
+    .publish-box {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 25px;
+    }
+    .publish-box button { width: 100%; }
+
+    .editor-chapter { flex-wrap: wrap; }
+    .editor-chapter-actions {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 650px) {
+    .add-novel-container { padding: 50px 5%; }
+    .add-novel-header h1 { font-size: 32px; }
+    .novel-form { padding: 20px; }
+    .form-buttons { flex-direction: column; }
+    .form-buttons button,
+    .form-buttons a { width: 100%; text-align: center; }
+}

@@ -1,0 +1,266 @@
+/* =====================================================
+   STORYNEST — READER
+   Reading page, progress bar, reader controls
+   ===================================================== */
+
+.reader-page {
+    background: #f7f4ed;
+    color: #222;
+    min-height: 100vh;
+    font-family: Georgia, 'Times New Roman', serif;
+    overflow-x: clip;
+}
+
+.reader-page.dark-theme {
+    background: #0d0d12;
+    color: #e8e8e8;
+}
+
+/* ================= HEADER ================= */
+.reader-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: rgba(247, 244, 237, 0.97);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.reader-page.dark-theme .reader-header {
+    background: rgba(13, 13, 18, 0.97);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.reader-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+}
+
+.reader-back {
+    color: #555;
+    font-size: 28px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background var(--transition);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.reader-back:hover { background: rgba(0, 0, 0, 0.06); }
+
+.reader-page.dark-theme .reader-back { color: #888; }
+.reader-page.dark-theme .reader-back:hover { background: rgba(255, 255, 255, 0.06); }
+
+.reader-header-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;          /* allow ellipsis to work inside flex */
+}
+
+.reader-header-info strong {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #222;
+    min-width: 0;              /* critical for flex ellipsis */
+    max-width: 100%;           /* use all available space */
+}
+
+.reader-page.dark-theme .reader-header-info strong { color: #e8e8e8; }
+
+.reader-header-info span {
+    font-size: 13px;
+    color: #888;
+}
+
+/* ================= ACTIONS ================= */
+.reader-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.reader-menu-btn {
+    border: 0;
+    background: rgba(0, 0, 0, 0.06);
+    color: #333;
+    border-radius: 24px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background var(--transition);
+    line-height: 1;
+}
+
+.reader-menu-btn:hover { background: rgba(0, 0, 0, 0.1); }
+
+.reader-page.dark-theme .reader-menu-btn {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ddd;
+}
+
+.reader-page.dark-theme .reader-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.reader-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    min-width: 180px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    display: none;
+    z-index: 200;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.reader-dropdown.active {
+    display: block;
+    animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.reader-dropdown a {
+    display: block;
+    padding: 10px 14px;
+    color: #333;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background var(--transition);
+}
+
+.reader-dropdown a:hover { background: rgba(155, 92, 255, 0.08); }
+
+.reader-page.dark-theme .reader-dropdown {
+    background: #1a1a2e;
+    border-color: #2a2a4a;
+}
+
+.reader-page.dark-theme .reader-dropdown a { color: #d0d0d0; }
+.reader-page.dark-theme .reader-dropdown a:hover { background: rgba(155, 92, 255, 0.15); }
+
+/* ================= PROGRESS ================= */
+.reading-progress {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    z-index: 999;
+    transition: width 0.15s ease;
+    box-shadow: 0 0 8px rgba(155, 92, 255, 0.5);
+}
+
+/* ================= CONTENT ================= */
+.reader-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 88px 24px 120px;
+}
+
+.reader-page-content {
+    width: 100%;
+    font-size: 18px;
+    line-height: 1.75;
+    color: #333;
+    touch-action: pan-y;
+}
+
+.reader-page.dark-theme .reader-page-content { color: #d0d0d0; }
+
+.reader-page-content h1,
+.page-chapter-title {
+    margin: 0 0 24px;
+    padding: 0;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.25;
+    color: #222;
+    font-weight: 700;
+}
+
+.reader-page.dark-theme .reader-page-content h1,
+.reader-page.dark-theme .page-chapter-title { color: #e8e8e8; }
+
+.reader-page-content p,
+.reader-page-content .story p {
+    margin: 0 0 1.2em;
+    font-size: 18px;
+    line-height: 1.75;
+    color: #333;
+}
+
+.reader-page.dark-theme .reader-page-content p,
+.reader-page.dark-theme .reader-page-content .story p { color: #d0d0d0; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 800px) {
+    .reader-header { height: 56px; padding: 0 14px; }
+    .reading-progress { top: 56px; }
+    .reader-container { padding: 76px 16px 90px; }
+    .reader-page-content { font-size: 17px; }
+    .reader-page-content h1,
+    .page-chapter-title { font-size: 22px; margin-bottom: 16px; }
+    .reader-page-content p,
+    .reader-page-content .story p { font-size: 17px; line-height: 1.7; }
+    .reader-header-info strong { font-size: 14px; }
+    .reader-header-info span { font-size: 12px; }
+    .reader-back { font-size: 24px; }
+    .reader-menu-btn { padding: 7px 12px; font-size: 18px; }
+    .reader-dropdown { min-width: 160px; top: 44px; right: -4px; }
+    .reader-dropdown a { font-size: 13px; padding: 8px 12px; }
+}
+
+@media (max-width: 650px) {
+    .reader-page-content p { font-size: 17px; line-height: 1.75; }
+    .reader-page-content h1,
+    .page-chapter-title { font-size: 22px; margin-bottom: 16px; }
+    .reader-header-info strong { font-size: 14px; }
+    .reader-header-info span { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+    .reader-container { padding: 68px 12px 84px; }
+    .reader-page-content h1,
+    .page-chapter-title { font-size: 20px; margin-bottom: 14px; }
+    .reader-page-content p { font-size: 16px; line-height: 1.7; }
+    .reader-header { padding: 0 10px; height: 50px; }
+    .reading-progress { top: 50px; }
+    .reader-header-info strong { font-size: 13px; }
+    .reader-header-info span { font-size: 11px; }
+    .reader-back { font-size: 22px; }
+    .reader-menu-btn { padding: 6px 10px; font-size: 16px; }
+    .reader-dropdown { min-width: 140px; top: 40px; padding: 4px; }
+    .reader-dropdown a { font-size: 12px; padding: 7px 10px; }
+}
+
+@media (min-width: 1100px) {
+    .reader-container { padding: 96px 40px 130px; }
+    .reader-page-content { font-size: 19px; }
+    .reader-page-content p,
+    .reader-page-content .story p { font-size: 19px; line-height: 1.8; }
+    .reader-page-content h1,
+    .page-chapter-title { font-size: 36px; margin-bottom: 28px; }
+}

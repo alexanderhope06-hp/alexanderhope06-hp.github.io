@@ -1,0 +1,550 @@
+/* =====================================================
+   STORYNEST — AUTHOR STUDIO
+   Dashboard, stats, analytics, novels, earnings, settings
+   ===================================================== */
+
+.author-page { background: var(--bg-primary); }
+
+.author-dashboard {
+    max-width: 1250px;
+    margin: auto;
+    padding: 60px 6% 100px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 8px;
+    line-height: 1.15;
+}
+
+.dashboard-header > div > p:not(.section-label) { color: var(--text-muted); }
+
+.author-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 24px 28px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #19151f, #15151c);
+    border: 1px solid #292630;
+    border-radius: var(--radius-xl);
+}
+
+.author-avatar {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #5e32a8);
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.author-profile-info { flex: 1; min-width: 0; }
+
+.author-profile-info h2 {
+    margin: 3px 0 4px;
+    font-size: 23px;
+    word-break: break-word;
+}
+
+.author-profile-info > p:last-child {
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+/* ================= DASHBOARD NAV ================= */
+.author-dashboard-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    margin-bottom: 55px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.author-dashboard-nav::-webkit-scrollbar { display: none; }
+
+.dashboard-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    color: #85858f;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.dashboard-nav-link:hover {
+    color: #fff;
+    background: #20202a;
+}
+
+.dashboard-nav-link.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(155, 92, 255, 0.3);
+}
+
+/* ================= AUTHOR STATS ================= */
+.author-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.author-stat {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 130px;
+    padding: 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+}
+
+.author-stat:hover {
+    transform: translateY(-4px);
+    border-color: #493263;
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #241b30;
+    border-radius: var(--radius-md);
+    font-size: 20px;
+}
+
+.author-stat span {
+    display: block;
+    color: #85858f;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.author-stat strong {
+    display: block;
+    font-size: 27px;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+.author-stat small {
+    display: block;
+    color: #62626c;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+/* ================= DASHBOARD SECTIONS ================= */
+.dashboard-section {
+    margin-top: 60px;
+    scroll-margin-top: 100px;
+}
+
+/* ================= ANALYTICS ================= */
+.analytics-card {
+    padding: 40px 30px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+.analytics-empty {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.analytics-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.analytics-empty h3 {
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+/* ================= ACTIVITY GRID ================= */
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.activity-card {
+    padding: 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+}
+
+.activity-card span {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.activity-card strong {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.activity-card small {
+    color: var(--text-faint);
+    font-size: 11px;
+}
+
+/* ================= TOP NOVELS ================= */
+.top-novels {
+    display: grid;
+    gap: 10px;
+}
+
+.top-novel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    transition: all var(--transition);
+}
+
+.top-novel:hover {
+    border-color: #493263;
+    transform: translateY(-2px);
+}
+
+.top-rank {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent-light);
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.top-novel-cover {
+    width: 44px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #4c1680, #100b19);
+    border-radius: 6px;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.top-novel-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.top-novel-info strong {
+    display: block;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.top-novel-info span {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.top-novel .top-earn {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--success);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.analytics-pending {
+    font-size: 11px;
+    color: var(--text-faint);
+    flex-shrink: 0;
+}
+
+/* ================= NOVEL FILTERS ================= */
+.novel-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.novel-filter {
+    padding: 8px 18px;
+    border: 2px solid #333;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.novel-filter:hover {
+    border-color: #666;
+    color: #fff;
+}
+
+.novel-filter.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 14px rgba(155, 92, 255, 0.3);
+}
+
+/* ================= AUTHOR NOVEL LIST ================= */
+.author-novel-list {
+    display: grid;
+    gap: 12px;
+}
+
+.author-novel {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+}
+
+.author-novel:hover {
+    border-color: #493263;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.author-novel .author-cover {
+    width: 75px;
+    height: 105px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    line-height: 1.2;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(145deg, #4c1680, #100b19);
+    font-size: 14px;
+    padding: 10px;
+    word-break: break-word;
+}
+
+.author-novel-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.author-novel-info .status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.author-novel-info .status.published { color: var(--success); }
+.author-novel-info .status.draft     { color: var(--warning); }
+
+.author-novel-info h2 {
+    font-size: 19px;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.author-novel-info p {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.author-novel-info .muted {
+    color: #5f5f68;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.author-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.author-actions .secondary-btn,
+.author-actions .danger-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 7px;
+}
+
+/* ================= EARNINGS ================= */
+.earnings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.earnings-card {
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+}
+
+.earnings-card span {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.earnings-card strong {
+    display: block;
+    font-size: 28px;
+    color: var(--accent-light);
+    margin-bottom: 4px;
+}
+
+.earnings-card small {
+    color: var(--text-faint);
+    font-size: 11px;
+}
+
+.earnings-note {
+    margin-top: 20px;
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    background: rgba(155, 92, 255, 0.06);
+    border: 1px solid rgba(155, 92, 255, 0.18);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    line-height: 1.65;
+}
+
+.earnings-note strong { color: #c39aff; }
+
+/* ================= SETTINGS ================= */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.settings-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    text-align: left;
+    color: #fff;
+    cursor: pointer;
+    transition: all var(--transition);
+    font: inherit;
+}
+
+.settings-card:hover {
+    border-color: #493263;
+    transform: translateY(-2px);
+    background: #1a1a22;
+}
+
+.settings-card span {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.settings-card strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+
+.settings-card small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+    .author-stats { grid-template-columns: repeat(2, 1fr); }
+    .activity-grid,
+    .earnings-grid,
+    .settings-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 800px) {
+    .author-dashboard { padding: 45px 5% 80px; }
+    .dashboard-header { flex-direction: column; align-items: flex-start; }
+    .dashboard-header h1 { font-size: 32px; }
+    .dashboard-header .primary-btn { width: 100%; text-align: center; }
+    .author-profile-card { flex-wrap: wrap; }
+    .author-profile-card .secondary-btn { width: 100%; text-align: center; }
+    .author-dashboard-nav { margin-bottom: 40px; gap: 2px; }
+    .dashboard-nav-link span { display: none; }
+    .dashboard-nav-link { padding: 10px 14px; font-size: 18px; }
+
+    .author-novel { flex-wrap: wrap; align-items: flex-start; }
+    .author-actions { width: 100%; justify-content: flex-start; }
+    .author-actions button { flex: 1; min-width: 80px; text-align: center; }
+}
+
+@media (max-width: 650px) {
+    .author-stats { grid-template-columns: 1fr; }
+    .activity-grid,
+    .earnings-grid,
+    .settings-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .author-avatar { width: 56px; height: 56px; font-size: 22px; }
+    .author-profile-card { padding: 18px; }
+    .author-novel .author-cover { width: 60px; height: 85px; font-size: 12px; }
+    .author-actions { flex-direction: column; width: 100%; }
+    .author-actions button { width: 100%; text-align: center; }
+    .dashboard-nav-link { padding: 8px 12px; font-size: 16px; }
+}

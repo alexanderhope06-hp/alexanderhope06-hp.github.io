@@ -453,25 +453,37 @@ document.addEventListener("keydown", function (event) {
         return;
     }
 
-    if (
-        event.key === "ArrowDown" ||
-        event.key === " " ||
-        event.key === "PageDown"
-    ) {
+    // --- Line-ish scroll for arrow keys ---
+    // ~2 lines ≈ lineHeight * fontSize * 2
+    const contentStyle = window.getComputedStyle(readerPageContent);
+    const fontSize = parseFloat(contentStyle.fontSize) || 18;
+    const lineHeight = parseFloat(contentStyle.lineHeight) || fontSize * 1.75;
+    const lineStep = lineHeight * 2;   // two lines
+
+    // Page-ish scroll for Space / PageDown / PageUp (keep as a page)
+    const pageStep = window.innerHeight * 0.85;
+
+    if (event.key === "ArrowDown") {
         event.preventDefault();
-        window.scrollBy({
-            top: window.innerHeight * 0.85,
-            behavior: "smooth"
-        });
+        window.scrollBy({ top: lineStep, behavior: "smooth" });
         return;
     }
 
-    if (event.key === "ArrowUp" || event.key === "PageUp") {
+    if (event.key === "ArrowUp") {
         event.preventDefault();
-        window.scrollBy({
-            top: -window.innerHeight * 0.85,
-            behavior: "smooth"
-        });
+        window.scrollBy({ top: -lineStep, behavior: "smooth" });
+        return;
+    }
+
+    if (event.key === " " || event.key === "PageDown") {
+        event.preventDefault();
+        window.scrollBy({ top: pageStep, behavior: "smooth" });
+        return;
+    }
+
+    if (event.key === "PageUp") {
+        event.preventDefault();
+        window.scrollBy({ top: -pageStep, behavior: "smooth" });
         return;
     }
 
@@ -491,7 +503,6 @@ document.addEventListener("keydown", function (event) {
     }
 
 });
-
 
 /* =====================================================
    MOBILE SWIPE (chapter change only)
