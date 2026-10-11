@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications — StoryNest</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+</head>
+<body>
+<header class="navbar">
+    <a href="index.html" class="logo">
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+        Story<span>Nest</span>
+    </a>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#trending">Discover</a>
+        <a href="author.html">Author Studio</a>
+    </nav>
+    <div class="nav-actions">
+        <button class="search-btn" id="searchBtn">🔍</button>
+    </div>
+</header>
+
+<div class="search-panel" id="searchPanel">
+    <input type="text" placeholder="Search StoryNest...">
+</div>
+
+<main class="page-container">
+    <div class="page-header">
+        <p class="section-label">YOUR ACCOUNT</p>
+        <h1>Notifications</h1>
+        <p class="page-subtitle">Everything that happened while you were away.</p>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="secondary-btn" id="markAllBtn">Mark all read</button>
+    </div>
+
+    <div id="notifList" class="nav-notif-list"
+         style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:14px;overflow:hidden;">
+        <div class="nav-notif-empty">Loading…</div>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-logo">📖 StoryNest</div>
+    <p>Discover. Read. Imagine.</p>
+    <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script>
+(async function () {
+    const session = await getCurrentSession();
+    if (!session?.user) return redirectToLogin('notifications.html');
+
+    const list = document.getElementById('notifList');
+    const markAll = document.getElementById('markAllBtn');
+    const user = session.user;
+
+    function iconForType(t) {
+        return ({ new_rating:'⭐', new_comment:'💬', new_follower:'👤',
+                  novel_published:'📚', system:'🔔' })[t] || '🔔';
+    }
+    function esc(v){const d=document.createElement('div');d.textContent=v??'';return d.innerHTML;}
+    function ago(iso){
+        const s=Math.floor((Date.now()-new Date(iso).getTime())/1000);
+        if(s<60)return'just now';
+        if(s<3600)return Math.floor(s/60)+'m ago';
+        if(s<86400)return Math.floor(s/3600)+'h ago';
+        if(s<604800)return Math.floor(s/86400)+'d ago';
+        return new Date(iso).toLocaleDateString();
+    }
+
+    async function load() {
+        const { data, error } = await supabaseClient
+            .from('notifications').select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (error || !data?.length) {
+            list.innerHTML = '<div class="nav-notif-empty">🔔<br>You\'re all caught up.</div>';
+            return;
+        }
+
+        list.innerHTML = data.map(n => `
+            <button type="button" class="nav-notif-item${n.is_read?'':' unread'}"
+                    data-id="${n.id}" data-link="${n.link||''}">
+                <div class="nav-notif-icon">${iconForType(n.type)}</div>
+                <div class="nav-notif-content">
+                    <strong>${esc(n.title)}</strong>
+                    ${n.body?`<p>${esc(n.body)}</p>`:''}
+                    <div class="nav-notif-time">${ago(n.created_at)}</div>
+                </div>
+            </button>
+        `).join('');
+
+        list.querySelectorAll('.nav-notif-item').forEach(el => {
+            el.addEventListener('click', async () => {
+                const id = el.dataset.id;
+                const link = el.dataset.link;
+                if (el.classList.contains('unread')) {
+                    el.classList.remove('unread');
+                    await supabaseClient.from('notifications')
+                        .update({ is_read: true }).eq('id', id).eq('user_id', user.id);
+                }
+                if (link) window.location.href = link;
+            });
+        });
+    }
+
+    markAll.addEventListener('click', async () => {
+        await supabaseClient.from('notifications')
+            .update({ is_read: true })
+            .eq('user_id', user.id).eq('is_read', false);
+        list.querySelectorAll('.nav-notif-item.unread')
+            .forEach(el => el.classList.remove('unread'));
+    });
+
+    load();
+})();
+</script>
+</body>
+</html>
