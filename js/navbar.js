@@ -21,6 +21,13 @@
         const navActions = document.querySelector('.nav-actions');
         if (!navActions) return;
 
+	// Reset any stale badge from a previous session before we know the truth
+	const existingBadge = document.querySelector('.nav-notif-badge');
+	if (existingBadge) {
+	    existingBadge.hidden = true;
+	    existingBadge.textContent = '';
+	}
+
         // Resolve session (localStorage first, then Supabase)
         let session = null;
         try {
@@ -208,34 +215,43 @@
     /* ============================================================
        UNREAD COUNT + LIST
        ============================================================ */
-    async function refreshUnreadCount() {
-        if (!currentUser) return;
-
-        const { count, error } = await supabaseClient
-            .from('notifications')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', currentUser.id)
-            .eq('is_read', false);
-
-        if (error) {
-            console.warn('Unread count failed:', error);
-            return;
-        }
-        setBadge(count || 0);
+async function refreshUnreadCount() {
+    if (!currentUser) {
+        setBadge(0);
+        return;
     }
 
-    function setBadge(count) {
-        unreadCount = count;
-        const badge = document.querySelector('.nav-notif-badge');
-        if (!badge) return;
+    const { count, error } = await supabaseClient
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', currentUser.id)
+        .eq('is_read', false);
 
-        if (count > 0) {
-            badge.textContent = count > 99 ? '99+' : String(count);
-            badge.hidden = false;
-        } else {
-            badge.hidden = true;
-        }
+    if (error) {
+        console.warn('Unread count failed:', error);
+        setBadge(0);                     // ← never leave a stale dot
+        return;
     }
+
+    setBadge(typeof count === 'number' ? count : 0);
+}
+
+function setBadge(count) {
+    const safe = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+    unreadCount = safe;
+
+    const badge = document.querySelector('.nav-notif-badge');
+    if (!badge) return;
+
+    if (safe > 0) {
+        badge.textContent = safe > 99 ? '99+' : String(safe);
+        badge.hidden = false;
+    } else {
+        badge.textContent = '';
+        badge.hidden = true;
+    }
+}
+
 
     async function loadPreview(list) {
         const { data, error } = await supabaseClient
@@ -315,45 +331,56 @@
     /* ============================================================
        REALTIME
        ============================================================ */
-    function subscribeToNotifications() {
-        if (notifChannel || !currentUser) return;
+function subscribeToNotifications() {
+    if (notifChannel || !currentUser) return;
 
-        notifChannel = supabaseClient
-            .channel('nav-notif-' + currentUser.id)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'notifications',
-                    filter: `user_id=eq.${currentUser.id}`
-                },
-                payload => {
-                    setBadge(unreadCount + 1);
-                    panelLoaded = false; // force refresh next open
+    notifChannel = supabaseClient
+        .channel('nav-notif-' + currentUser.id)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_id=eq.${currentUser.id}`
+            },
+            payload => {
+                // Defensive: only count rows that are actually ours and unread
+                const row = payload.new || {};
+                if (row.user_id !== currentUser.id) return;
+                if (row.is_read === true) return;
 
-                    const list = document.querySelector('.nav-notif-list');
-                    const panel = document.querySelector('.nav-notif-panel');
-                    if (list && panel && !panel.hidden) {
-                        list.insertAdjacentHTML('afterbegin', renderNotifItem(payload.new));
-                        bindNotifItems(list);
-                    }
+                setBadge(unreadCount + 1);
+                panelLoaded = false;
+
+                const list  = document.querySelector('.nav-notif-list');
+                const panel = document.querySelector('.nav-notif-panel');
+                if (list && panel && !panel.hidden) {
+                    list.insertAdjacentHTML('afterbegin', renderNotifItem(row));
+                    bindNotifItems(list);
                 }
-            )
-            .subscribe();
+            }
+        )
+        .subscribe();
+}
+
+
+function teardownNotif() {
+    if (notifChannel) {
+        supabaseClient.removeChannel(notifChannel);
+        notifChannel = null;
     }
 
-    function teardownNotif() {
-        if (notifChannel) {
-            supabaseClient.removeChannel(notifChannel);
-            notifChannel = null;
-        }
-        document.querySelector('.nav-notif')?.remove();
-        document.querySelector('.nav-account')?.remove();
-        currentUser = null;
-        unreadCount = 0;
-        panelLoaded = false;
-    }
+    // Explicitly zero the badge before removing the elements
+    setBadge(0);
+
+    document.querySelector('.nav-notif')?.remove();
+    document.querySelector('.nav-account')?.remove();
+
+    currentUser  = null;
+    panelLoaded  = false;
+}
+
 
     /* ============================================================
        GUEST — SIGNUP BUTTON
