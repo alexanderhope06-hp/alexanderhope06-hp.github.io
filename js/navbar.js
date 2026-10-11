@@ -12,6 +12,7 @@
     let currentUser   = null;
     let unreadCount   = 0;
     let panelLoaded   = false;
+    let booting       = false;
     const MAX_PREVIEW = 8;
 
     /* ============================================================
@@ -21,61 +22,77 @@
         const navActions = document.querySelector('.nav-actions');
         if (!navActions) return;
 
-	// Reset any stale badge from a previous session before we know the truth
-	const existingBadge = document.querySelector('.nav-notif-badge');
-	if (existingBadge) {
-	    existingBadge.hidden = true;
-	    existingBadge.textContent = '';
-	}
+        // ── Prevent concurrent / duplicate runs ────────────────
+        if (booting) return;
+        booting = true;
 
-        // Resolve session (localStorage first, then Supabase)
-        let session = null;
         try {
-            const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-            if (stored) session = JSON.parse(stored);
-        } catch (_) {}
+            // Nuke any duplicate bells / account menus left over
+            // from a previous injection (defensive).
+            const bells = navActions.querySelectorAll('.nav-notif');
+            bells.forEach((el, i) => { if (i > 0) el.remove(); });
 
-        if (!session?.user) {
-            const { data } = await supabaseClient.auth.getSession();
-            session = data?.session || null;
+            const accounts = navActions.querySelectorAll('.nav-account');
+            accounts.forEach((el, i) => { if (i > 0) el.remove(); });
+
+            // Hide any stale badge before we know the truth
+            const existingBadge = navActions.querySelector('.nav-notif-badge');
+            if (existingBadge) {
+                existingBadge.hidden = true;
+                existingBadge.textContent = '';
+            }
+
+            // Resolve session (localStorage first, then Supabase)
+            let session = null;
+            try {
+                const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+                if (stored) session = JSON.parse(stored);
+            } catch (_) {}
+
+            if (!session?.user) {
+                const { data } = await supabaseClient.auth.getSession();
+                session = data?.session || null;
+            }
+
+            // -------- Guest --------
+            if (!session?.user) {
+                teardownNotif();
+                injectSignupButton(navActions);
+                return;
+            }
+
+            // -------- Signed in --------
+            currentUser = session.user;
+            const role = currentUser.user_metadata?.role;
+            const displayName =
+                currentUser.user_metadata?.display_name ||
+                currentUser.user_metadata?.full_name ||
+                currentUser.email?.split('@')[0] ||
+                'Account';
+
+            navActions.querySelectorAll('.login-btn, .signup-nav-btn')
+                .forEach(el => { el.style.display = 'none'; });
+
+            // Notifications bell
+            if (!navActions.querySelector('.nav-notif')) {
+                navActions.appendChild(buildNotifBell());
+                await refreshUnreadCount();
+                subscribeToNotifications();
+            }
+
+            // Account dropdown
+            if (!navActions.querySelector('.nav-account')) {
+                navActions.appendChild(buildAccountMenu(displayName, role));
+            }
+
+            injectStyles();
+        } finally {
+            booting = false;
         }
-
-        // -------- Guest --------
-        if (!session?.user) {
-            teardownNotif();
-            injectSignupButton(navActions);
-            return;
-        }
-
-        // -------- Signed in --------
-        currentUser = session.user;
-        const role = currentUser.user_metadata?.role;
-        const displayName =
-            currentUser.user_metadata?.display_name ||
-            currentUser.user_metadata?.full_name ||
-            currentUser.email?.split('@')[0] ||
-            'Account';
-
-        navActions.querySelectorAll('.login-btn, .signup-nav-btn')
-            .forEach(el => { el.style.display = 'none'; });
-
-        // Notifications bell (before the account dropdown)
-        if (!navActions.querySelector('.nav-notif')) {
-            navActions.appendChild(buildNotifBell());
-            await refreshUnreadCount();
-            subscribeToNotifications();
-        }
-
-        // Account dropdown
-        if (!navActions.querySelector('.nav-account')) {
-            navActions.appendChild(buildAccountMenu(displayName, role));
-        }
-
-        injectStyles();
     }
 
     /* ============================================================
-       ACCOUNT DROPDOWN  (contains the ONLY logout in the app)
+       ACCOUNT DROPDOWN
        ============================================================ */
     function buildAccountMenu(displayName, role) {
         const account = document.createElement('div');
@@ -103,7 +120,6 @@
 
         btn.addEventListener('click', e => {
             e.stopPropagation();
-            // Close notif panel if open
             closeNotifPanel();
             const open = menu.hidden;
             menu.hidden = !open;
@@ -172,7 +188,6 @@
         btn.addEventListener('click', async e => {
             e.stopPropagation();
 
-            // Close account menu if open
             document.querySelectorAll('.nav-account-menu')
                 .forEach(m => { m.hidden = true; });
 
@@ -213,46 +228,51 @@
     }
 
     /* ============================================================
-       UNREAD COUNT + LIST
+       UNREAD COUNT + BADGE
        ============================================================ */
-async function refreshUnreadCount() {
-    if (!currentUser) {
-        setBadge(0);
-        return;
+    async function refreshUnreadCount() {
+        if (!currentUser) {
+            setBadge(0);
+            return;
+        }
+
+        const { count, error } = await supabaseClient
+            .from('notifications')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', currentUser.id)
+            .eq('is_read', false);
+
+        if (error) {
+            console.warn('Unread count failed:', error);
+            setBadge(0);
+            return;
+        }
+
+        setBadge(typeof count === 'number' ? count : 0);
     }
 
-    const { count, error } = await supabaseClient
-        .from('notifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', currentUser.id)
-        .eq('is_read', false);
+    /**
+     * Sets the badge on ALL matching elements. Uses
+     * querySelectorAll so stale duplicates can't survive.
+     */
+    function setBadge(count) {
+        const safe = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+        unreadCount = safe;
 
-    if (error) {
-        console.warn('Unread count failed:', error);
-        setBadge(0);                     // ← never leave a stale dot
-        return;
+        document.querySelectorAll('.nav-notif-badge').forEach(badge => {
+            if (safe > 0) {
+                badge.textContent = safe > 99 ? '99+' : String(safe);
+                badge.hidden = false;
+            } else {
+                badge.textContent = '';
+                badge.hidden = true;
+            }
+        });
     }
 
-    setBadge(typeof count === 'number' ? count : 0);
-}
-
-function setBadge(count) {
-    const safe = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
-    unreadCount = safe;
-
-    const badge = document.querySelector('.nav-notif-badge');
-    if (!badge) return;
-
-    if (safe > 0) {
-        badge.textContent = safe > 99 ? '99+' : String(safe);
-        badge.hidden = false;
-    } else {
-        badge.textContent = '';
-        badge.hidden = true;
-    }
-}
-
-
+    /* ============================================================
+       PREVIEW LIST
+       ============================================================ */
     async function loadPreview(list) {
         const { data, error } = await supabaseClient
             .from('notifications')
@@ -262,12 +282,16 @@ function setBadge(count) {
             .limit(MAX_PREVIEW);
 
         if (error) {
-            list.innerHTML = '<div class="nav-notif-empty">Could not load notifications.</div>';
+            list.innerHTML = `
+                <div class="nav-notif-empty">
+                    ⚠️<br>Could not load notifications.
+                </div>`;
             return;
         }
 
         if (!data || data.length === 0) {
-            list.innerHTML = '<div class="nav-notif-empty">🔔<br>You\'re all caught up.</div>';
+            list.innerHTML =
+                '<div class="nav-notif-empty">🔔<br>You\'re all caught up.</div>';
             return;
         }
 
@@ -331,56 +355,52 @@ function setBadge(count) {
     /* ============================================================
        REALTIME
        ============================================================ */
-function subscribeToNotifications() {
-    if (notifChannel || !currentUser) return;
+    function subscribeToNotifications() {
+        if (notifChannel || !currentUser) return;
 
-    notifChannel = supabaseClient
-        .channel('nav-notif-' + currentUser.id)
-        .on(
-            'postgres_changes',
-            {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'notifications',
-                filter: `user_id=eq.${currentUser.id}`
-            },
-            payload => {
-                // Defensive: only count rows that are actually ours and unread
-                const row = payload.new || {};
-                if (row.user_id !== currentUser.id) return;
-                if (row.is_read === true) return;
+        notifChannel = supabaseClient
+            .channel('nav-notif-' + currentUser.id)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: `user_id=eq.${currentUser.id}`
+                },
+                payload => {
+                    const row = payload.new || {};
+                    if (row.user_id !== currentUser.id) return;
+                    if (row.is_read === true) return;
 
-                setBadge(unreadCount + 1);
-                panelLoaded = false;
+                    setBadge(unreadCount + 1);
+                    panelLoaded = false;
 
-                const list  = document.querySelector('.nav-notif-list');
-                const panel = document.querySelector('.nav-notif-panel');
-                if (list && panel && !panel.hidden) {
-                    list.insertAdjacentHTML('afterbegin', renderNotifItem(row));
-                    bindNotifItems(list);
+                    const list  = document.querySelector('.nav-notif-list');
+                    const panel = document.querySelector('.nav-notif-panel');
+                    if (list && panel && !panel.hidden) {
+                        list.insertAdjacentHTML('afterbegin', renderNotifItem(row));
+                        bindNotifItems(list);
+                    }
                 }
-            }
-        )
-        .subscribe();
-}
-
-
-function teardownNotif() {
-    if (notifChannel) {
-        supabaseClient.removeChannel(notifChannel);
-        notifChannel = null;
+            )
+            .subscribe();
     }
 
-    // Explicitly zero the badge before removing the elements
-    setBadge(0);
+    function teardownNotif() {
+        if (notifChannel) {
+            supabaseClient.removeChannel(notifChannel);
+            notifChannel = null;
+        }
 
-    document.querySelector('.nav-notif')?.remove();
-    document.querySelector('.nav-account')?.remove();
+        setBadge(0);
 
-    currentUser  = null;
-    panelLoaded  = false;
-}
+        document.querySelectorAll('.nav-notif').forEach(el => el.remove());
+        document.querySelectorAll('.nav-account').forEach(el => el.remove());
 
+        currentUser = null;
+        panelLoaded = false;
+    }
 
     /* ============================================================
        GUEST — SIGNUP BUTTON
@@ -418,8 +438,7 @@ function teardownNotif() {
     }
 
     /* ============================================================
-       INJECTED STYLES  (account dropdown only;
-       notification styles live in components.css)
+       INJECTED STYLES
        ============================================================ */
     function injectStyles() {
         if (document.getElementById('navAccountStyles')) return;
@@ -514,15 +533,16 @@ function teardownNotif() {
     }
 
     /* ============================================================
-       REACT TO AUTH CHANGES (login / logout in another tab)
+       AUTH STATE — only react to real sign-in / sign-out
        ============================================================ */
     if (typeof supabaseClient !== 'undefined') {
         supabaseClient.auth.onAuthStateChange((event) => {
+            // INITIAL_SESSION, TOKEN_REFRESHED, USER_UPDATED
+            // are not reasons to rebuild the navbar.
             if (event === 'SIGNED_OUT') {
                 teardownNotif();
                 updateNavbar();
             } else if (event === 'SIGNED_IN') {
-                // Re-run after the DOM settles
                 setTimeout(updateNavbar, 50);
             }
         });
