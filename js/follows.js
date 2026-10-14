@@ -71,7 +71,7 @@ async function initFollowButton(btn, authorId, authorName) {
     const state = await getFollowState(authorId);
 
     if (state.isSelf) {
-        btn.textContent = 'Edit Profile';
+        btn.textContent = 'EDIT PROFILE';
         btn.classList.add('secondary-btn');
         btn.addEventListener('click', () => {
             window.location.href = 'profile.html';
@@ -80,7 +80,9 @@ async function initFollowButton(btn, authorId, authorName) {
     }
 
     const render = (following) => {
-        btn.textContent = following ? '✓ Following' : '+ Follow';
+        btn.innerHTML = following
+            ? `<span class="follow-icon">✓</span><span class="follow-label">FOLLOWING</span>`
+            : `<span class="follow-icon">+</span><span class="follow-label">FOLLOW</span>`;
         btn.classList.toggle('following', following);
     };
 
@@ -88,14 +90,17 @@ async function initFollowButton(btn, authorId, authorName) {
 
     btn.addEventListener('click', async () => {
         btn.disabled = true;
-        const prev = btn.textContent;
-        btn.textContent = '...';
+        const prevHTML = btn.innerHTML;
+        btn.innerHTML = `<span class="follow-label">…</span>`;
+
         const nowFollowing = await toggleFollow(authorId);
+
         if (nowFollowing === null) {
-            btn.textContent = prev;
+            btn.innerHTML = prevHTML;
             btn.disabled = false;
             return;
         }
+
         render(nowFollowing);
         btn.disabled = false;
         showToast(nowFollowing

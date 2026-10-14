@@ -119,61 +119,69 @@ function displayNovel() {
 }
 
 
-/* ---------- Author block (name chip + follow button) ---------- */
+
+/* ---------- Author pill (avatar + name + follow) ---------- */
 
 async function renderAuthorBlock() {
     const wrap = document.getElementById('novelAuthorWrap');
     if (!wrap) return;
 
     const authorId = novel.author_id;
-    const authorName = novel.author_name || 'StoryNest Author';
+    const fallbackName = novel.author_name || 'StoryNest Author';
 
     wrap.innerHTML = '';
 
-    // Fetch the public profile (may be missing for legacy novels)
+    // Fetch the public profile (may not exist for legacy novels)
     let profile = null;
     if (authorId) {
         const { data } = await supabaseClient
             .from('profiles')
-            .select('display_name, bio')
+            .select('display_name, bio, avatar_url')
             .eq('id', authorId)
             .maybeSingle();
         profile = data;
     }
 
-    const finalName = profile?.display_name || authorName;
+    const finalName = profile?.display_name || fallbackName;
 
-    // "By" label
-    const byLabel = document.createElement('span');
-    byLabel.className = 'author-by-label';
-    byLabel.textContent = 'By';
+    // ----- Pill container -----
+    const pill = document.createElement('div');
+    pill.className = 'author-pill';
 
-    // Name chip → opens author profile page
-    const chip = document.createElement('a');
-    chip.className = 'author-chip';
-    chip.href = authorId
+    // ----- Avatar -----
+    const avatar = document.createElement('div');
+    avatar.className = 'author-pill-avatar';
+
+    if (profile?.avatar_url) {
+        const img = document.createElement('img');
+        img.src = profile.avatar_url;
+        img.alt = finalName;
+        img.onerror = () => {
+            avatar.innerHTML = '';
+            avatar.textContent = finalName.charAt(0).toUpperCase();
+        };
+        avatar.appendChild(img);
+    } else {
+        avatar.textContent = finalName.charAt(0).toUpperCase();
+    }
+
+    // ----- Name link -----
+    const nameLink = document.createElement('a');
+    nameLink.className = 'author-pill-name';
+    nameLink.href = authorId
         ? `author-profile.html?id=${encodeURIComponent(authorId)}`
         : '#';
-    if (!authorId) chip.style.pointerEvents = 'none';
+    nameLink.textContent = finalName;
+    if (!authorId) nameLink.style.pointerEvents = 'none';
 
-    const chipName = document.createElement('span');
-    chipName.className = 'author-chip-name';
-    chipName.textContent = finalName;
-
-    const chipArrow = document.createElement('span');
-    chipArrow.className = 'author-chip-arrow';
-    chipArrow.textContent = '→';
-    chipArrow.setAttribute('aria-hidden', 'true');
-
-    chip.append(chipName, chipArrow);
-
-    // Follow button
+    // ----- Follow button -----
     const followBtn = document.createElement('button');
     followBtn.type = 'button';
     followBtn.className = 'follow-btn';
     followBtn.id = 'followAuthorBtn';
 
-    wrap.append(byLabel, chip, followBtn);
+    pill.append(avatar, nameLink, followBtn);
+    wrap.appendChild(pill);
 
     if (authorId && typeof initFollowButton === 'function') {
         initFollowButton(followBtn, authorId, finalName);

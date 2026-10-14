@@ -9,7 +9,7 @@
     padding: 60px 6% 80px;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (author-profile.html) ---------- */
 .author-hero {
     display: flex;
     gap: 32px;
@@ -26,6 +26,7 @@
     height: 120px;
     flex-shrink: 0;
     border-radius: 50%;
+    overflow: hidden;
     background: linear-gradient(145deg, #4c1680, #100b19);
     display: flex;
     align-items: center;
@@ -34,6 +35,13 @@
     font-weight: 700;
     color: #fff;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.public-author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .author-hero-meta { flex: 1; min-width: 0; }
@@ -65,135 +73,133 @@
     flex-wrap: wrap;
 }
 
-/* ---------- Follow button (used on both pages) ---------- */
-.follow-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border-radius: 999px;
-    border: 1px solid var(--accent);
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
+/* =====================================================
+   AUTHOR PILL (novel page)
+   avatar + name + follow button inside one rounded pill
+   ===================================================== */
 
-.follow-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(155, 92, 255, 0.35);
-}
-
-.follow-btn.following {
-    background: transparent;
-    color: var(--accent-light);
-}
-
-.follow-btn:disabled {
-    opacity: 0.7;
-    cursor: wait;
-    transform: none;
-}
-
-/* ---------- Author block on novel page ---------- */
 .author-block {
     display: flex;
-    align-items: center;
-    justify-content: center;   /* centered on mobile novel page */
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 10px 0 4px;
+    justify-content: center;
+    margin: 18px 0 6px;
 }
 
-.author-by-label {
-    color: var(--text-muted);
-    font-size: 15px;
-}
-
-/* Explorable author chip */
-.author-chip {
+.author-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 14px 7px 16px;
-    background: rgba(155, 92, 255, 0.10);
-    border: 1px solid rgba(155, 92, 255, 0.30);
+    gap: 14px;
+    padding: 8px 10px 8px 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
     border-radius: 999px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.author-pill:hover {
+    border-color: rgba(155, 92, 255, 0.35);
+    box-shadow: 0 6px 22px rgba(155, 92, 255, 0.12);
+}
+
+/* ----- Avatar ----- */
+.author-pill-avatar {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--accent), #5e32a8);
     color: #fff;
-    font-size: 15px;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(155, 92, 255, 0.45);
+}
+
+.author-pill-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ----- Name ----- */
+.author-pill-name {
+    color: #fff;
+    font-size: 17px;
     font-weight: 600;
-    text-decoration: none;
-    transition: all 0.25s ease;
+    text-decoration: underline;
+    text-decoration-color: rgba(155, 92, 255, 0.5);
+    text-underline-offset: 4px;
+    padding: 0 2px;
+    white-space: nowrap;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-.author-chip:hover {
-    background: rgba(155, 92, 255, 0.22);
-    border-color: var(--accent);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(155, 92, 255, 0.25);
-}
-
-.author-chip-arrow {
-    font-size: 14px;
+.author-pill-name:hover {
     color: var(--accent-light);
-    transition: transform 0.25s ease;
+    text-decoration-color: var(--accent-light);
 }
 
-.author-chip:hover .author-chip-arrow {
-    transform: translateX(3px);
-}
+/* =====================================================
+   FOLLOW BUTTON (used on both novel page + author profile)
+   ===================================================== */
 
-/* ---------- Follow button ---------- */
 .follow-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 18px;
+    padding: 11px 22px;
     border-radius: 999px;
-    border: 1px solid var(--accent);
-    background: var(--accent);
+    border: none;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
     color: #fff;
-    font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
     white-space: nowrap;
 }
 
-.follow-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(155, 92, 255, 0.35);
+.follow-btn .follow-icon {
+    font-size: 15px;
+    line-height: 1;
+    display: inline-block;
 }
 
-/* "Following" state — outlined, muted, distinct from "+ Follow" */
+.follow-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
+}
+
+.follow-btn:active { transform: translateY(0); }
+
+/* "Following" state — outlined, muted, distinct */
 .follow-btn.following {
     background: transparent;
     color: var(--accent-light);
-    border-color: rgba(155, 92, 255, 0.45);
+    border: 1.5px solid rgba(155, 92, 255, 0.55);
 }
 
 .follow-btn.following:hover {
-    background: rgba(248, 113, 113, 0.10);
+    background: rgba(248, 113, 113, 0.08);
     color: #f87171;
-    border-color: rgba(248, 113, 113, 0.45);
+    border-color: rgba(248, 113, 113, 0.55);
     box-shadow: 0 6px 18px rgba(248, 113, 113, 0.20);
 }
 
-/* Optional: change label on hover to hint "unfollow" */
-.follow-btn.following:hover::before {
-    content: 'Unfollow';
-}
-.follow-btn.following:hover .btn-label { display: none; }
-
 .follow-btn:disabled {
-    opacity: 0.7;
+    opacity: 0.75;
     cursor: wait;
     transform: none;
 }
 
-/* ---------- Genre filter ---------- */
+/* =====================================================
+   GENRE FILTER (author-profile.html)
+   ===================================================== */
+
 .genre-filter select {
     padding: 10px 14px;
     background: var(--bg-elevated);
@@ -209,7 +215,10 @@
     border-color: var(--accent);
 }
 
-/* ---------- Responsive ---------- */
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
 @media (max-width: 640px) {
     .author-hero {
         flex-direction: column;
@@ -218,4 +227,11 @@
     }
     .author-hero-actions { justify-content: center; }
     .author-block { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+    .author-pill { gap: 10px; padding: 6px 8px 6px 6px; }
+    .author-pill-avatar { width: 40px; height: 40px; font-size: 17px; }
+    .author-pill-name { font-size: 15px; }
+    .follow-btn { padding: 9px 16px; font-size: 12px; }
 }
