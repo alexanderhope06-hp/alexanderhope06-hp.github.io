@@ -1,237 +1,372 @@
-/* =====================================================
-   STORYNEST — PUBLIC AUTHOR PROFILE
-   (separate from author.css which is for the dashboard)
-   ===================================================== */
+/* ==========================================
+   STORYNEST — AUTHOR PROFILE INFORMATION
+   ========================================== */
 
-.author-profile-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px 6% 80px;
-}
-
-/* ---------- Hero (author-profile.html) ---------- */
+/* Author profile container */
 .author-hero {
+    position: relative;
+
+    /* cap + center */
+    max-width: 1600px;
+    margin: 0 auto 45px;
+
     display: flex;
-    gap: 32px;
-    align-items: flex-start;
-    padding: 32px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    margin-bottom: 40px;
+    align-items: center;
+    gap: 30px;
+
+    padding: 36px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.13),
+        rgba(20, 19, 27, 0.98) 75%
+    );
+
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 20px;
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+
+    overflow: hidden;
 }
 
-.public-author-avatar {
-    width: 120px;
-    height: 120px;
-    flex-shrink: 0;
+/* Decorative purple glow */
+.author-hero::before {
+    content: "";
+    position: absolute;
+
+    top: -100px;
+    right: -70px;
+
+    width: 230px;
+    height: 230px;
+
+    background: rgba(139, 92, 246, 0.12);
     border-radius: 50%;
-    overflow: hidden;
-    background: linear-gradient(145deg, #4c1680, #100b19);
+    filter: blur(65px);
+
+    pointer-events: none;
+}
+
+/* Author avatar */
+.author-hero .public-author-avatar {
+    position: relative;
+    z-index: 1;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
-    font-weight: 700;
-    color: #fff;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+
+    width: 112px;
+    height: 112px;
+    min-width: 112px;
+
+    font-size: 46px;
+    color: #ffffff;
+
+    background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+
+    border: 4px solid rgba(196, 181, 253, 0.4);
+    border-radius: 50%;
+
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.22);
 }
 
-.public-author-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+/* Author details */
+.author-hero .author-hero-meta {
+    position: relative;
+    z-index: 1;
+
+    flex: 1;
+    min-width: 0;
 }
 
-.author-hero-meta { flex: 1; min-width: 0; }
+/* AUTHOR label */
+.author-hero .section-label {
+    margin: 0 0 10px;
 
-.author-hero-meta h1 {
+    color: #a78bfa;
+
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* Author name */
+.author-hero .author-hero-meta h1 {
+    margin: 0 0 12px;
+
+    color: #ffffff;
+
     font-size: clamp(28px, 4vw, 40px);
-    margin: 4px 0 8px;
-    line-height: 1.1;
-    word-break: break-word;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+
+    overflow-wrap: anywhere;
 }
 
-.author-follower-count {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 14px;
-}
-
-.author-hero-bio {
-    color: var(--text-secondary);
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 18px;
-    white-space: pre-wrap;
-}
-
-.author-hero-actions {
+/* Followers and published novels */
+.author-hero .author-follower-count {
     display: flex;
-    gap: 10px;
+    align-items: center;
     flex-wrap: wrap;
-}
+    gap: 8px;
 
-/* =====================================================
-   AUTHOR PILL (novel page)
-   avatar + name + follow button inside one rounded pill
-   ===================================================== */
+    margin: 0 0 16px;
 
-.author-block {
-    display: flex;
-    justify-content: center;
-    margin: 18px 0 6px;
-}
+    color: #c4c4d0;
 
-.author-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    padding: 8px 10px 8px 8px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-default);
-    border-radius: 999px;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.author-pill:hover {
-    border-color: rgba(155, 92, 255, 0.35);
-    box-shadow: 0 6px 22px rgba(155, 92, 255, 0.12);
-}
-
-/* ----- Avatar ----- */
-.author-pill-avatar {
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    overflow: hidden;
-    background: linear-gradient(135deg, var(--accent), #5e32a8);
-    color: #fff;
-    font-size: 20px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(155, 92, 255, 0.45);
-}
-
-.author-pill-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* ----- Name ----- */
-.author-pill-name {
-    color: #fff;
-    font-size: 17px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: rgba(155, 92, 255, 0.5);
-    text-underline-offset: 4px;
-    padding: 0 2px;
-    white-space: nowrap;
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
-}
-
-.author-pill-name:hover {
-    color: var(--accent-light);
-    text-decoration-color: var(--accent-light);
-}
-
-/* =====================================================
-   FOLLOW BUTTON (used on both novel page + author profile)
-   ===================================================== */
-
-.follow-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 11px 22px;
-    border-radius: 999px;
-    border: none;
-    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
-    white-space: nowrap;
-}
-
-.follow-btn .follow-icon {
-    font-size: 15px;
-    line-height: 1;
-    display: inline-block;
-}
-
-.follow-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
-}
-
-.follow-btn:active { transform: translateY(0); }
-
-/* "Following" state — outlined, muted, distinct */
-.follow-btn.following {
-    background: transparent;
-    color: var(--accent-light);
-    border: 1.5px solid rgba(155, 92, 255, 0.55);
-}
-
-.follow-btn.following:hover {
-    background: rgba(248, 113, 113, 0.08);
-    color: #f87171;
-    border-color: rgba(248, 113, 113, 0.55);
-    box-shadow: 0 6px 18px rgba(248, 113, 113, 0.20);
-}
-
-.follow-btn:disabled {
-    opacity: 0.75;
-    cursor: wait;
-    transform: none;
-}
-
-/* =====================================================
-   GENRE FILTER (author-profile.html)
-   ===================================================== */
-
-.genre-filter select {
-    padding: 10px 14px;
-    background: var(--bg-elevated);
-    color: #fff;
-    border: 1px solid var(--border-default);
-    border-radius: 10px;
     font-size: 14px;
+    line-height: 1.7;
+}
+
+/* Author biography */
+.author-hero .author-hero-bio {
+    max-width: 650px;
+
+    margin: 0 0 22px;
+
+    color: #b7b7c7;
+
+    font-size: 15px;
+    line-height: 1.8;
+
+    overflow-wrap: anywhere;
+}
+
+/* Hide empty biography */
+.author-hero .author-hero-bio:empty {
+    display: none;
+}
+
+/* Follow button container */
+.author-hero .author-hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Follow button */
+.author-hero .follow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+    padding: 0 26px;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+
+    border: 1px solid rgba(196, 181, 253, 0.3);
+    border-radius: 11px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
     cursor: pointer;
+
+    box-shadow: 0 5px 16px rgba(109, 40, 217, 0.2);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.genre-filter select:focus {
-    outline: none;
-    border-color: var(--accent);
+/* Hover effect */
+.author-hero .follow-btn:hover {
+    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.3);
 }
 
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
+/* Click effect */
+.author-hero .follow-btn:active {
+    transform: translateY(0);
+}
+
+/* Keyboard accessibility */
+.author-hero .follow-btn:focus-visible {
+    outline: 3px solid #c4b5fd;
+    outline-offset: 4px;
+}
+
+/* Following state, if used by your JavaScript */
+.author-hero .follow-btn.following {
+    color: #ddd6fe;
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(167, 139, 250, 0.5);
+    box-shadow: none;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVENESS
+   ========================================== */
 
 @media (max-width: 640px) {
     .author-hero {
         flex-direction: column;
         align-items: center;
+        gap: 20px;
+
+        padding: 28px 20px;
+        margin-bottom: 35px;
+
+        border-radius: 17px;
+
         text-align: center;
     }
-    .author-hero-actions { justify-content: center; }
-    .author-block { justify-content: center; }
+
+    .author-hero .public-author-avatar {
+        width: 96px;
+        height: 96px;
+        min-width: 96px;
+
+        font-size: 40px;
+    }
+
+    .author-hero .author-hero-meta {
+        width: 100%;
+    }
+
+    .author-hero .author-hero-meta h1 {
+        font-size: 29px;
+    }
+
+    .author-hero .author-follower-count {
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    .author-hero .author-hero-bio {
+        font-size: 14px;
+        line-height: 1.75;
+    }
+
+    .author-hero .author-hero-actions {
+        justify-content: center;
+    }
+
+    .author-hero .follow-btn {
+        min-width: 145px;
+        min-height: 46px;
+    }
 }
 
-@media (max-width: 480px) {
-    .author-pill { gap: 10px; padding: 6px 8px 6px 6px; }
-    .author-pill-avatar { width: 40px; height: 40px; font-size: 17px; }
-    .author-pill-name { font-size: 15px; }
-    .follow-btn { padding: 9px 16px; font-size: 12px; }
+
+
+
+
+
+
+/* ==========================================
+   STORYNEST — AUTHOR PROFILE GENRE FILTER
+   ========================================== */
+
+.author-profile-page .genre-filter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+}
+
+/* Genre dropdown */
+.author-profile-page .genre-filter select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    min-width: 155px;
+    max-width: 100%;
+    padding: 12px 42px 12px 16px;
+
+    color: #e9e4ff;
+    background: linear-gradient(
+        135deg,
+        #211b30,
+        #17151f
+    );
+
+    border: 1px solid #45365f;
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    outline: none;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Custom dropdown arrow */
+.author-profile-page .genre-filter::after {
+    content: "";
+
+    position: absolute;
+    right: 17px;
+    top: 50%;
+
+    width: 7px;
+    height: 7px;
+
+    border-right: 2px solid #a78bfa;
+    border-bottom: 2px solid #a78bfa;
+
+    transform: translateY(-70%) rotate(45deg);
+
+    pointer-events: none;
+}
+
+/* Hover effect */
+.author-profile-page .genre-filter select:hover {
+    border-color: #8b5cf6;
+    background: #241c35;
+}
+
+/* Focus effect */
+.author-profile-page .genre-filter select:focus {
+    border-color: #a78bfa;
+
+    box-shadow:
+        0 0 0 3px rgba(139, 92, 246, 0.15),
+        0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown options */
+.author-profile-page .genre-filter select option {
+    color: #eee9ff;
+    background: #191521;
+    padding: 10px;
+}
+
+/* Disabled state, if applicable */
+.author-profile-page .genre-filter select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .author-profile-page .genre-filter {
+        width: 100%;
+    }
+
+    .author-profile-page .genre-filter select {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+    }
 }
