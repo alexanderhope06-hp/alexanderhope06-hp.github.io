@@ -99,23 +99,42 @@
                 return;
             }
 
-            if (!data?.session || !data?.user) {
-                showMessage('Login failed. Please try again.', true);
+            // Confirm the SDK actually persisted the session before we leave
+            const { data: sessionData } =
+                await supabaseClient.auth.getSession();
+
+            if (!sessionData?.session) {
+                showMessage(
+                    'Login succeeded but session was not saved. Please try again.',
+                    true
+                );
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
                 return;
             }
 
-            localStorage.setItem(
-                AUTH_STORAGE_KEY,
-                JSON.stringify(data.session)
-            );
+            // Persist the chosen role into user metadata
+            if (
+                selectedRole &&
+                data?.user?.user_metadata?.role !== selectedRole
+            ) {
+                await supabaseClient.auth.updateUser({
+                    data: { ...data.user.user_metadata, role: selectedRole }
+                });
+            }
+
+            // Tiny delay so localStorage is flushed on slower/desktop browsers
+            await new Promise(r => setTimeout(r, 150));
 
             const params = new URLSearchParams(window.location.search);
             const redirect = params.get('redirect');
 
             let destination;
-            if (redirect && !redirect.includes('://') && !redirect.startsWith('//')) {
+            if (
+                redirect &&
+                !redirect.includes('://') &&
+                !redirect.startsWith('//')
+            ) {
                 destination = redirect;
             } else if (selectedRole === 'author') {
                 destination = 'author.html';
@@ -124,7 +143,7 @@
             }
 
             showMessage('Login successful. Redirecting...');
-            setTimeout(() => window.location.replace(destination), 300);
+            setTimeout(() => window.location.replace(destination), 100);
 
         } catch (err) {
             console.error('Login error:', err);

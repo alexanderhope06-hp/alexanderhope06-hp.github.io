@@ -3,31 +3,19 @@
    Shared utilities. Form handling lives in login.js / signup.js
    ===================================================== */
 
-// Must match your Supabase project ref
-const AUTH_STORAGE_KEY = 'sb-smvkexbzgobzpvndmdgh-auth-token';
-
 
 /* =====================================================
    SESSION HELPERS
    ===================================================== */
 
 async function getCurrentSession() {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored) {
-        try {
-            const session = JSON.parse(stored);
-            if (session && session.user) return session;
-        } catch (_) {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
-        }
+    // Let the SDK read its own persisted session.
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+        console.warn('[Auth] getSession error:', error.message);
+        return null;
     }
-
-    const { data } = await supabaseClient.auth.getSession();
-    if (data?.session) {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data.session));
-        return data.session;
-    }
-    return null;
+    return data?.session || null;
 }
 
 
@@ -59,11 +47,13 @@ function getUserRole(user) {
 /* =====================================================
    ROLE GUARD — use on author-only pages
    Returns the user if they're allowed, or null after
-   redirecting / upgrading. Call at the top of any
-   author-only script.
+   redirecting / upgrading.
    ===================================================== */
 
 async function requireAuthor(options = {}) {
+    // Wait a beat so any in-flight session write from login.js finishes
+    await new Promise(r => setTimeout(r, 50));
+
     const session = await getCurrentSession();
 
     // No session — send to login
@@ -99,14 +89,7 @@ async function requireAuthor(options = {}) {
                 data: { ...user.user_metadata, role: 'author' }
             });
 
-            const { data } = await supabaseClient.auth.refreshSession();
-
-            if (data?.session) {
-                localStorage.setItem(
-                    AUTH_STORAGE_KEY,
-                    JSON.stringify(data.session)
-                );
-            }
+            await supabaseClient.auth.refreshSession();
 
             window.location.reload();
         } catch (err) {
