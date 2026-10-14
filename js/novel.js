@@ -119,7 +119,7 @@ function displayNovel() {
 }
 
 
-/* ---------- Author block (name + follow + link) ---------- */
+/* ---------- Author block (name chip + follow button) ---------- */
 
 async function renderAuthorBlock() {
     const wrap = document.getElementById('novelAuthorWrap');
@@ -143,21 +143,29 @@ async function renderAuthorBlock() {
 
     const finalName = profile?.display_name || authorName;
 
-    // Name link → author profile page
-    const link = document.createElement('a');
-    link.className = 'author-link';
-    link.href = authorId
+    // "By" label
+    const byLabel = document.createElement('span');
+    byLabel.className = 'author-by-label';
+    byLabel.textContent = 'By';
+
+    // Name chip → opens author profile page
+    const chip = document.createElement('a');
+    chip.className = 'author-chip';
+    chip.href = authorId
         ? `author-profile.html?id=${encodeURIComponent(authorId)}`
         : '#';
-    link.textContent = finalName;
-    if (!authorId) link.style.pointerEvents = 'none';
+    if (!authorId) chip.style.pointerEvents = 'none';
 
-    const byText = document.createElement('span');
-    byText.textContent = 'By ';
+    const chipName = document.createElement('span');
+    chipName.className = 'author-chip-name';
+    chipName.textContent = finalName;
 
-    const nameWrap = document.createElement('p');
-    nameWrap.className = 'author-large';
-    nameWrap.append(byText, link);
+    const chipArrow = document.createElement('span');
+    chipArrow.className = 'author-chip-arrow';
+    chipArrow.textContent = '→';
+    chipArrow.setAttribute('aria-hidden', 'true');
+
+    chip.append(chipName, chipArrow);
 
     // Follow button
     const followBtn = document.createElement('button');
@@ -165,7 +173,7 @@ async function renderAuthorBlock() {
     followBtn.className = 'follow-btn';
     followBtn.id = 'followAuthorBtn';
 
-    wrap.append(nameWrap, followBtn);
+    wrap.append(byLabel, chip, followBtn);
 
     if (authorId && typeof initFollowButton === 'function') {
         initFollowButton(followBtn, authorId, finalName);
