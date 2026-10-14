@@ -1,164 +1,212 @@
 /* =====================================================
    STORYNEST — LOGIN
+   Requires supabase.js to load before this file.
    ===================================================== */
 
 (function () {
     'use strict';
 
-    const rolePicker = document.getElementById('rolePicker');
-    const loginForm = document.getElementById('loginForm');
-    const roleSelected = document.getElementById('roleSelected');
+    function initLogin() {
+        const rolePicker = document.getElementById('rolePicker');
+        const loginForm = document.getElementById('loginForm');
+        const roleSelected = document.getElementById('roleSelected');
 
-    if (!loginForm) return;
+        if (!loginForm) return;
 
-    let selectedRole = null;
+        let selectedRole = null;
+        let isSubmitting = false;
 
-
-    /* ---------- Role pick ---------- */
-
-    if (rolePicker) {
-        rolePicker.querySelectorAll('.role-card').forEach(card => {
-            card.addEventListener('click', () => {
-                selectedRole = card.dataset.role;
-                showForm(selectedRole);
+        if (rolePicker) {
+            rolePicker.querySelectorAll('.role-card').forEach(function (card) {
+                card.addEventListener('click', function () {
+                    const role = card.dataset.role;
+                    if (role !== 'reader' && role !== 'author') {
+                        showMessage('Please choose Reader or Author.', true);
+                        return;
+                    }
+                    selectedRole = role;
+                    showForm(role);
+                });
             });
-        });
-    }
-
-
-    function showForm(role) {
-        rolePicker.hidden = true;
-        loginForm.hidden = false;
-
-        renderRolePill(role);
-
-        const emailField = document.getElementById('loginEmail');
-        if (emailField) setTimeout(() => emailField.focus(), 50);
-    }
-
-
-    function showPicker() {
-        loginForm.hidden = true;
-        rolePicker.hidden = false;
-        selectedRole = null;
-    }
-
-
-    function renderRolePill(role) {
-        if (!roleSelected) return;
-
-        const icon = role === 'author' ? '✍️' : '📖';
-        const label = role === 'author' ? 'Author' : 'Reader';
-
-        roleSelected.innerHTML = `
-            <span class="role-selected-icon">${icon}</span>
-            <span class="role-selected-label">
-                Continuing as <strong>${label}</strong>
-            </span>
-            <button type="button" class="role-change-btn" id="roleChangeBtn">
-                Change
-            </button>
-        `;
-
-        const changeBtn = roleSelected.querySelector('#roleChangeBtn');
-        if (changeBtn) changeBtn.addEventListener('click', showPicker);
-    }
-
-
-    /* ---------- Submit ---------- */
-
-    loginForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        if (!selectedRole) {
-            showMessage('Please choose a role first.', true);
-            return;
         }
 
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        function showForm(role) {
+            if (rolePicker) rolePicker.hidden = true;
+            loginForm.hidden = false;
+            renderRolePill(role);
 
-        if (!email || !password) {
-            showMessage('Please enter your email and password.', true);
-            return;
+            const emailField = document.getElementById('loginEmail');
+            if (emailField) window.setTimeout(function () { emailField.focus(); }, 50);
         }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Logging in...';
-        showMessage('Logging in...');
+        function showPicker() {
+            loginForm.hidden = true;
+            if (rolePicker) rolePicker.hidden = false;
+            selectedRole = null;
+            showMessage('');
+        }
 
-        try {
-            const { data, error } =
-                await supabaseClient.auth.signInWithPassword({ email, password });
+        function renderRolePill(role) {
+            if (!roleSelected) return;
 
-            if (error) {
-                showMessage(error.message, true);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
-                return;
-            }
+            const isAuthor = role === 'author';
+            roleSelected.replaceChildren();
 
-            // Confirm the SDK actually persisted the session before we leave
-            const { data: sessionData } =
-                await supabaseClient.auth.getSession();
+            const icon = document.createElement('span');
+            icon.className = 'role-selected-icon';
+            icon.textContent = isAuthor ? '✍️' : '📖';
 
-            if (!sessionData?.session) {
+            const label = document.createElement('span');
+            label.className = 'role-selected-label';
+            label.append('Continuing as ');
+            const strong = document.createElement('strong');
+            strong.textContent = isAuthor ? 'Author' : 'Reader';
+            label.appendChild(strong);
+
+            const change = document.createElement('button');
+            change.type = 'button';
+            change.className = 'role-change-btn';
+            change.textContent = 'Change';
+            change.addEventListener('click', showPicker);
+
+            roleSelected.append(icon, label, change);
+        }
+
+        loginForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            if (isSubmitting) return;
+
+            const client = window.supabaseClient;
+            if (!client || !client.auth) {
                 showMessage(
-                    'Login succeeded but session was not saved. Please try again.',
+                    window.storyNestSupabaseError ||
+                    'Login service is not ready. Refresh the page and try again.',
                     true
                 );
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
                 return;
             }
 
-            // Persist the chosen role into user metadata
-            if (
-                selectedRole &&
-                data?.user?.user_metadata?.role !== selectedRole
-            ) {
-                await supabaseClient.auth.updateUser({
-                    data: { ...data.user.user_metadata, role: selectedRole }
-                });
+            if (!selectedRole) {
+                showMessage('Please choose Reader or Author first.', true);
+                return;
             }
 
-            // Tiny delay so localStorage is flushed on slower/desktop browsers
-            await new Promise(r => setTimeout(r, 150));
+            const emailInput = document.getElementById('loginEmail');
+            const passwordInput = document.getElementById('loginPassword');
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-            const params = new URLSearchParams(window.location.search);
-            const redirect = params.get('redirect');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value : '';
 
-            let destination;
-            if (
-                redirect &&
-                !redirect.includes('://') &&
-                !redirect.startsWith('//')
-            ) {
-                destination = redirect;
-            } else if (selectedRole === 'author') {
-                destination = 'author.html';
-            } else {
-                destination = 'index.html';
+            if (!email || !password) {
+                showMessage('Please enter your email and password.', true);
+                return;
             }
 
-            showMessage('Login successful. Redirecting...');
-            setTimeout(() => window.location.replace(destination), 100);
+            isSubmitting = true;
+            setButton(submitBtn, true, 'Logging in...');
+            showMessage('Logging in...');
 
-        } catch (err) {
-            console.error('Login error:', err);
-            showMessage('Something went wrong. Please try again.', true);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Login';
+            try {
+                const result = await client.auth.signInWithPassword({ email, password });
+
+                if (result.error) {
+                    throw result.error;
+                }
+
+                // Confirm that the current browser can read the authenticated session.
+                const sessionResult = await client.auth.getSession();
+                if (sessionResult.error) throw sessionResult.error;
+
+                if (!sessionResult.data || !sessionResult.data.session) {
+                    throw new Error(
+                        'Login was accepted, but this browser could not read the saved session. Enable site storage and try again.'
+                    );
+                }
+
+                const user = sessionResult.data.session.user || result.data.user;
+
+                // Role metadata is helpful for the app UI, but a role-update failure
+                // should not turn a successful password login into a failed login.
+                if (user && user.user_metadata && user.user_metadata.role !== selectedRole) {
+                    const updateResult = await client.auth.updateUser({
+                        data: Object.assign({}, user.user_metadata, { role: selectedRole })
+                    });
+
+                    if (updateResult.error) {
+                        console.warn('[StoryNest] Login succeeded, but role metadata was not updated:', updateResult.error.message);
+                    }
+                }
+
+                const params = new URLSearchParams(window.location.search);
+                const requestedRedirect = params.get('redirect');
+                const safeRedirect = isSafeLocalRedirect(requestedRedirect);
+
+                let destination;
+                if (safeRedirect) {
+                    destination = requestedRedirect;
+                } else {
+                    destination = selectedRole === 'author' ? 'author.html' : 'index.html';
+                }
+
+                showMessage('Login successful. Redirecting...');
+                window.setTimeout(function () {
+                    window.location.assign(destination);
+                }, 150);
+            } catch (error) {
+                console.error('[StoryNest] Login failed:', error);
+                showMessage(readableAuthError(error), true);
+                isSubmitting = false;
+                setButton(submitBtn, false, 'Login');
+            }
+        });
+
+        function isSafeLocalRedirect(value) {
+            if (!value || value.startsWith('//') || value.includes('\\')) return false;
+            try {
+                const url = new URL(value, window.location.href);
+                return url.origin === window.location.origin &&
+                    !/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(value);
+            } catch (_) {
+                return false;
+            }
         }
-    });
 
+        function setButton(button, disabled, text) {
+            if (!button) return;
+            button.disabled = disabled;
+            button.textContent = text;
+        }
 
-    function showMessage(message, isError = false) {
-        const el = document.getElementById('authMessage');
-        if (!el) return;
-        el.textContent = message;
-        el.style.color = isError ? '#ff6b6b' : '#58d68d';
+        function showMessage(message, isError) {
+            const el = document.getElementById('authMessage');
+            if (!el) return;
+            el.textContent = message || '';
+            el.style.color = isError ? '#ff6b6b' : '#58d68d';
+            el.setAttribute('role', isError ? 'alert' : 'status');
+        }
+
+        function readableAuthError(error) {
+            const message = error && error.message ? error.message : '';
+            if (/invalid login credentials/i.test(message)) {
+                return 'Email or password is incorrect. Check both and try again.';
+            }
+            if (/email not confirmed/i.test(message)) {
+                return 'Please confirm your email address before logging in.';
+            }
+            if (/fetch|network|failed to fetch/i.test(message)) {
+                return 'Could not reach the login service. Check your internet connection, then try again.';
+            }
+            if (/localStorage|storage|persist session/i.test(message)) {
+                return 'This browser could not save your login session. Enable site storage, then try again.';
+            }
+            return message || 'Login failed. Please try again.';
+        }
     }
 
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLogin);
+    } else {
+        initLogin();
+    }
 })();

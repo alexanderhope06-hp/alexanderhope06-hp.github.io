@@ -1,166 +1,160 @@
 /* =====================================================
-   STORYNEST — AUTH HELPERS
-   Shared utilities. Form handling lives in login.js / signup.js
+   STORYNEST — SHARED AUTH HELPERS
+   Requires supabase.js to load before this file.
    ===================================================== */
 
+(function () {
+    'use strict';
 
-/* =====================================================
-   SESSION HELPERS
-   ===================================================== */
-
-async function getCurrentSession() {
-    // Let the SDK read its own persisted session.
-    const { data, error } = await supabaseClient.auth.getSession();
-    if (error) {
-        console.warn('[Auth] getSession error:', error.message);
-        return null;
-    }
-    return data?.session || null;
-}
-
-
-function redirectToLogin(destination) {
-    const currentPage =
-        window.location.pathname.split('/').pop() || 'index.html';
-    const redirect = destination || currentPage;
-
-    window.location.replace(
-        `login.html?redirect=${encodeURIComponent(redirect)}`
-    );
-}
-
-
-function redirectAfterAuth(destination) {
-    window.location.replace(destination || 'index.html');
-}
-
-
-/**
- * Returns 'reader', 'author', or null.
- */
-function getUserRole(user) {
-    if (!user) return null;
-    return user.user_metadata?.role || null;
-}
-
-
-/* =====================================================
-   ROLE GUARD — use on author-only pages
-   Returns the user if they're allowed, or null after
-   redirecting / upgrading.
-   ===================================================== */
-
-async function requireAuthor(options = {}) {
-    // Wait a beat so any in-flight session write from login.js finishes
-    await new Promise(r => setTimeout(r, 50));
-
-    const session = await getCurrentSession();
-
-    // No session — send to login
-    if (!session?.user) {
-        const redirect =
-            options.redirect ||
-            window.location.pathname.split('/').pop() ||
-            'index.html';
-
-        window.location.replace(
-            `login.html?redirect=${encodeURIComponent(redirect)}`
-        );
-        return null;
-    }
-
-    const user = session.user;
-    const role = user.user_metadata?.role;
-
-    // Already an author — let them through
-    if (role === 'author') return user;
-
-    // Reader — offer to upgrade
-    const upgrade = confirm(
-        options.message ||
-        'This area is for authors.\n\n' +
-        'Become an author to write, publish and earn from your stories.\n\n' +
-        'Continue?'
-    );
-
-    if (upgrade) {
-        try {
-            await supabaseClient.auth.updateUser({
-                data: { ...user.user_metadata, role: 'author' }
-            });
-
-            await supabaseClient.auth.refreshSession();
-
-            window.location.reload();
-        } catch (err) {
-            console.error('Role upgrade failed:', err);
-            alert('Could not upgrade your account. Please try again.');
-            window.location.replace('index.html');
+    async function getCurrentSession() {
+        const client = window.supabaseClient;
+        if (!client || !client.auth) {
+            console.error('[Auth] Supabase client is not available.');
+            return null;
         }
-        return null;
+
+        try {
+            const { data, error } = await client.auth.getSession();
+            if (error) {
+                console.warn('[Auth] getSession error:', error.message);
+                return null;
+            }
+            return (data && data.session) || null;
+        } catch (error) {
+            console.warn('[Auth] Could not read session:', error);
+            return null;
+        }
     }
 
-    // Declined — send home
-    window.location.replace('index.html');
-    return null;
-}
-
-
-/* =====================================================
-   TOASTS
-   ===================================================== */
-
-function showToast(message, type = 'success') {
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
+    function redirectToLogin(destination) {
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const redirect = destination || currentPage;
+        window.location.assign('login.html?redirect=' + encodeURIComponent(redirect));
     }
 
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <span>${message}</span>
-        <button class="toast-close">&times;</button>
-    `;
+    function redirectAfterAuth(destination) {
+        window.location.assign(destination || 'index.html');
+    }
 
-    container.appendChild(toast);
+    function getUserRole(user) {
+        if (!user) return null;
+        return (user.user_metadata && user.user_metadata.role) || null;
+    }
 
-    toast.querySelector('.toast-close')
-        .addEventListener('click', () => toast.remove());
+    async function requireAuthor(options) {
+        options = options || {};
 
-    setTimeout(() => {
-        toast.classList.add('toast-fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
-}
+        const session = await getCurrentSession();
+        if (!session || !session.user) {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const redirect = options.redirect || currentPage;
+            window.location.assign('login.html?redirect=' + encodeURIComponent(redirect));
+            return null;
+        }
 
+        const user = session.user;
+        if (getUserRole(user) === 'author') return user;
 
-/* =====================================================
-   PASSWORD VISIBILITY TOGGLE
-   ===================================================== */
+        const shouldUpgrade = window.confirm(
+            options.message ||
+            'This area is for authors.\n\n' +
+            'Become an author to write, publish and manage your stories.\n\n' +
+            'Continue?'
+        );
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.password-toggle').forEach(btn => {
-        btn.addEventListener('click', function (event) {
-            event.preventDefault();
+        if (!shouldUpgrade) {
+            window.location.assign('index.html');
+            return null;
+        }
 
-            const input = document.getElementById(this.dataset.target);
-            if (!input) return;
+        const client = window.supabaseClient;
+        try {
+            const { error } = await client.auth.updateUser({
+                data: Object.assign({}, user.user_metadata || {}, { role: 'author' })
+            });
+            if (error) throw error;
 
-            const hidden = input.type === 'password';
-            input.type = hidden ? 'text' : 'password';
+            const refreshed = await client.auth.getSession();
+            if (refreshed.error) throw refreshed.error;
 
-            this.textContent = hidden ? '🙈' : '👁️';
-            this.setAttribute(
-                'aria-label',
-                hidden ? 'Hide password' : 'Show password'
-            );
+            // Do not reload forever if metadata has not propagated.
+            if (refreshed.data && refreshed.data.session &&
+                getUserRole(refreshed.data.session.user) === 'author') {
+                window.location.reload();
+                return null;
+            }
 
-            const pos = input.value.length;
-            input.focus();
-            try { input.setSelectionRange(pos, pos); } catch (_) {}
+            window.alert('Your account was updated. Refresh this page to continue.');
+            return null;
+        } catch (error) {
+            console.error('[Auth] Role upgrade failed:', error);
+            window.alert('Could not upgrade your account. ' + (error.message || 'Please try again.'));
+            window.location.assign('index.html');
+            return null;
+        }
+    }
+
+    function showToast(message, type) {
+        type = type || 'success';
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+
+        const text = document.createElement('span');
+        text.textContent = message;
+
+        const close = document.createElement('button');
+        close.className = 'toast-close';
+        close.type = 'button';
+        close.setAttribute('aria-label', 'Close notification');
+        close.textContent = '×';
+        close.addEventListener('click', function () { toast.remove(); });
+
+        toast.append(text, close);
+        container.appendChild(toast);
+
+        window.setTimeout(function () {
+            toast.classList.add('toast-fade-out');
+            window.setTimeout(function () { toast.remove(); }, 300);
+        }, 4000);
+    }
+
+    function initPasswordToggles() {
+        document.querySelectorAll('.password-toggle').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const input = document.getElementById(button.dataset.target);
+                if (!input) return;
+
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                button.textContent = show ? '🙈' : '👁️';
+                button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+
+                const position = input.value.length;
+                input.focus();
+                try { input.setSelectionRange(position, position); } catch (_) {}
+            });
         });
-    });
-});
+    }
+
+    // Publish helpers on window so they work from classic scripts and modules.
+    window.getCurrentSession = getCurrentSession;
+    window.redirectToLogin = redirectToLogin;
+    window.redirectAfterAuth = redirectAfterAuth;
+    window.getUserRole = getUserRole;
+    window.requireAuthor = requireAuthor;
+    window.showToast = showToast;
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPasswordToggles);
+    } else {
+        initPasswordToggles();
+    }
+})();
