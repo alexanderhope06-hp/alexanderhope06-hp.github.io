@@ -95,7 +95,7 @@ function showDraftBadge() {
 
 /* ---------- Render the novel header ---------- */
 
-function displayNovel() {
+async function displayNovel() {
     document.title = `${novel.title} — StoryNest`;
 
     if (novelTitle) novelTitle.textContent = novel.title;
@@ -104,7 +104,7 @@ function displayNovel() {
     if (novelStatus) novelStatus.textContent = novel.status || 'Published';
 
     renderCover();
-    renderAuthorBlock();          // NEW
+    await renderAuthorBlock();
 
     if (typeof initRatingWidget === 'function') {
         initRatingWidget(novelId);
@@ -122,36 +122,51 @@ function displayNovel() {
 
 /* ---------- Author pill (avatar + name + follow) ---------- */
 
+
 async function renderAuthorBlock() {
     const wrap = document.getElementById('novelAuthorWrap');
     if (!wrap) return;
 
     const authorId = novel.author_id;
-    const fallbackName = novel.author_name || 'StoryNest Author';
 
-    wrap.innerHTML = '';
-
-    // Fetch the public profile (may not exist for legacy novels)
+    // 1) Try the public profile
     let profile = null;
     if (authorId) {
-        const { data } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('profiles')
-            .select('display_name, bio, avatar_url')
+            .select('display_name, avatar_url')
             .eq('id', authorId)
             .maybeSingle();
+        if (error) console.warn('[Author] profile fetch:', error.message);
         profile = data;
     }
 
-    const finalName = profile?.display_name || fallbackName;
+    // 2) Fallback: read author_name from any of their novels
+    let fallbackName = novel.author_name || null;
+    if (!profile?.display_name && !fallbackName && authorId) {
+        const { data: sample } = await supabaseClient
+            .from('novels')
+            .select('author_name')
+            .eq('author_id', authorId)
+            .not('author_name', 'is', null)
+            .limit(1)
+            .maybeSingle();
+        fallbackName = sample?.author_name || null;
+    }
 
-    // ----- Pill container -----
+    const finalName =
+        profile?.display_name ||
+        fallbackName ||
+        'StoryNest Author';
+
+    wrap.innerHTML = '';
+
     const pill = document.createElement('div');
     pill.className = 'author-pill';
 
     // ----- Avatar -----
     const avatar = document.createElement('div');
     avatar.className = 'author-pill-avatar';
-
     if (profile?.avatar_url) {
         const img = document.createElement('img');
         img.src = profile.avatar_url;
@@ -165,7 +180,7 @@ async function renderAuthorBlock() {
         avatar.textContent = finalName.charAt(0).toUpperCase();
     }
 
-    // ----- Name link -----
+    // ----- Name -----
     const nameLink = document.createElement('a');
     nameLink.className = 'author-pill-name';
     nameLink.href = authorId
@@ -189,7 +204,6 @@ async function renderAuthorBlock() {
         followBtn.remove();
     }
 }
-
 
 function renderCover() {
     const container = document.getElementById('novelCover');

@@ -370,3 +370,156 @@
         min-height: 46px;
     }
 }
+
+
+
+
+
+
+/* ==========================================
+   AUTHOR PILL — used on novel.html
+   (unscoped so it works outside .author-hero)
+   ========================================== */
+
+.author-block {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 14px 0 20px;
+    flex-wrap: wrap;
+}
+
+.author-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 10px 8px 8px;
+    background: var(--bg-card, #17141f);
+    border: 1px solid var(--border-default, #2a2535);
+    border-radius: 999px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    max-width: 100%;
+}
+
+.author-pill:hover {
+    border-color: rgba(155, 92, 255, 0.35);
+    box-shadow: 0 6px 22px rgba(155, 92, 255, 0.12);
+}
+
+/* ----- Avatar ----- */
+.author-pill-avatar {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #8b5cf6, #5e32a8);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(155, 92, 255, 0.45);
+}
+
+.author-pill-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ----- Name ----- */
+.author-pill-name {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: rgba(155, 92, 255, 0.5);
+    text-underline-offset: 4px;
+    white-space: nowrap;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.author-pill-name:hover {
+    color: #c39aff;
+    text-decoration-color: #c39aff;
+}
+
+/* ==========================================
+   FOLLOW BUTTON — unscoped version
+   (applies on novel.html AND author-profile.html)
+   ========================================== */
+
+.follow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 0 22px;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    border: 1px solid rgba(196, 181, 253, 0.3);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 5px 16px rgba(109, 40, 217, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.follow-btn .follow-icon {
+    font-size: 15px;
+    line-height: 1;
+    display: inline-block;
+}
+
+.follow-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.35);
+}
+
+.follow-btn:active { transform: translateY(0); }
+
+.follow-btn.following {
+    background: transparent;
+    color: #c39aff;
+    border: 1.5px solid rgba(155, 92, 255, 0.55);
+    box-shadow: none;
+}
+
+.follow-btn.following:hover {
+    background: rgba(248, 113, 113, 0.08);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.55);
+    box-shadow: 0 6px 18px rgba(248, 113, 113, 0.2);
+}
+
+.follow-btn:disabled {
+    opacity: 0.75;
+    cursor: wait;
+    transform: none;
+}
+
+/* ==========================================
+   NOVEL PAGE PILL RESPONSIVE
+   ========================================== */
+
+@media (max-width: 800px) {
+    .author-block {
+        justify-content: center;
+        margin: 12px 0 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .author-pill { gap: 10px; padding: 6px 8px 6px 6px; }
+    .author-pill-avatar { width: 40px; height: 40px; font-size: 17px; }
+    .author-pill-name { font-size: 15px; }
+    .follow-btn { min-height: 40px; padding: 0 16px; font-size: 12px; }
+}
