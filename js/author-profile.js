@@ -26,22 +26,65 @@ async function init() {
     await loadNovels();
 }
 
+/* ---------- Load profile (works for logged-out viewers) ---------- */
+
 async function loadProfile() {
-    const { data: profile } = await supabaseClient
+    // 1) Try the public profiles row
+    const { data: profile, error: profileErr } = await supabaseClient
         .from('profiles')
-        .select('display_name, bio')
+        .select('display_name, bio, avatar_url')
         .eq('id', authorId)
         .maybeSingle();
 
-    const name = profile?.display_name || 'StoryNest Author';
+    if (profileErr) {
+        console.warn('[AuthorProfile] profile fetch failed:', profileErr.message);
+    }
+
+    // 2) Fallback: read author_name from any of their novels
+    let fallbackName = null;
+    if (!profile?.display_name) {
+        const { data: sampleNovel } = await supabaseClient
+            .from('novels')
+            .select('author_name')
+            .eq('author_id', authorId)
+            .not('author_name', 'is', null)
+            .limit(1)
+            .maybeSingle();
+        fallbackName = sampleNovel?.author_name || null;
+    }
+
+    const name =
+        profile?.display_name ||
+        fallbackName ||
+        'StoryNest Author';
+
     document.title = `${name} — StoryNest`;
-    nameEl.textContent = name;
-    bioEl.textContent = profile?.bio || '';
-    if (profile?.bio) bioEl.style.display = '';
-    else bioEl.style.display = 'none';
+    if (nameEl) nameEl.textContent = name;
 
-    avatarEl.textContent = name.charAt(0).toUpperCase() || '👤';
+    // Bio
+    if (bioEl) {
+        bioEl.textContent = profile?.bio || '';
+        bioEl.style.display = profile?.bio ? '' : 'none';
+    }
 
+    // Avatar (image or fallback initial)
+    if (avatarEl) {
+        avatarEl.innerHTML = '';
+        if (profile?.avatar_url) {
+            const img = document.createElement('img');
+            img.src = profile.avatar_url;
+            img.alt = name;
+            img.onerror = () => {
+                avatarEl.innerHTML = '';
+                avatarEl.textContent = name.charAt(0).toUpperCase();
+            };
+            avatarEl.appendChild(img);
+        } else {
+            avatarEl.textContent = name.charAt(0).toUpperCase() || '👤';
+        }
+    }
+
+    // Stats: followers + novel count
     const { followerCount } = await getFollowState(authorId);
     const { count: novelCount } = await supabaseClient
         .from('novels')
@@ -49,14 +92,19 @@ async function loadProfile() {
         .eq('author_id', authorId)
         .eq('status', 'published');
 
-    statsEl.textContent =
-        `${followerCount} follower${followerCount === 1 ? '' : 's'} · ` +
-        `${novelCount || 0} novel${novelCount === 1 ? '' : 's'}`;
+    if (statsEl) {
+        statsEl.textContent =
+            `${followerCount} follower${followerCount === 1 ? '' : 's'} · ` +
+            `${novelCount || 0} novel${novelCount === 1 ? '' : 's'}`;
+    }
 
-    if (followBtn) {
+    // Follow button
+    if (followBtn && typeof initFollowButton === 'function') {
         initFollowButton(followBtn, authorId, name);
     }
 }
+
+/* ---------- Novels list ---------- */
 
 async function loadNovels() {
     const { data, error } = await supabaseClient
@@ -67,7 +115,8 @@ async function loadNovels() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        gridEl.innerHTML = '<p>Could not load novels.</p>';
+        console.error('[AuthorProfile] novels fetch failed:', error.message);
+        if (gridEl) gridEl.innerHTML = '<p>Could not load novels.</p>';
         return;
     }
 
@@ -77,6 +126,7 @@ async function loadNovels() {
 }
 
 function buildGenreFilter() {
+    if (!genreFilter) return;
     const genres = [...new Set(allNovels.map(n => n.genre).filter(Boolean))].sort();
     genres.forEach(g => {
         const opt = document.createElement('option');
@@ -88,7 +138,8 @@ function buildGenreFilter() {
 }
 
 function renderNovels() {
-    const filter = genreFilter.value;
+    if (!gridEl) return;
+    const filter = genreFilter?.value || '';
     const list = filter ? allNovels.filter(n => n.genre === filter) : allNovels;
 
     if (list.length === 0) {
@@ -116,6 +167,8 @@ function renderNovels() {
         gridEl.appendChild(card);
     });
 }
+
+/* ---------- Safety ---------- */
 
 function escapeHTML(value) {
     const div = document.createElement('div');
