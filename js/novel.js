@@ -102,9 +102,9 @@ function displayNovel() {
     if (novelGenre) novelGenre.textContent = novel.genre || 'STORY';
     if (storyAbout) storyAbout.textContent = novel.description || 'No description available.';
     if (novelStatus) novelStatus.textContent = novel.status || 'Published';
-    if (novelAuthor) novelAuthor.textContent = novel.author_name || 'StoryNest Author';
 
     renderCover();
+    renderAuthorBlock();          // NEW
 
     if (typeof initRatingWidget === 'function') {
         initRatingWidget(novelId);
@@ -115,6 +115,62 @@ function displayNovel() {
             window.location.href =
                 `reader.html?id=${encodeURIComponent(novelId)}&chapter=1`;
         });
+    }
+}
+
+
+/* ---------- Author block (name + follow + link) ---------- */
+
+async function renderAuthorBlock() {
+    const wrap = document.getElementById('novelAuthorWrap');
+    if (!wrap) return;
+
+    const authorId = novel.author_id;
+    const authorName = novel.author_name || 'StoryNest Author';
+
+    wrap.innerHTML = '';
+
+    // Fetch the public profile (may be missing for legacy novels)
+    let profile = null;
+    if (authorId) {
+        const { data } = await supabaseClient
+            .from('profiles')
+            .select('display_name, bio')
+            .eq('id', authorId)
+            .maybeSingle();
+        profile = data;
+    }
+
+    const finalName = profile?.display_name || authorName;
+
+    // Name link → author profile page
+    const link = document.createElement('a');
+    link.className = 'author-link';
+    link.href = authorId
+        ? `author-profile.html?id=${encodeURIComponent(authorId)}`
+        : '#';
+    link.textContent = finalName;
+    if (!authorId) link.style.pointerEvents = 'none';
+
+    const byText = document.createElement('span');
+    byText.textContent = 'By ';
+
+    const nameWrap = document.createElement('p');
+    nameWrap.className = 'author-large';
+    nameWrap.append(byText, link);
+
+    // Follow button
+    const followBtn = document.createElement('button');
+    followBtn.type = 'button';
+    followBtn.className = 'follow-btn';
+    followBtn.id = 'followAuthorBtn';
+
+    wrap.append(nameWrap, followBtn);
+
+    if (authorId && typeof initFollowButton === 'function') {
+        initFollowButton(followBtn, authorId, finalName);
+    } else {
+        followBtn.remove();
     }
 }
 

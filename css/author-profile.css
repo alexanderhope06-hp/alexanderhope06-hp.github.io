@@ -1,0 +1,145 @@
+/* =====================================================
+   STORYNEST — PUBLIC AUTHOR PROFILE
+   (separate from author.css which is for the dashboard)
+   ===================================================== */
+
+.author-profile-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 6% 80px;
+}
+
+/* ---------- Hero ---------- */
+.author-hero {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    padding: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    margin-bottom: 40px;
+}
+
+.public-author-avatar {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #4c1680, #100b19);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.author-hero-meta { flex: 1; min-width: 0; }
+
+.author-hero-meta h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 4px 0 8px;
+    line-height: 1.1;
+    word-break: break-word;
+}
+
+.author-follower-count {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.author-hero-bio {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    white-space: pre-wrap;
+}
+
+.author-hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Follow button (used on both pages) ---------- */
+.follow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.follow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(155, 92, 255, 0.35);
+}
+
+.follow-btn.following {
+    background: transparent;
+    color: var(--accent-light);
+}
+
+.follow-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    transform: none;
+}
+
+/* ---------- Author block on the novel page ---------- */
+.author-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.author-link {
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(155, 92, 255, 0.5);
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.author-link:hover { color: var(--accent-light); }
+
+/* ---------- Genre filter ---------- */
+.genre-filter select {
+    padding: 10px 14px;
+    background: var(--bg-elevated);
+    color: #fff;
+    border: 1px solid var(--border-default);
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.genre-filter select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+    .author-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .author-hero-actions { justify-content: center; }
+    .author-block { justify-content: center; }
+}

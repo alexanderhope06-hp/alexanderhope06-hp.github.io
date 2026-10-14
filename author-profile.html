@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Author — StoryNest</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/novels.css">
+    <link rel="stylesheet" href="css/author.css">
+    <link rel="icon" type="image/png" href="image/fav.png">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="index.html" class="logo">
+        <img src="image/fav.png" alt="StoryNest" class="logo-icon">
+        Story<span>Nest</span>
+    </a>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#trending">Trending</a>
+        <a href="index.html#genres">Genres</a>
+    </nav>
+    <div class="nav-actions">
+        <a href="login.html" class="login-btn">Login</a>
+    </div>
+</header>
+
+<main class="author-page">
+
+    <section class="author-hero">
+        <div class="author-avatar" id="authorAvatar">👤</div>
+        <div class="author-meta">
+            <p class="section-label">AUTHOR</p>
+            <h1 id="authorName">Loading…</h1>
+            <p class="author-stats" id="authorStats">—</p>
+            <p class="author-bio" id="authorBio"></p>
+
+            <div class="author-actions">
+                <button type="button" class="follow-btn" id="followAuthorBtn">+ Follow</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">WORKS</p>
+                <h2>Published Novels</h2>
+            </div>
+            <div class="genre-filter">
+                <select id="genreFilter">
+                    <option value="">All Genres</option>
+                </select>
+            </div>
+        </div>
+        <div class="novel-grid" id="authorNovels">
+            <p>Loading novels…</p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <div class="footer-logo">📖 StoryNest</div>
+    <p>Discover. Read. Imagine.</p>
+    <p class="copyright">© 2026 StoryNest. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/follows.js"></script>
+<script src="js/author-profile.js"></script>
+</body>
+</html>
