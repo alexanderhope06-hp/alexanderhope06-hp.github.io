@@ -1,18 +1,17 @@
 /* =====================================================
    STORYNEST — ROLE-AWARE NAVBAR
-   Injects: search button (already in HTML), notifications
-   bell, and account dropdown with logout.
-   Single source of truth for the top-right actions.
+   Injects: notifications bell + account dropdown.
+   Single source of truth for top-right actions.
    ===================================================== */
 
 (function () {
     'use strict';
 
     let notifChannel = null;
-    let currentUser   = null;
-    let unreadCount   = 0;
-    let panelLoaded   = false;
-    let booting       = false;
+    let currentUser  = null;
+    let unreadCount  = 0;
+    let panelLoaded  = false;
+    let booting      = false;
     const MAX_PREVIEW = 8;
 
     /* ============================================================
@@ -22,18 +21,17 @@
         const navActions = document.querySelector('.nav-actions');
         if (!navActions) return;
 
-        // ── Prevent concurrent / duplicate runs ────────────────
+        // Prevent concurrent / duplicate runs (DOMContentLoaded +
+        // onAuthStateChange can fire close together).
         if (booting) return;
         booting = true;
 
         try {
-            // Nuke any duplicate bells / account menus left over
-            // from a previous injection (defensive).
-            const bells = navActions.querySelectorAll('.nav-notif');
-            bells.forEach((el, i) => { if (i > 0) el.remove(); });
-
-            const accounts = navActions.querySelectorAll('.nav-account');
-            accounts.forEach((el, i) => { if (i > 0) el.remove(); });
+            // Remove any duplicate bells/account menus from prior runs
+            navActions.querySelectorAll('.nav-notif')
+                .forEach((el, i) => { if (i > 0) el.remove(); });
+            navActions.querySelectorAll('.nav-account')
+                .forEach((el, i) => { if (i > 0) el.remove(); });
 
             // Hide any stale badge before we know the truth
             const existingBadge = navActions.querySelector('.nav-notif-badge');
@@ -73,7 +71,7 @@
             navActions.querySelectorAll('.login-btn, .signup-nav-btn')
                 .forEach(el => { el.style.display = 'none'; });
 
-            // Notifications bell
+            // Notifications bell (before the account dropdown)
             if (!navActions.querySelector('.nav-notif')) {
                 navActions.appendChild(buildNotifBell());
                 await refreshUnreadCount();
@@ -92,7 +90,7 @@
     }
 
     /* ============================================================
-       ACCOUNT DROPDOWN
+       ACCOUNT DROPDOWN  (contains the ONLY logout in the app)
        ============================================================ */
     function buildAccountMenu(displayName, role) {
         const account = document.createElement('div');
@@ -188,6 +186,7 @@
         btn.addEventListener('click', async e => {
             e.stopPropagation();
 
+            // Close account menu if open
             document.querySelectorAll('.nav-account-menu')
                 .forEach(m => { m.hidden = true; });
 
@@ -251,10 +250,6 @@
         setBadge(typeof count === 'number' ? count : 0);
     }
 
-    /**
-     * Sets the badge on ALL matching elements. Uses
-     * querySelectorAll so stale duplicates can't survive.
-     */
     function setBadge(count) {
         const safe = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
         unreadCount = safe;
@@ -507,6 +502,7 @@
             case 'new_rating':      return '⭐';
             case 'new_comment':     return '💬';
             case 'new_follower':    return '👤';
+            case 'new_chapter':     return '📖';
             case 'novel_published': return '📚';
             case 'system':          return '🔔';
             default:                return '🔔';
@@ -533,12 +529,10 @@
     }
 
     /* ============================================================
-       AUTH STATE — only react to real sign-in / sign-out
+       AUTH STATE — react only to real sign-in / sign-out
        ============================================================ */
     if (typeof supabaseClient !== 'undefined') {
         supabaseClient.auth.onAuthStateChange((event) => {
-            // INITIAL_SESSION, TOKEN_REFRESHED, USER_UPDATED
-            // are not reasons to rebuild the navbar.
             if (event === 'SIGNED_OUT') {
                 teardownNotif();
                 updateNavbar();
