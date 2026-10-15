@@ -12,6 +12,7 @@
     let unreadCount  = 0;
     let panelLoaded  = false;
     let booting      = false;
+    let booted       = false;   // set true after first successful build
     const MAX_PREVIEW = 8;
 
     /* ============================================================
@@ -21,13 +22,11 @@
         const navActions = document.querySelector('.nav-actions');
         if (!navActions) return;
 
-        // Prevent concurrent / duplicate runs (DOMContentLoaded +
-        // onAuthStateChange can fire close together).
         if (booting) return;
         booting = true;
 
         try {
-            // Remove any duplicate bells/account menus from prior runs
+            // Remove any duplicate bells / account menus from prior runs
             navActions.querySelectorAll('.nav-notif')
                 .forEach((el, i) => { if (i > 0) el.remove(); });
             navActions.querySelectorAll('.nav-account')
@@ -40,7 +39,7 @@
                 existingBadge.textContent = '';
             }
 
-            // Resolve session (localStorage first, then Supabase)
+            // Resolve session
             let session = null;
             try {
                 const stored = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -56,6 +55,7 @@
             if (!session?.user) {
                 teardownNotif();
                 injectSignupButton(navActions);
+                booted = true;
                 return;
             }
 
@@ -71,26 +71,40 @@
             navActions.querySelectorAll('.login-btn, .signup-nav-btn')
                 .forEach(el => { el.style.display = 'none'; });
 
-            // Notifications bell (before the account dropdown)
+            // Build bell if missing
             if (!navActions.querySelector('.nav-notif')) {
                 navActions.appendChild(buildNotifBell());
-                await refreshUnreadCount();
-                subscribeToNotifications();
             }
 
-            // Account dropdown
+            // Build account menu if missing
             if (!navActions.querySelector('.nav-account')) {
                 navActions.appendChild(buildAccountMenu(displayName, role));
             }
 
+            // Refresh count + (re)subscribe every time we boot,
+            // regardless of whether the DOM was already built.
+            await refreshUnreadCount();
+
+            // Make sure the Realtime socket carries our JWT before
+            // subscribing — otherwise the server drops the filtered
+            // stream and no events arrive.
+            try {
+                await supabaseClient.realtime.setAuth();
+            } catch (e) {
+                console.warn('[Notif] setAuth failed:', e);
+            }
+
+            subscribeToNotifications();
+
             injectStyles();
+            booted = true;
         } finally {
             booting = false;
         }
     }
 
     /* ============================================================
-       ACCOUNT DROPDOWN  (contains the ONLY logout in the app)
+       ACCOUNT DROPDOWN
        ============================================================ */
     function buildAccountMenu(displayName, role) {
         const account = document.createElement('div');
@@ -142,9 +156,7 @@
         account.querySelector('.nav-account-logout')
             .addEventListener('click', async () => {
                 if (!confirm('Log out of StoryNest?')) return;
-                try {
-                    await supabaseClient.auth.signOut();
-                } catch (_) {}
+                try { await supabaseClient.auth.signOut(); } catch (_) {}
                 localStorage.removeItem(AUTH_STORAGE_KEY);
                 teardownNotif();
                 window.location.replace('index.html');
@@ -186,7 +198,6 @@
         btn.addEventListener('click', async e => {
             e.stopPropagation();
 
-            // Close account menu if open
             document.querySelectorAll('.nav-account-menu')
                 .forEach(m => { m.hidden = true; });
 
@@ -230,10 +241,7 @@
        UNREAD COUNT + BADGE
        ============================================================ */
     async function refreshUnreadCount() {
-        if (!currentUser) {
-            setBadge(0);
-            return;
-        }
+        if (!currentUser) { setBadge(0); return; }
 
         const { count, error } = await supabaseClient
             .from('notifications')
@@ -242,7 +250,7 @@
             .eq('is_read', false);
 
         if (error) {
-            console.warn('Unread count failed:', error);
+            console.warn('[Notif] unread count failed:', error);
             setBadge(0);
             return;
         }
@@ -341,7 +349,7 @@
             .eq('is_read', false);
 
         if (error) {
-            console.warn('Mark all failed:', error);
+            console.warn('[Notif] mark all failed:', error);
             return;
         }
         setBadge(0);
@@ -351,7 +359,15 @@
        REALTIME
        ============================================================ */
     function subscribeToNotifications() {
-        if (notifChannel || !currentUser) return;
+        if (!currentUser) return;
+
+        // Drop any previous channel (e.g. after a user switch)
+        if (notifChannel) {
+            try { supabaseClient.removeChannel(notifChannel); } catch (_) {}
+            notifChannel = null;
+        }
+
+        console.log('[Notif] subscribing for user', currentUser.id);
 
         notifChannel = supabaseClient
             .channel('nav-notif-' + currentUser.id)
@@ -364,10 +380,16 @@
                     filter: `user_id=eq.${currentUser.id}`
                 },
                 payload => {
+                    console.log('[Notif] realtime payload:', payload);
+
                     const row = payload.new || {};
-                    if (row.user_id !== currentUser.id) return;
+                    if (row.user_id !== currentUser.id) {
+                        console.warn('[Notif] wrong user, ignoring');
+                        return;
+                    }
                     if (row.is_read === true) return;
 
+                    console.log('[Notif] bumping badge to', unreadCount + 1);
                     setBadge(unreadCount + 1);
                     panelLoaded = false;
 
@@ -379,12 +401,14 @@
                     }
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('[Notif] channel status:', status);
+            });
     }
 
     function teardownNotif() {
         if (notifChannel) {
-            supabaseClient.removeChannel(notifChannel);
+            try { supabaseClient.removeChannel(notifChannel); } catch (_) {}
             notifChannel = null;
         }
 
@@ -529,10 +553,11 @@
     }
 
     /* ============================================================
-       AUTH STATE — react only to real sign-in / sign-out
+       AUTH STATE
        ============================================================ */
     if (typeof supabaseClient !== 'undefined') {
-        supabaseClient.auth.onAuthStateChange((event) => {
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('[Notif] auth event:', event);
             if (event === 'SIGNED_OUT') {
                 teardownNotif();
                 updateNavbar();
