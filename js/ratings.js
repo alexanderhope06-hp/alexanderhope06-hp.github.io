@@ -187,6 +187,7 @@ async function initRatingWidget(novelId) {
 
     if (!starsEl || !ratingTextEl) return;
 
+    // ----- Load summary + reader count in parallel -----
     const [ratingSummary, readerCount] = await Promise.all([
         fetchNovelRating(novelId),
         fetchNovelReaders(novelId),
@@ -210,19 +211,28 @@ async function initRatingWidget(novelId) {
 
     if (!starPicker) return;
 
+    // ----- Prevent double-binding on re-render -----
+    if (starPicker.dataset.bound === '1') return;
+    starPicker.dataset.bound = '1';
+
     const starButtons = starPicker.querySelectorAll('.star-btn');
-    const { data: { user } } = await supabaseClient.auth.getUser();
 
-    let userRating = user ? await fetchUserRating(novelId) : null;
+    // Show existing rating if the user is logged in (best effort — may be null)
+    let userRating = null;
+    const { data: { user: initialUser } } = await supabaseClient.auth.getUser();
 
-    if (userRating) {
-        highlightStars(starButtons, userRating);
-        if (userRatingLabel) {
-            userRatingLabel.textContent =
-                `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}`;
+    if (initialUser) {
+        userRating = await fetchUserRating(novelId);
+        if (userRating) {
+            highlightStars(starButtons, userRating);
+            if (userRatingLabel) {
+                userRatingLabel.textContent =
+                    `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}`;
+            }
         }
     }
 
+    // ----- Hover preview -----
     starButtons.forEach(btn => {
         btn.addEventListener('mouseenter', () => {
             const val = parseInt(btn.dataset.value);
@@ -234,11 +244,16 @@ async function initRatingWidget(novelId) {
         highlightStars(starButtons, userRating || 0);
     });
 
+    // ----- Click to rate -----
     starButtons.forEach(btn => {
         btn.addEventListener('click', async () => {
+            // ⚠️ Re-check the user on every click — never rely on a stale value
+            const { data: { user: liveUser } } = await supabaseClient.auth.getUser();
+
             const val = parseInt(btn.dataset.value);
 
-            if (!user) {
+            // ----- Not logged in -----
+            if (!liveUser) {
                 if (userRatingHint) {
                     const redirect = encodeURIComponent(
                         window.location.pathname + window.location.search
@@ -255,13 +270,14 @@ async function initRatingWidget(novelId) {
                 return;
             }
 
+            // ----- Optimistic UI -----
             highlightStars(starButtons, val);
-
             if (userRatingHint) {
                 userRatingHint.textContent = 'Saving...';
                 userRatingHint.className = 'user-rating-hint';
             }
 
+            // ----- Save -----
             const result = await submitRating(novelId, val);
 
             if (result.success) {
@@ -276,6 +292,7 @@ async function initRatingWidget(novelId) {
                     userRatingHint.className = 'user-rating-hint success';
                 }
 
+                // Refresh summary
                 const updated = await fetchNovelRating(novelId);
                 const newAvg = updated.average_rating
                     ? parseFloat(updated.average_rating)
@@ -299,6 +316,7 @@ async function initRatingWidget(novelId) {
                         'Could not save. Please try again.';
                     userRatingHint.className = 'user-rating-hint error';
                 }
+                // Revert highlight
                 highlightStars(starButtons, userRating || 0);
             }
         });
