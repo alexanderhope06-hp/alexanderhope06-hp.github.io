@@ -119,9 +119,7 @@ async function displayNovel() {
 }
 
 
-
 /* ---------- Author pill (avatar + name + follow) ---------- */
-
 
 async function renderAuthorBlock() {
     const wrap = document.getElementById('novelAuthorWrap');
@@ -205,6 +203,7 @@ async function renderAuthorBlock() {
     }
 }
 
+
 function renderCover() {
     const container = document.getElementById('novelCover');
     if (!container) return;
@@ -270,6 +269,14 @@ async function loadChapters() {
             </div>
             <span>→</span>
         `;
+
+        // Count the reader the moment they commit to a chapter.
+        // Fire-and-forget — do not await, navigation is about to happen.
+        link.addEventListener('click', () => {
+            if (typeof recordNovelRead === 'function') {
+                recordNovelRead(novelId);
+            }
+        });
 
         chapterList.appendChild(link);
     });

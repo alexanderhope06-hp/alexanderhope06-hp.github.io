@@ -141,21 +141,24 @@ function displayChapter() {
     if (!chapter) return;
 
     chapterHeader.textContent = `Chapter ${chapter.chapter_number}`;
-    document.title = `${chapter.title || "Chapter " + chapter.chapter_number} — ${novel.title}`;
+    document.title =
+        `${chapter.title || "Chapter " + chapter.chapter_number} — ${novel.title}`;
 
     unlockScrolling();
     renderChapter(chapter);
 
+    // Track impression for revenue attribution (fire-and-forget)
     if (novel && novel.id && novel.author_id && chapter.id) {
         trackChapterImpression(novel.id, chapter.id, novel.author_id);
     }
 
-    // Record this read once (feeds reader count)
-    recordNovelReadOnce(novel.id);
+    // Start the dwell timer — reader counted only after MIN_READ_MS of real reading
+    startReadTimer(novel.id);
 
     updateURL();
     restorePosition();
 }
+
 
 /* =====================================================
    RENDER CHAPTER
@@ -180,10 +183,10 @@ function renderChapter(chapter) {
 
     /* =================================================
        MID-CHAPTER AD DECISION (word-count based)
-       - < 800 words    → 0 ads
-       - 800–2500       → 1 ad at ~50%
-       - 2500–5000      → 2 ads at ~33%, ~66%
-       - 5000+          → 3 ads at ~25%, ~50%, ~75% (cap)
+       - < 400 words    → 0 ads
+       - 400–1200       → 1 ad at ~55%
+       - 1200–3000      → 2 ads at ~35%, ~70%
+       - 3000+          → 3 ads at ~25%, ~50%, ~75% (cap)
     ================================================= */
 
     let adInsertIndexes = [];
@@ -197,15 +200,15 @@ function renderChapter(chapter) {
 
         let targets = [];
 
-	if (totalWords < 400) {
-    	    targets = [];
-	} else if (totalWords < 1200) {
-    	    targets = [0.55];
-	} else if (totalWords < 3000) {
-    	    targets = [0.35, 0.70];
-	} else {
-    	    targets = [0.25, 0.50, 0.75];
-	}
+        if (totalWords < 400) {
+            targets = [];
+        } else if (totalWords < 1200) {
+            targets = [0.55];
+        } else if (totalWords < 3000) {
+            targets = [0.35, 0.70];
+        } else {
+            targets = [0.25, 0.50, 0.75];
+        }
 
         targets.forEach(pct => {
             const targetWords = Math.floor(totalWords * pct);
@@ -445,14 +448,12 @@ document.addEventListener("keydown", function (event) {
         return;
     }
 
-    // --- Line-ish scroll for arrow keys ---
     // ~2 lines ≈ lineHeight * fontSize * 2
     const contentStyle = window.getComputedStyle(readerPageContent);
     const fontSize = parseFloat(contentStyle.fontSize) || 18;
     const lineHeight = parseFloat(contentStyle.lineHeight) || fontSize * 1.75;
-    const lineStep = lineHeight * 2;   // two lines
+    const lineStep = lineHeight * 2;
 
-    // Page-ish scroll for Space / PageDown / PageUp (keep as a page)
     const pageStep = window.innerHeight * 0.85;
 
     if (event.key === "ArrowDown") {
@@ -694,7 +695,6 @@ function applyAdFreeState() {
 
     document.body.classList.toggle('ad-free-active', active);
 
-    // Hide / show every ad container on the page
     document.querySelectorAll(
         '.storynest-top-ad, .storynest-bottom-ad, .storynest-in-content-ad'
     ).forEach(el => {
@@ -808,15 +808,89 @@ async function trackChapterImpression(novelId, chapterId, authorId) {
 
 
 /* =====================================================
-   RECORD NOVEL READ
-   Feeds novel_readers_summary. Runs once per page load.
+   READER TRACKING — DWELL TIME
+   A reader is only counted if they stay on the chapter
+   for at least MIN_READ_MS with the tab visible.
+   Timer pauses when the tab is hidden or the window loses
+   focus, so leaving a tab open overnight does not count.
    ===================================================== */
+
+const MIN_READ_MS = 30 * 1000;   // 30 seconds
+
+let _readTimerState = {
+    novelId: null,
+    accumulatedMs: 0,
+    lastTickAt: null,
+    timerId: null,
+    recorded: false,
+};
+
+function startReadTimer(novelId) {
+    // Reset any previous timer (e.g. chapter change)
+    stopReadTimer();
+
+    _readTimerState.novelId = novelId;
+    _readTimerState.accumulatedMs = 0;
+    _readTimerState.recorded = false;
+
+    resumeReadTimer();
+
+    _readTimerState.timerId = setInterval(tickReadTimer, 1000);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', pauseReadTimer);
+    window.addEventListener('focus', resumeReadTimer);
+}
+
+function stopReadTimer() {
+    if (_readTimerState.timerId) {
+        clearInterval(_readTimerState.timerId);
+        _readTimerState.timerId = null;
+    }
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('blur', pauseReadTimer);
+    window.removeEventListener('focus', resumeReadTimer);
+
+    _readTimerState.lastTickAt = null;
+}
+
+function pauseReadTimer() {
+    if (_readTimerState.lastTickAt === null) return;
+
+    const now = Date.now();
+    _readTimerState.accumulatedMs += now - _readTimerState.lastTickAt;
+    _readTimerState.lastTickAt = null;
+}
+
+function resumeReadTimer() {
+    if (document.hidden) return;
+    _readTimerState.lastTickAt = Date.now();
+}
+
+function handleVisibilityChange() {
+    if (document.hidden) pauseReadTimer();
+    else resumeReadTimer();
+}
+
+function tickReadTimer() {
+    if (_readTimerState.recorded) return;
+    if (document.hidden) return;
+
+    const now = Date.now();
+    const elapsed =
+        _readTimerState.accumulatedMs +
+        (now - (_readTimerState.lastTickAt || now));
+
+    if (elapsed >= MIN_READ_MS) {
+        _readTimerState.recorded = true;
+        stopReadTimer();
+        recordNovelReadOnce(_readTimerState.novelId);
+    }
+}
 
 async function recordNovelReadOnce(novelId) {
     if (!novelId) return;
     if (typeof recordNovelRead !== 'function') return;
-    if (recordNovelReadOnce._done) return;
-    recordNovelReadOnce._done = true;
 
     try {
         await recordNovelRead(novelId);
