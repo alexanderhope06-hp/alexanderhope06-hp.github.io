@@ -75,15 +75,23 @@
 
         // ---- Trending: stars first, then readers ----
         const trending = [...allNovels].sort((a, b) => {
-            if (b.average_rating !== a.average_rating) {
-                return b.average_rating - a.average_rating;
+            const aStars = Number(a.average_rating) || 0;
+            const bStars = Number(b.average_rating) || 0;
+
+            // Primary: average star rating, higher first
+            if (bStars !== aStars) {
+                return bStars - aStars;
             }
-            return b.reader_count - a.reader_count;
+
+            // Tiebreaker: reader count, higher first
+            const aReaders = Number(a.reader_count) || 0;
+            const bReaders = Number(b.reader_count) || 0;
+            return bReaders - aReaders;
         });
 
         displayTrending(trending.slice(0, 4));
 
-        // ---- New Releases: keep respecting the genre filter ----
+        // ---- New Releases ----
         renderNewReleases();
     }
 
